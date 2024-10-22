@@ -34,6 +34,8 @@ public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger  lo
         }
         private set => _jwt = value;
     }
+    
+    private JwtSecurityTokenHandler _handler = new();
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
@@ -43,24 +45,23 @@ public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger  lo
         
         if (Jwt is null) return false;
         if (!Jwt.Payload.TryGetValue(key, out object? objectValue)) return false;
-
-        switch (objectValue) {
-            case T objectString when typeof(T) == typeof(string): {
-                value = objectString;
-                return true;
-            }
-            case JsonElement permissionsJson: {
-                try {
+        try {
+            switch (objectValue) {
+                case T objectString when typeof(T) == typeof(string): {
+                    value = objectString;
+                    return true;
+                }
+                case JsonElement permissionsJson: {
                     value = JsonSerializer.Deserialize<T>(permissionsJson.GetRawText());
                     return value is not null;
                 }
-                catch (Exception ex) {
-                    logger.Error(ex, "Error parsing permissions");
+                default:
                     return false;
-                }
             }
-            default:
-                return false;
+        }
+        catch (Exception ex) {
+            logger.Error(ex, "Error parsing for {Key} at {Value}", key, objectValue);
+            return false;
         }
     }
     
@@ -68,23 +69,18 @@ public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger  lo
         jwt = null;
 
         if (contextAccessor.HttpContext is not { } httpContext ) return false;
-        if (!httpContext.Request.Headers.TryGetValue("Authorization", out StringValues authorizationHeader) ) return false;
+        if (!httpContext.Request.Headers.TryGetValue("Authorization", out StringValues authorizationHeader)) return false;
 
-        var handler = new JwtSecurityTokenHandler();
-        
-        try {
-            Jwt = jwt = handler.ReadJwtToken(authorizationHeader.ToString().Replace("Bearer ", string.Empty));
-            return jwt is not null;
-        }
-        catch (Exception ex) {
-            logger.Error(ex, "Error parsing JWT");
-            return false;
-        }
+        string token = authorizationHeader
+            .ToString()
+            .Replace("Bearer ", string.Empty);
 
+        if (!_handler.CanReadToken(token)) return false;
+        return (Jwt = jwt = _handler.ReadJwtToken(token)) is not null;
     }
 
-    public bool TryGetPermissions([NotNullWhen(true)] out string[]? permissions) =>
-        TryGetPayloadData("permissions", out permissions);
+    public bool TryGetPermissions([NotNullWhen(true)] out string[]? permissions) => TryGetPayloadData("permissions", out permissions);
+    public bool TryGetRoles([NotNullWhen(true)] out string[]? permissions) => TryGetPayloadData("roles", out permissions);
 }
 
 
