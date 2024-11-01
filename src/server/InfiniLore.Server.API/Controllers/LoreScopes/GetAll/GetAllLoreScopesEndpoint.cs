@@ -1,8 +1,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Contracts.Data.Repositories.Commands;
-using InfiniLore.Server.Contracts.Services;
+using InfiniLore.Server.Contracts.Data.Repositories.Queries;
 using InfiniLore.Server.Data.Models.UserData;
 using InfiniLoreLib.Results;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +11,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.GetAll;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetAllLoreScopesEndpoint(IInfiniLoreUserCommands userRepository, IJwtParsingService jwtParsing, ILogger logger) :
+public class GetAllLoreScopesEndpoint(ILoreScopeQueries loreScopeQueries) :
     Endpoint<
         GetAllLoreScopesRequest,
         Results<
@@ -25,16 +24,16 @@ public class GetAllLoreScopesEndpoint(IInfiniLoreUserCommands userRepository, IJ
 
     public override void Configure() {
         Get("/{UserId:guid}/lore-scopes/");
-        Permissions("read:lore-scopes");
-        // AllowAnonymous();
+        // Permissions("read:lore-scopes");
+        AllowAnonymous();
     }
 
     public async override Task<Results<Ok<IEnumerable<LoreScopeResponse>>, NotFound, ForbidHttpResult>> ExecuteAsync(GetAllLoreScopesRequest req, CancellationToken ct) {
-        if (jwtParsing.TryGetPermissions(out string[]? permissions)) return TypedResults.Forbid();
+        QueryOutputMany<LoreScopeModel> resultLoreScopes = await loreScopeQueries.TryGetByUserAsync(req.UserId, ct);
+        if (!resultLoreScopes.TryGetSuccessValue(out LoreScopeModel[]? models)) {
+            return TypedResults.NotFound();
+        }
         
-        ResultMany<LoreScopeModel> result = await userRepository.GetLoreScopesAsync(req.UserId, ct);
-        if (result.IsFailure || result.Values is null) return TypedResults.NotFound();
-
-        return TypedResults.Ok(result.Values.Select(ls => Map.FromEntity(ls)));
+        return TypedResults.Ok(models.Select(ls => Map.FromEntity(ls)));
     }
 }

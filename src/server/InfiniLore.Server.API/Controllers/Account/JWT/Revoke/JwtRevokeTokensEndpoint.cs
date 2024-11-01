@@ -26,7 +26,7 @@ public class JwtRevokeTokensEndpoint(IJwtTokenService jwtTokenService, ILogger l
         Delete("/account/jwt/token/refresh");
         PermissionsAll("account.jwt.tokens_revoke");
     }
-    public override async Task<Results<BadRequest<ProblemDetails>, Ok>> ExecuteAsync(JwtRevokeTokensRequest req, CancellationToken ct) {
+    public async override Task<Results<BadRequest<ProblemDetails>, Ok>> ExecuteAsync(JwtRevokeTokensRequest req, CancellationToken ct) {
         if (await userManager.FindByIdAsync(User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value) is not {} user) {
             return TypedResults.BadRequest(new ProblemDetails { Detail = "User not found." });
         }
@@ -44,7 +44,7 @@ public class JwtRevokeTokensEndpoint(IJwtTokenService jwtTokenService, ILogger l
             );
         }
 
-        if (errors.IsNullOrEmpty()) return TypedResults.Ok();
+        // if (errors.IsNullOrEmpty()) return TypedResults.Ok();
 
         return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to revoke tokens.", Errors = errors });
     }

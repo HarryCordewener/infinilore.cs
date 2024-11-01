@@ -5,6 +5,7 @@ using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Data.Models.Base;
 using InfiniLoreLib.Results;
+using OneOf.Types;
 
 namespace InfiniLore.Server.Data.Repositories;
 
@@ -14,50 +15,58 @@ namespace InfiniLore.Server.Data.Repositories;
 public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : Repository<T>(unitOfWork), ICommandRepository<T> 
     where T : UserContent<T>
 {
-
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
-    public async Task<BoolResult> TryAddAsync(T model, CancellationToken ct) {
+    public async ValueTask<CommandOutput> TryAddAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
-        if (dbSet.Any(m => m.Id == model.Id)) return BoolResult.Failure("Model already exists");
+        if (dbSet.Any(m => m.Id == model.Id)) return "Model already exists";
 
         await dbSet.AddAsync(model, ct);
-        return BoolResult.Success();
+        return new Success();
     }
     
-    public async Task<BoolResult> TryUpdateAsync(T model, CancellationToken ct) {
+    public async ValueTask<CommandOutput> TryUpdateAsync(T model,  Func<T, ValueTask<T>> update, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T? existing = await dbSet.FindAsync([model.Id], cancellationToken:ct);
-        if (existing == null) return BoolResult.Failure("Model does not exist");
+        if (existing == null) return "Model does not exist";
+
+        dbSet.Update(await update(existing));
         
-        existing.Update(model);
-        return BoolResult.Success();
+        return new Success();
     }
     
-    public async Task<BoolResult> TryAddOrUpdateAsync(T model, CancellationToken ct) {
-        BoolResult result =await TryUpdateAsync(model, ct);
-        if (result.IsFailure) return await TryAddAsync(model, ct);
-        return result;
+    public async ValueTask<CommandOutput> TryAddOrUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+        if (model.Id == Guid.Empty) return await TryAddAsync(model, ct);
+        
+        DbSet<T> dbSet = await GetDbSetAsync();
+        T? existing = await dbSet.FindAsync([model.Id], ct);
+        if (existing is null) {
+            await dbSet.AddAsync(model, ct);
+            return new Success();
+        }
+        
+        dbSet.Update(await update(existing));
+        return new Success();
     }
     
-    public async Task<BoolResult> TryDeleteAsync(T model, CancellationToken ct) {
+    public async ValueTask<CommandOutput> TryDeleteAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T? existing = await dbSet.FindAsync([model.Id], cancellationToken:ct);
-        if (existing == null) return BoolResult.Failure("Model does not exist");
+        if (existing == null) return "Model does not exist";
         
         existing.SoftDelete();
-        return BoolResult.Success();
+        return new Success();
     }
     
-    public async Task<BoolResult> TryAddRange(IEnumerable<T> models, CancellationToken ct) {
+    public async ValueTask<CommandOutput> TryAddRange(IEnumerable<T> models, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
-        if (dbSet.Any(m => models.Any(m2 => m2.Id == m.Id))) return BoolResult.Failure("One or more Models already exist");
+        if (dbSet.Any(m => models.Any(m2 => m2.Id == m.Id))) return "One or more Models already exist";
         await dbSet.AddRangeAsync(models, ct);
-        return BoolResult.Success();
+        return new Success();
     }
 
-    public async Task<BoolResult> TryDeleteRange(IEnumerable<T> models, CancellationToken ct) {
+    public async ValueTask<CommandOutput> TryDeleteRange(IEnumerable<T> models, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         IEnumerable<Guid> ids = models.Select(model => model.Id);
 
@@ -65,6 +74,6 @@ public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> un
             .Where(model => ids.Contains(model.Id))
             .ForEachAsync(model => model.SoftDelete(), ct);
 
-        return BoolResult.Success();
+        return new Success();
     }
 }

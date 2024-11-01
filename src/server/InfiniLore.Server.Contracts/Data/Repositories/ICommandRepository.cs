@@ -3,6 +3,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Data.Models.Base;
 using InfiniLoreLib.Results;
+using OneOf;
+using OneOf.Types;
 
 namespace InfiniLore.Server.Contracts.Data.Repositories;
 
@@ -10,10 +12,11 @@ namespace InfiniLore.Server.Contracts.Data.Repositories;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public interface ICommandRepository<T> where T : UserContent<T> {
-    Task<BoolResult> TryAddAsync(T model, CancellationToken ct);
-    Task<BoolResult> TryUpdateAsync(T model, CancellationToken ct);
-    Task<BoolResult> TryAddOrUpdateAsync(T model, CancellationToken ct);
-    Task<BoolResult> TryDeleteAsync(T model, CancellationToken ct); 
-    Task<BoolResult> TryAddRange(IEnumerable<T> models, CancellationToken ct); 
-    Task<BoolResult> TryDeleteRange(IEnumerable<T> models, CancellationToken ct); 
+    ValueTask<CommandOutput> TryAddAsync(T model, CancellationToken ct = default);
+    ValueTask<CommandOutput> TryUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default);
+    ValueTask<CommandOutput> TryAddOrUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default);
+    ValueTask<CommandOutput> TryDeleteAsync(T model, CancellationToken ct = default); 
+    ValueTask<CommandOutput> TryAddRange(IEnumerable<T> models, CancellationToken ct = default); 
+    ValueTask<CommandOutput> TryDeleteRange(IEnumerable<T> models, CancellationToken ct = default); 
 }
+

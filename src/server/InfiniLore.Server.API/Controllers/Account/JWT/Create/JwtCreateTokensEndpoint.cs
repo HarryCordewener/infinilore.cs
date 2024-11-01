@@ -25,7 +25,7 @@ public class JwtCreateTokensEndpoint(IApiSignInService apiSignInService, IJwtTok
         AllowAnonymous();
     }
 
-    public override async Task<Results<BadRequest<ProblemDetails>, Ok<JwtResponse>>> ExecuteAsync(JwtCreateTokensRequest req, CancellationToken ct) {
+    public async override Task<Results<BadRequest<ProblemDetails>, Ok<JwtResponse>>> ExecuteAsync(JwtCreateTokensRequest req, CancellationToken ct) {
         try {
             
             IdentityUserResult<InfiniLoreUser> signInResult = await apiSignInService.SignInAsync(req.Username, req.Password, ct).ConfigureAwait(false);

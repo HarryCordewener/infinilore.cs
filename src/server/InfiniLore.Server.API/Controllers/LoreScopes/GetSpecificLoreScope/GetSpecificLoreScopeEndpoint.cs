@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Contracts.Data.Repositories.Commands;
+using InfiniLore.Server.Contracts.Data.Repositories.Queries;
 using InfiniLore.Server.Data.Models.UserData;
 using InfiniLoreLib.Results;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +11,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.GetSpecificLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetSpecificLoreScopeEndpoint(IInfiniLoreUserCommands userRepository) :
+public class GetSpecificLoreScopeEndpoint(ILoreScopeQueries loreScopeQueries) :
     Endpoint<
         GetSpecificLoreScopeRequest,
         Results<
@@ -26,13 +26,12 @@ public class GetSpecificLoreScopeEndpoint(IInfiniLoreUserCommands userRepository
         AllowAnonymous();
     }
 
-    public override async Task<Results<Ok<LoreScopeResponse>, NotFound>> ExecuteAsync(GetSpecificLoreScopeRequest req, CancellationToken ct) {
-        ResultMany<LoreScopeModel> result = await userRepository.GetLoreScopesAsync(req.UserId, ct);
-        if (result.IsFailure || result.Values is null) return TypedResults.NotFound();
-
-        LoreScopeModel? scope = result.Values.FirstOrDefault(x => x.Id == req.LoreScopeId);
-        if (scope is null) return TypedResults.NotFound();
-
-        return TypedResults.Ok(Map.FromEntity(scope));
+    public async override Task<Results<Ok<LoreScopeResponse>, NotFound>> ExecuteAsync(GetSpecificLoreScopeRequest req, CancellationToken ct) {
+        QueryOutput<LoreScopeModel> resultLoreScope = await loreScopeQueries.TryGetByIdAsync(req.LoreScopeId, ct);
+        return resultLoreScope.Match<Results<Ok<LoreScopeResponse>, NotFound>>(
+            success => TypedResults.Ok(Map.FromEntity(success.Value)),
+            _ => TypedResults.NotFound(),
+            _ => TypedResults.NotFound()
+        );
     }
 }

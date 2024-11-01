@@ -7,6 +7,7 @@ using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Data.Models.Account;
 using InfiniLore.Server.Data.Models.Base;
 using InfiniLoreLib.Results;
+using OneOf.Types;
 using System.Linq.Expressions;
 
 namespace InfiniLore.Server.Data.Repositories;
@@ -20,40 +21,44 @@ public abstract class QueryRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unit
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
     #region Results
-    public async virtual Task<Result<T>> TryGetByIdAsync(Guid id, CancellationToken ct) {
+    public async virtual ValueTask<QueryOutput<T>> TryGetByIdAsync(Guid id, CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T? result = await dbSet
             .FirstOrDefaultAsync(ls => ls.Id == id, cancellationToken: ct);
-        
-        return result is not null
-            ? Result<T>.Success(result)
-            : Result<T>.Failure($"{nameof(T)} not found by criteria: {nameof(id)} == {id}");
+
+        if (result is null) return new None();
+        return new Success<T>(result);
     }
     
-    public async virtual Task<Result<T[]>> TryGetByUserAsync(InfiniLoreUser user, CancellationToken ct) => 
+    public async virtual ValueTask<QueryOutputMany<T>> TryGetByUserAsync(InfiniLoreUser user, CancellationToken ct) => 
         await TryGetByUserAsync(user.Id, ct);
     
-    public async virtual Task<Result<T[]>> TryGetByUserAsync(string userId, CancellationToken ct) {DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<QueryOutputMany<T>> TryGetByUserAsync(Guid userId, CancellationToken ct) => 
+        await TryGetByUserAsync(userId.ToString(), ct);
+    
+    public async virtual ValueTask<QueryOutputMany<T>> TryGetByUserAsync(string userId, CancellationToken ct) {DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
             .Where(ls => ls.OwnerId == userId)
             .ToArrayAsync(cancellationToken: ct);
-        
+
         return result.Length > 0
-            ? Result<T[]>.Success(result)
-            : Result<T[]>.Failure($"{nameof(T)} no items were found");
+            ? result
+            : new None();
     }
 
-    public async virtual Task<Result<T[]>> TryGetAllAsync(CancellationToken ct) {
+    public async virtual ValueTask<QueryOutputMany<T>> TryGetAllAsync(CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
             .ToArrayAsync(cancellationToken: ct);
         
         return result.Length > 0
-            ? Result<T[]>.Success(result)
-            : Result<T[]>.Failure($"{nameof(T)} no items were found");
+            ? result
+            : new None();
     }
     
-    public async virtual Task<Result<T[]>> TryGetAllASync(PaginationInfo pageInfo, CancellationToken ct) {
+    public async virtual ValueTask<QueryOutputMany<T>> TryGetAllASync(PaginationInfo pageInfo, CancellationToken ct) {
+        if (pageInfo.IsNotValid(out Error<string> pageInfoError)) return pageInfoError;
+        
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
             .Skip(pageInfo.SkipAmount)
@@ -61,36 +66,34 @@ public abstract class QueryRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unit
             .ToArrayAsync(ct);
         
         return result.Length > 0
-            ? Result<T[]>.Success(result)
-            : Result<T[]>.Failure($"{nameof(T)} no items were found");
+            ? result
+            : new None();
     }
 
-    public async virtual Task<Result<T[]>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, CancellationToken ct) {
+    public async virtual ValueTask<QueryOutputMany<T>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
             .Where(predicate)
             .ToArrayAsync(cancellationToken: ct);
         
         return result.Length > 0
-            ? Result<T[]>.Success(result)
-            : Result<T[]>.Failure($"{nameof(T)} not found by criteria: {predicate}");
+            ? result
+            : new None();
     }
     
-    public async virtual Task<Result<T[]>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, CancellationToken ct) {
+    public async virtual ValueTask<QueryOutputMany<T>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
             .Where(predicate)
             .ToArrayAsync(cancellationToken: ct);
         
         return result.Length > 0
-            ? Result<T[]>.Success(result)
-            : Result<T[]>.Failure($"{nameof(T)} not found by criteria: {predicate}");
+            ? result
+            : new None();
     }
     
-    public async virtual Task<Result<T[]>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct, Expression<Func<T, object>>? orderBy = null) {
-        if (pageInfo.IsNotValid()) {
-            return Result<T[]>.Failure($"{nameof(pageInfo)} is not valid");
-        }
+    public async virtual ValueTask<QueryOutputMany<T>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct, Expression<Func<T, object>>? orderBy = null) {
+        if (pageInfo.IsNotValid(out Error<string> pageInfoError)) return pageInfoError;
         
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
@@ -101,14 +104,12 @@ public abstract class QueryRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unit
             .ToArrayAsync(cancellationToken: ct);
         
         return result.Length > 0
-            ? Result<T[]>.Success(result)
-            : Result<T[]>.Failure($"{nameof(T)} not found by criteria: {predicate}");
+            ? result
+            : new None();
     }
     
-    public async virtual Task<Result<T[]>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct, Expression<Func<T, object>>? orderBy = null) {
-        if (pageInfo.IsNotValid()) {
-            return Result<T[]>.Failure($"{nameof(pageInfo)} is not valid");
-        }
+    public async virtual ValueTask<QueryOutputMany<T>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct, Expression<Func<T, object>>? orderBy = null) {
+        if (pageInfo.IsNotValid(out Error<string> pageInfoError)) return pageInfoError;
         
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
@@ -117,12 +118,10 @@ public abstract class QueryRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unit
             .Skip(pageInfo.SkipAmount)
             .Take(pageInfo.PageSize)
             .ToArrayAsync(cancellationToken: ct);
-        
+    
         return result.Length > 0
-            ? Result<T[]>.Success(result)
-            : Result<T[]>.Failure($"{nameof(T)} not found by criteria: {predicate}");
+            ? result
+            : new None();
         #endregion
     }
-    
-    
 }

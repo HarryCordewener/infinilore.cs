@@ -8,6 +8,4 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.GetAll;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [UsedImplicitly]
-public class GetAllLoreScopesRequest {
-    [FromRoute] public Guid UserId { get; set; }
-}
+public record GetAllLoreScopesRequest([FromRoute] Guid UserId);

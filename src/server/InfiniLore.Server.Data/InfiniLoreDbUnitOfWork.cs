@@ -13,15 +13,15 @@ namespace InfiniLore.Server.Data;
 /// <inheritdoc cref="InfiniLore.Server.Contracts.Data.IDbUnitOfWork{T}" />
 [RegisterService<IDbUnitOfWork<InfiniLoreDbContext>>(LifeTime.Scoped)]
 public class InfiniLoreDbUnitOfWork(IDbContextFactory<InfiniLoreDbContext> dbContextFactory, ILogger logger) : IDbUnitOfWork<InfiniLoreDbContext> {
-    private readonly Lazy<Task<InfiniLoreDbContext>> _db = new(() => dbContextFactory.CreateDbContextAsync());
+    private InfiniLoreDbContext? _db;
     private IDbContextTransaction? _transaction;
-
+    
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
     /// <inheritdoc/>
     public async Task CommitAsync(CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = await GetDbContextAsync();
+        InfiniLoreDbContext dbContext = await GetDbContextAsync(ct);
         if (_transaction == null) {
             await dbContext.SaveChangesAsync(ct);
             return;
@@ -33,7 +33,7 @@ public class InfiniLoreDbUnitOfWork(IDbContextFactory<InfiniLoreDbContext> dbCon
 
     /// <inheritdoc/>
     public async Task<bool> TryCommitAsync(CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = await GetDbContextAsync();
+        InfiniLoreDbContext dbContext = await GetDbContextAsync(ct);
         try {
             if (_transaction == null) {
                 await dbContext.SaveChangesAsync(ct);
@@ -52,7 +52,7 @@ public class InfiniLoreDbUnitOfWork(IDbContextFactory<InfiniLoreDbContext> dbCon
 
     /// <inheritdoc/>
     public async Task BeginTransactionAsync(CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = await GetDbContextAsync();
+        InfiniLoreDbContext dbContext = await GetDbContextAsync(ct);
         _transaction = await dbContext.Database.BeginTransactionAsync(ct);
     }
 
@@ -62,14 +62,27 @@ public class InfiniLoreDbUnitOfWork(IDbContextFactory<InfiniLoreDbContext> dbCon
     /// <inheritdoc/>
     public async Task<bool> TryRollbackAsync(CancellationToken ct = default) {
         if (_transaction == null) return false;
+        
         await _transaction.RollbackAsync(ct);
         _transaction = null;
         return true;
     }
+    
+    /// <inheritdoc/>
+    public async Task<bool> TryRollbackToSavepointAsync(string name, CancellationToken ct = default) {
+        if (_transaction == null) return false;
+        await _transaction.RollbackToSavepointAsync(name, ct);
+        return true;
+    }
 
     /// <inheritdoc/>
-    public async Task<InfiniLoreDbContext> GetDbContextAsync() => await _db.Value;
+    public async Task<InfiniLoreDbContext> GetDbContextAsync(CancellationToken ct = default) => 
+        _db ??= await dbContextFactory.CreateDbContextAsync(ct);
 
+    /// <inheritdoc/>
+    public async Task CreateSavepointAsync(string name, CancellationToken ct = default) {
+        await (_transaction?.CreateSavepointAsync(name, ct) ?? Task.CompletedTask );
+    }
     
     /// <summary>
     /// Asynchronously disposes the current resources.
@@ -77,12 +90,11 @@ public class InfiniLoreDbUnitOfWork(IDbContextFactory<InfiniLoreDbContext> dbCon
     /// active transactions are properly disposed asynchronously.
     /// </summary>
     public async ValueTask DisposeAsync() {
-        if (_db.IsValueCreated) {
-            InfiniLoreDbContext dbContext = await _db.Value;
-            await dbContext.DisposeAsync();
-        }
+        if (_db is null) return;
+        await _db.DisposeAsync();
 
         if (_transaction is not null) {
+            await _transaction.RollbackAsync();
             await _transaction.DisposeAsync();
         }
 

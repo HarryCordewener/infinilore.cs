@@ -3,6 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories.Commands;
+using InfiniLore.Server.Contracts.Data.Repositories.Queries;
 using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.UserData;
 using InfiniLoreLib.Results;
@@ -13,7 +14,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.DeleteSpecificLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class DeleteSpecificLoreScopeEndpoint(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, IInfiniLoreUserCommands userRepository, ILoreScopesCommands loreScopeRepository) :
+public class DeleteSpecificLoreScopeEndpoint(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ILoreScopeQueries loreScopeQueries, ILoreScopesCommands loreScopeCommands) :
     Endpoint<
         DeleteSpecificLoreScopeRequest,
         Results<
@@ -28,30 +29,19 @@ public class DeleteSpecificLoreScopeEndpoint(IDbUnitOfWork<InfiniLoreDbContext> 
         AllowAnonymous();
     }
 
-    public override async Task<Results<Ok, NotFound>> ExecuteAsync(DeleteSpecificLoreScopeRequest req, CancellationToken ct) {
-        // TODO Move to a service
+    
+    public async override Task<Results<Ok, NotFound>> ExecuteAsync(DeleteSpecificLoreScopeRequest req, CancellationToken ct) {
         await unitOfWork.BeginTransactionAsync(ct);
-
-        ResultMany<LoreScopeModel> resultLoreScopes = await userRepository.GetLoreScopesAsync(req.UserId, ct);
-        if (resultLoreScopes.IsFailure || resultLoreScopes.Values is null) {
-            return TypedResults.NotFound();// Nothing to rollback
+        
+        QueryOutput<LoreScopeModel> resultUser = await loreScopeQueries.TryGetByIdAsync(req.UserId, ct);
+        if(!resultUser.TryGetSuccessValue(out LoreScopeModel? loreScope)){
+            return TypedResults.NotFound(); // Fine for now
         }
-
-        LoreScopeModel? scope = resultLoreScopes.Values.FirstOrDefault(x => x.Id == req.LoreScopeId);
-        if (scope is null) {
-            return TypedResults.NotFound();// Nothing to rollback
-        }
-
-        Result<bool> resultDelete = await loreScopeRepository.DeleteAsync(scope, ct);
-        if (resultDelete.IsFailure) {
-            await unitOfWork.RollbackAsync(ct);
-            return TypedResults.NotFound();
-        }
-
-        if (await unitOfWork.TryCommitAsync(ct)) return TypedResults.Ok();
-
-        await unitOfWork.RollbackAsync(ct);
-        return TypedResults.NotFound();
-
+        
+        CommandOutput resultDelete = await loreScopeCommands.TryDeleteAsync(loreScope, ct);
+        if (resultDelete.IsError) return TypedResults.NotFound();
+        
+        await unitOfWork.CommitAsync(ct);
+        return TypedResults.Ok();
     }
 }
