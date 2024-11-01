@@ -90,14 +90,15 @@ public class InfiniLoreDbUnitOfWork(IDbContextFactory<InfiniLoreDbContext> dbCon
     /// active transactions are properly disposed asynchronously.
     /// </summary>
     public async ValueTask DisposeAsync() {
-        if (_db is null) return;
-        await _db.DisposeAsync();
-
-        if (_transaction is not null) {
-            await _transaction.RollbackAsync();
-            await _transaction.DisposeAsync();
-        }
-
+        if (_db != null) await _db.DisposeAsync();
+        if (_transaction != null) await _transaction.DisposeAsync();
+        
+        GC.SuppressFinalize(this);
+    }
+    
+    public void Dispose() {
+        _db?.Dispose();
+        _transaction?.Dispose();
         GC.SuppressFinalize(this);
     }
 }

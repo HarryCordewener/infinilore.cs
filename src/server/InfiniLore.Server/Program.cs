@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using IAssemblyEntry=InfiniLore.Server.API.IAssemblyEntry;
 
 namespace InfiniLore.Server;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -30,44 +31,40 @@ public static class Program {
         builder.OverrideLoggingAsSeriLog();
 
         // TODO: Add Kestrel SLL
-        //  This will take some tweaking to get working
 
         #region Database
         builder.Services.AddDbContextFactory<InfiniLoreDbContext>();
         #endregion
 
         #region Authentication
-        // Register JWT Authentication
-        builder.Services.AddAuthenticationJwtBearer(signingOptions: options => {
+        builder.Services.AddAuthenticationJwtBearer(
+            options => {
                 options.SigningKey = builder.Configuration["JWT:Key"];
-            }
-            , bearerOptions: bearerOptions => {
-                bearerOptions.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
-                bearerOptions.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
+            }, 
+            bearerOptions => {
+            bearerOptions.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
+            bearerOptions.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
 
-                bearerOptions.TokenValidationParameters.ValidIssuer = builder.Configuration["JWT:Issuer"];
-                bearerOptions.TokenValidationParameters.ValidAudience = builder.Configuration["JWT:Audience"];
+            bearerOptions.TokenValidationParameters.ValidIssuer = builder.Configuration["JWT:Issuer"];
+            bearerOptions.TokenValidationParameters.ValidAudience = builder.Configuration["JWT:Audience"];
 
-                bearerOptions.MapInboundClaims = true;
-            });
+            bearerOptions.MapInboundClaims = true;
+        });
 
         builder.Services.AddAuthentication(o => {
-                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }
-        );
+            o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        });
 
         // TODO Add google oauth login
 
-        // Register Identity
         builder.Services.AddIdentityCore<InfiniLoreUser>(options => {
                 options.SignIn.RequireConfirmedAccount = false;
             })
-            .AddRoles<IdentityRole>()// Resolves an issue, thanks to : https://stackoverflow.com/a/68603582/9133374
+            .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<InfiniLoreDbContext>()
             .AddSignInManager();
 
-        // Override cookie auth scheme to return 401/403 instead of redirecting on API calls
         builder.Services.ConfigureApplicationCookie(
             cookieOptions => {
                 cookieOptions.Events.OnRedirectToLogin = context => {
@@ -96,7 +93,7 @@ public static class Program {
         builder.Services
             .AddFastEndpoints(options => {
                 options.Assemblies = [
-                    typeof(API.IAssemblyEntry).Assembly
+                    typeof(IAssemblyEntry).Assembly
                 ];
             })
             .SwaggerDocument(options => {
@@ -149,6 +146,7 @@ public static class Program {
             ctx.RoutePrefix = "swagger";
         });
 
+        await using AsyncServiceScope scope = app.Services.CreateAsyncScope();// CreateAsyncScope
         await Task.WhenAll(
             MigrateDatabaseAsync(app),// Db Migrations on startup
             app.RunAsync()
@@ -162,4 +160,5 @@ public static class Program {
     }
 
     private static bool IsApiRequest(RedirectContext<CookieAuthenticationOptions> context) => context is { Request.Path.Value: "/api", Response.StatusCode: 200 };
+
 }

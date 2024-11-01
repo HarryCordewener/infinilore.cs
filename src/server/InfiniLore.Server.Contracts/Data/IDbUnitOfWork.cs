@@ -10,7 +10,7 @@ namespace InfiniLore.Server.Contracts.Data;
 /// <summary>
 /// Implementation of the unit of work pattern specific to InfiniLore database context.
 /// </summary>
-public interface IDbUnitOfWork<T> : IAsyncDisposable where T : DbContext {
+public interface IDbUnitOfWork<T> : IAsyncDisposable, IDisposable where T : DbContext {
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // ----------------------------------------------------------------------------------------------------------------
