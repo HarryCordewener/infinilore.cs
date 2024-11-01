@@ -14,4 +14,9 @@ public abstract class UserContent<T> : BaseContent<T> where T : BaseContent<T> {
     
     public bool IsPublic { get; set; }
     public ICollection<UserContentAccess<T>> UserAccess { get; set; } = [];
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Methods
+    // -----------------------------------------------------------------------------------------------------------------
+    public abstract void Update(T model);
 }

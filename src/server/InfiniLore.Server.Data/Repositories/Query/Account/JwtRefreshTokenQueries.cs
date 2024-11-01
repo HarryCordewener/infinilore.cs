@@ -21,9 +21,9 @@ public class JwtRefreshTokenQueries(IDbUnitOfWork<InfiniLoreDbContext> unitOfWor
     }
     
     #region GetAsync
-    public async Task<JwtRefreshToken?> GetAsync(Guid token, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = unitOfWork.GetDbContext();
-        string hashedToken = HashToken(token);
+    public async Task<JwtRefreshToken?> GetAsync(Guid refreshtoken, CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
+        string hashedToken = HashToken(refreshtoken);
 
         JwtRefreshToken? tokenData = await dbContext.JwtRefreshTokens
             .Include(t => t.User)

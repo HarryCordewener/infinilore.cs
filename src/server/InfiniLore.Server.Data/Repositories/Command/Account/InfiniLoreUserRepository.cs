@@ -20,7 +20,7 @@ public class InfiniLoreUserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         => GetLoreScopesAsync(userId.ToString(), ct);
 
     public async Task<ResultMany<LoreScopeModel>> GetLoreScopesAsync(string userId, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = unitOfWork.GetDbContext();
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
         IQueryable<InfiniLoreUser> query = dbContext.Users
             .Include(u => u.LoreScopes)
             .Where(u => u.Id == userId);
@@ -39,7 +39,7 @@ public class InfiniLoreUserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         => GetMultiversesAsync(userId.ToString(), ct);
 
     public async Task<ResultMany<MultiverseModel>> GetMultiversesAsync(string userId, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = unitOfWork.GetDbContext();
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
         IQueryable<InfiniLoreUser> query = dbContext.Users
             .Include(u => u.Multiverses)
             .Where(u => u.Id == userId);
@@ -58,7 +58,7 @@ public class InfiniLoreUserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         => GetUniversesAsync(userId.ToString(), ct);
 
     public async Task<ResultMany<UniverseModel>> GetUniversesAsync(string userId, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = unitOfWork.GetDbContext();
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
         IQueryable<InfiniLoreUser> query = dbContext.Users
             .Include(u => u.Universes)
             .Where(u => u.Id == userId);

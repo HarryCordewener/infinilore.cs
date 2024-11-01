@@ -10,6 +10,7 @@ namespace InfiniLore.Server.Data.Models.Base;
 // ---------------------------------------------------------------------------------------------------------------------
 public abstract class BaseContent<T> where T : BaseContent<T> {
     [Key] public Guid Id { get; set; }
+    public DateTime CreatedDate { get; private set; } = DateTime.UtcNow;
 
     #region SoftDelete
     [NotMapped] public bool IsSoftDeleted => SoftDeleteDate != null;

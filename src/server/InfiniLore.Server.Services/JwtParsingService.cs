@@ -35,7 +35,7 @@ public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger  lo
         private set => _jwt = value;
     }
     
-    private JwtSecurityTokenHandler _handler = new();
+    private readonly JwtSecurityTokenHandler _handler = new();
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods

@@ -10,7 +10,7 @@ namespace InfiniLore.Server.Contracts.Data;
 /// <summary>
 /// Implementation of the unit of work pattern specific to InfiniLore database context.
 /// </summary>
-public interface IDbUnitOfWork<out T> : IDisposable where T : DbContext {
+public interface IDbUnitOfWork<T> : IAsyncDisposable where T : DbContext {
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // ----------------------------------------------------------------------------------------------------------------
@@ -52,8 +52,8 @@ public interface IDbUnitOfWork<out T> : IDisposable where T : DbContext {
     Task<bool> TryRollbackAsync(CancellationToken ct = default);
 
     /// <summary>
-    /// Retrieves the current InfiniLoreDbContext instance.
+    /// Asynchronously retrieves the current InfiniLoreDbContext instance.
     /// </summary>
-    /// <returns>The InfiniLoreDbContext instance.</returns>
-    T GetDbContext();
+    /// <returns>A task that represents the asynchronous operation. The task result contains the InfiniLoreDbContext instance.</returns>
+    Task<T> GetDbContextAsync();
 }

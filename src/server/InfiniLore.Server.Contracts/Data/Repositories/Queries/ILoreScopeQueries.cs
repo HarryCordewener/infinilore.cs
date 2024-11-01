@@ -3,9 +3,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Data.Models.UserData;
 
-namespace InfiniLore.Server.Contracts.Data.Repositories.Commands;
+namespace InfiniLore.Server.Contracts.Data.Repositories.Queries;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface ILoreScopesCommands : ICommandRepository<LoreScopeModel> {
-}
+public interface ILoreScopeQueries : IQueryRepository<LoreScopeModel>;

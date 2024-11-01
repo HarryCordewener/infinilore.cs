@@ -1,11 +1,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Data.Models.UserData;
+namespace InfiniLore.Server.Contracts.Data.Repositories;
 
-namespace InfiniLore.Server.Contracts.Data.Repositories.Commands;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface ILoreScopesCommands : ICommandRepository<LoreScopeModel> {
+public readonly record struct PaginationInfo(int PageNumber, int PageSize) {
+    public int SkipAmount => (PageNumber - 1) * PageSize;
+    
+    public bool IsValid() => PageNumber > 0 && PageSize > 0;
+    public bool IsNotValid() => !IsValid();
 }

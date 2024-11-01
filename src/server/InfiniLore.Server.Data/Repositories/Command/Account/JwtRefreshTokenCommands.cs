@@ -24,7 +24,7 @@ public class JwtRefreshTokenCommands(IDbUnitOfWork<InfiniLoreDbContext> unitOfWo
     
     #region AddAsync
     public async Task<bool> AddAsync(string userId, Guid token, DateTime expiresAt, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = unitOfWork.GetDbContext();
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
         InfiniLoreUser? user = await dbContext.Users.FindAsync([userId], ct);
 
         if (user != null) return await AddAsync(user, token, expiresAt, roles, permissions, expiresInDays, ct);
@@ -36,7 +36,7 @@ public class JwtRefreshTokenCommands(IDbUnitOfWork<InfiniLoreDbContext> unitOfWo
 
     public async Task<bool> AddAsync(InfiniLoreUser user, Guid token, DateTime expiresAt, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
         try {
-            InfiniLoreDbContext dbContext = unitOfWork.GetDbContext();
+            InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
             string hashedToken = HashToken(token);
 
             bool tokenExists = await dbContext.JwtRefreshTokens.AnyAsync(predicate: t => t.TokenHash == hashedToken, ct);
@@ -77,17 +77,17 @@ public class JwtRefreshTokenCommands(IDbUnitOfWork<InfiniLoreDbContext> unitOfWo
         return await DeleteAsync(tokenData, ct);
     }
 
-    public Task<bool> DeleteAsync(JwtRefreshToken token, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = unitOfWork.GetDbContext();
+    public async Task<bool> DeleteAsync(JwtRefreshToken token, CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
 
         dbContext.JwtRefreshTokens.Remove(token);
-        return Task.FromResult(true);
+        return true;
     }
     #endregion
 
     #region RemoveAllAsync
     public async Task<bool> DeleteAllAsync(string userId, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = unitOfWork.GetDbContext();
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
 
         int recordAffected = await dbContext.JwtRefreshTokens
             .Where(t => t.User.Id == userId)
