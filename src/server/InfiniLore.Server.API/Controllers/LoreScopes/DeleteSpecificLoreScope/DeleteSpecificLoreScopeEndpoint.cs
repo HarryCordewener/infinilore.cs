@@ -29,18 +29,18 @@ public class DeleteSpecificLoreScopeEndpoint(IDbUnitOfWork<InfiniLoreDbContext> 
         AllowAnonymous();
     }
 
-    
+
     public async override Task<Results<Ok, NotFound>> ExecuteAsync(DeleteSpecificLoreScopeRequest req, CancellationToken ct) {
         await unitOfWork.BeginTransactionAsync(ct);
-        
+
         QueryOutput<LoreScopeModel> resultUser = await loreScopeQueries.TryGetByIdAsync(req.UserId, ct);
-        if(!resultUser.TryGetSuccessValue(out LoreScopeModel? loreScope)){
-            return TypedResults.NotFound(); // Fine for now
+        if (!resultUser.TryGetSuccessValue(out LoreScopeModel? loreScope)) {
+            return TypedResults.NotFound();// Fine for now
         }
-        
+
         CommandOutput resultDelete = await loreScopeCommands.TryDeleteAsync(loreScope, ct);
         if (resultDelete.IsError) return TypedResults.NotFound();
-        
+
         await unitOfWork.CommitAsync(ct);
         return TypedResults.Ok();
     }

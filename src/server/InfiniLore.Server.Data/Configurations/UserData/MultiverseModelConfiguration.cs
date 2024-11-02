@@ -13,7 +13,7 @@ public class MultiverseModelConfiguration : UserContentConfiguration<MultiverseM
 
     public override void Configure(EntityTypeBuilder<MultiverseModel> builder) {
         base.Configure(builder);
-        
+
         builder.HasQueryFilter(model => model.SoftDeleteDate == null);
 
         builder.HasIndex(model => new { model.Name, model.LoreScopeId }).IsUnique();

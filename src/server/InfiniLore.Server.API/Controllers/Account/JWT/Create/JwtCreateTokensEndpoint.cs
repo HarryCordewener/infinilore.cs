@@ -42,7 +42,7 @@ public class JwtCreateTokensEndpoint(IApiSignInService apiSignInService, IJwtTok
             InfiniLoreUser user = signInResult.AsSuccess.Value;
 
             // Check user integrity before generating tokens
-            if (!await userManager.Users.AnyAsync(u => u.NormalizedUserName == user.NormalizedUserName, ct)) {
+            if (!await userManager.Users.AnyAsync(predicate: u => u.NormalizedUserName == user.NormalizedUserName, ct)) {
                 logger.Error("User with NormalizedUserName {NormalizedUserName} not found.", user.NormalizedUserName);
                 return TypedResults.BadRequest(new ProblemDetails { Detail = "User not found." });
             }

@@ -26,11 +26,6 @@ namespace InfiniLore.Server.Services;
 // ---------------------------------------------------------------------------------------------------------------------
 [RegisterService<IJwtTokenService>(LifeTime.Scoped)]
 public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, IConfiguration configuration, IJwtRefreshTokenCommands commands, IJwtRefreshTokenQueries queries, ILogger logger, UserManager<InfiniLoreUser> userManager) : IJwtTokenService {
-    private static string HashToken(Guid token) {
-        byte[] tokenBytes = Encoding.UTF8.GetBytes(token.ToString());
-        byte[] hashBytes = SHA256.HashData(tokenBytes);
-        return Convert.ToBase64String(hashBytes);
-    }
 
     public async Task<JwtResult> GenerateTokensAsync(InfiniLoreUser user, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
         try {
@@ -64,52 +59,6 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         catch (Exception ex) {
             logger.Error(ex, "Error generating tokens");
             return "Unexpected error generating tokens";
-        }
-    }
-
-    private string GenerateAccessToken(InfiniLoreUser user, string[] roles, string[] permissions, DateTime expiresAt) {
-        string jwtToken = JwtBearer.CreateToken(
-            o => {
-                o.SigningKey = configuration["Jwt:Key"]!;
-                o.ExpireAt = expiresAt;
-                o.Audience = configuration["JWT:Audience"];
-                o.Issuer = configuration["JWT:Issuer"];
-
-                o.User.Roles.Add(roles);
-                o.User.Permissions.Add(permissions);
-                o.User[ClaimTypes.NameIdentifier] = user.Id;
-            });
-
-        return jwtToken;
-    }
-
-    private async Task<OneOf<Guid, False>> GenerateRefreshTokenAsync(InfiniLoreUser user, string[] roles, string[] permissions, DateTime expiresAt, CancellationToken ct = default) {
-        var token = Guid.NewGuid();
-        var refreshToken = new JwtRefreshTokenModel {
-            Owner = user,
-            ExpiresAt = expiresAt,
-            TokenHash = HashToken(token),
-            Roles = roles,
-            Permissions = permissions
-        };
-
-        CommandOutput resultAddition = await commands.TryAddAsync(refreshToken, ct);
-        switch (resultAddition.Value) {
-            case Success:
-                try {
-                    logger.Information("Attempting to commit transaction for user {UserId}", user.Id);
-                    await unitOfWork.CommitAsync(ct);
-                    logger.Information("Transaction committed successfully for user {UserId}", user.Id);
-                    return token;
-                }
-                catch (Exception ex) {
-                    logger.Error(ex, "Error during commit for user {UserId}", user.Id);
-                    return new False();
-                }
-
-            default:
-                logger.Error("Error adding refresh token for user {UserId}", user.Id);
-                return new False();
         }
     }
 
@@ -156,5 +105,56 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
 
         return true;
 
+    }
+    private static string HashToken(Guid token) {
+        byte[] tokenBytes = Encoding.UTF8.GetBytes(token.ToString());
+        byte[] hashBytes = SHA256.HashData(tokenBytes);
+        return Convert.ToBase64String(hashBytes);
+    }
+
+    private string GenerateAccessToken(InfiniLoreUser user, string[] roles, string[] permissions, DateTime expiresAt) {
+        string jwtToken = JwtBearer.CreateToken(
+            o => {
+                o.SigningKey = configuration["Jwt:Key"]!;
+                o.ExpireAt = expiresAt;
+                o.Audience = configuration["JWT:Audience"];
+                o.Issuer = configuration["JWT:Issuer"];
+
+                o.User.Roles.Add(roles);
+                o.User.Permissions.Add(permissions);
+                o.User[ClaimTypes.NameIdentifier] = user.Id;
+            });
+
+        return jwtToken;
+    }
+
+    private async Task<OneOf<Guid, False>> GenerateRefreshTokenAsync(InfiniLoreUser user, string[] roles, string[] permissions, DateTime expiresAt, CancellationToken ct = default) {
+        var token = Guid.NewGuid();
+        var refreshToken = new JwtRefreshTokenModel {
+            Owner = user,
+            ExpiresAt = expiresAt,
+            TokenHash = HashToken(token),
+            Roles = roles,
+            Permissions = permissions
+        };
+
+        CommandOutput resultAddition = await commands.TryAddAsync(refreshToken, ct);
+        switch (resultAddition.Value) {
+            case Success:
+                try {
+                    logger.Information("Attempting to commit transaction for user {UserId}", user.Id);
+                    await unitOfWork.CommitAsync(ct);
+                    logger.Information("Transaction committed successfully for user {UserId}", user.Id);
+                    return token;
+                }
+                catch (Exception ex) {
+                    logger.Error(ex, "Error during commit for user {UserId}", user.Id);
+                    return new False();
+                }
+
+            default:
+                logger.Error("Error adding refresh token for user {UserId}", user.Id);
+                return new False();
+        }
     }
 }

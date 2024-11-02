@@ -11,16 +11,16 @@ namespace InfiniLore.Server.Data;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public class InfiniLoreDbContext : IdentityDbContext<InfiniLoreUser, IdentityRole, string> {
-    public DbSet<LoreScopeModel> LoreScopes { get; init; }
-    public DbSet<MultiverseModel> Multiverses { get; init; }
-    public DbSet<UniverseModel> Universes { get; init; }
-    public DbSet<JwtRefreshTokenModel> JwtRefreshTokens { get; init; }
 
     // -----------------------------------------------------------------------------------------------------------------
     // Constructors
     // -----------------------------------------------------------------------------------------------------------------
     public InfiniLoreDbContext() {}
     public InfiniLoreDbContext(DbContextOptions<InfiniLoreDbContext> options) : base(options) {}
+    public DbSet<LoreScopeModel> LoreScopes { get; init; }
+    public DbSet<MultiverseModel> Multiverses { get; init; }
+    public DbSet<UniverseModel> Universes { get; init; }
+    public DbSet<JwtRefreshTokenModel> JwtRefreshTokens { get; init; }
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods

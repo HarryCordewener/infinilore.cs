@@ -8,4 +8,4 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.DeleteSpecificLoreScope;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [UsedImplicitly]
-public record DeleteSpecificLoreScopeRequest([FromRoute]Guid UserId, [FromRoute]Guid LoreScopeId);
+public record DeleteSpecificLoreScopeRequest([FromRoute] Guid UserId, [FromRoute] Guid LoreScopeId);

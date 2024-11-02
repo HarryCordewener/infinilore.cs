@@ -1,11 +1,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+
 using FastEndpoints;
 using InfiniLore.Server.Contracts.Services;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
-
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 
@@ -39,5 +39,4 @@ public class ApiSignInService(SignInManager<InfiniLoreUser> signInManager, ILogg
         logger.Information("User {@Username} signed in", username);
         return user;
     }
-
 }

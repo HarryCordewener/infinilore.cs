@@ -4,11 +4,10 @@
 using InfiniLore.Server.Data.Models.Account;
 
 namespace InfiniLore.Server.Data.Models.Base;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public interface IHasOwner {
-    public InfiniLoreUser Owner { get; set; } 
+    public InfiniLoreUser Owner { get; set; }
     public string OwnerId { get; set; }
 }

@@ -44,6 +44,7 @@ public class JwtRevokeTokensEndpoint(IJwtTokenService jwtTokenService, ILogger l
                         Name = "Unable to revoke tokens.",
                         Reason = "Unable to revoke tokens."
                     });
+
                     break;
                 }
 
@@ -55,6 +56,7 @@ public class JwtRevokeTokensEndpoint(IJwtTokenService jwtTokenService, ILogger l
         }
 
         if (errors.Count == 0) return TypedResults.Ok();
+
         return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to revoke tokens.", Errors = errors });
     }
 }

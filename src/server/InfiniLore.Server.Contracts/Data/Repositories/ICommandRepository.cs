@@ -1,12 +1,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Data.Models.Base;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
+using InfiniLore.Server.Data.Models.Base;
 
 namespace InfiniLore.Server.Contracts.Data.Repositories;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -15,7 +14,6 @@ public interface ICommandRepository<T> :
     ICommandHasTryUpdateAsync<T>,
     ICommandHasTryAddOrUpdateAsync<T>,
     ICommandHasTryDeleteAsync<T>
-
     where T : UserContent<T>;
 
 public interface ICommandHasTryAddAsync<in T> where T : BaseContent<T> {

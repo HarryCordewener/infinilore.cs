@@ -1,52 +1,50 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Base;
-
 using OneOf.Types;
 
 namespace InfiniLore.Server.Data.Repositories;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : Repository<T>(unitOfWork), ICommandRepository<T> 
-    where T : UserContent<T>
-{
+public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : Repository<T>(unitOfWork), ICommandRepository<T>
+    where T : UserContent<T> {
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
     public async ValueTask<CommandOutput> TryAddAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
-        if (await dbSet.AnyAsync(m => m.Id == model.Id, cancellationToken: ct)) return "Model already exists";
+        if (await dbSet.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";
 
         await dbSet.AddAsync(model, ct);
         return new Success();
     }
-    
-    public async ValueTask<CommandOutput> TryUpdateAsync(T model,  Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+
+    public async ValueTask<CommandOutput> TryUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
-        T? existing = await dbSet.FindAsync([model.Id], cancellationToken:ct);
+        T? existing = await dbSet.FindAsync([model.Id], ct);
         if (existing == null) return "Model does not exist";
 
         dbSet.Update(await update(existing));
-        
+
         return new Success();
     }
-    
+
     public async ValueTask<CommandOutput> TryAddOrUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
         if (model.Id == Guid.Empty) return await TryAddAsync(model, ct);
-        
+
         DbSet<T> dbSet = await GetDbSetAsync();
         T? existing = await dbSet.FindAsync([model.Id], ct);
         if (existing is null) {
             await dbSet.AddAsync(model, ct);
             return new Success();
         }
-        
+
         dbSet.Update(await update(existing));
         return new Success();
     }
@@ -54,7 +52,7 @@ public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> un
     public async ValueTask<CommandOutput> TryAddOrUpdateRangeAsync(IEnumerable<T> models, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
         var modelsToAdd = new List<T>();
         var modelsToUpdate = new List<T>();
-        
+
         IEnumerable<T> userContents = models as T[] ?? models.ToArray();
         List<Guid> modelIds = userContents.Select(m => m.Id).Where(id => id != Guid.Empty).ToList();
 
@@ -85,16 +83,17 @@ public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> un
 
     public async ValueTask<CommandOutput> TryDeleteAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
-        T? existing = await dbSet.FindAsync([model.Id], cancellationToken:ct);
+        T? existing = await dbSet.FindAsync([model.Id], ct);
         if (existing == null) return "Model does not exist";
-        
+
         existing.SoftDelete();
         return new Success();
     }
-    
+
     public async ValueTask<CommandOutput> TryAddRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
-        if (await dbSet.AnyAsync(m => models.Any(m2 => m2.Id == m.Id), cancellationToken: ct)) return "One or more Models already exist";
+        if (await dbSet.AnyAsync(predicate: m => models.Any(m2 => m2.Id == m.Id), ct)) return "One or more Models already exist";
+
         await dbSet.AddRangeAsync(models, ct);
         return new Success();
     }
@@ -105,7 +104,7 @@ public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> un
 
         await dbSet
             .Where(model => ids.Contains(model.Id))
-            .ForEachAsync(model => model.SoftDelete(), ct);
+            .ForEachAsync(action: model => model.SoftDelete(), ct);
 
         return new Success();
     }

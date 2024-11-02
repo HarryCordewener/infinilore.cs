@@ -43,18 +43,20 @@ public class GetAllLoreScopesEndpoint(ILoreScopeQueries loreScopeQueries, UserMa
         if (HttpContext.User.IsInRole("admin")) {
             resultLoreScopes = await loreScopeQueries.TryGetByUserAsync(req.UserId, ct);
             if (!resultLoreScopes.TryGetSuccessValue(out models)) return TypedResults.NotFound();
+
             return TypedResults.Ok(models.Select(ls => Map.FromEntity(ls)));
         }
-        
+
         resultLoreScopes = await loreScopeQueries.TryGetByUserWithUserAccessAsync(req.UserId, user, AccessLevel.Read, ct);
         if (!resultLoreScopes.TryGetSuccessValue(out models)) return TypedResults.NotFound();
-        
+
         IEnumerable<LoreScopeModel> data = models
-            .Where(model => model.UserAccess.Any(access => 
-                access.User.Id == req.UserId.ToString() 
-                && access.AccessLevel == AccessLevel.Read
+            .Where(model => model.UserAccess.Any(access =>
+                    access.User.Id == req.UserId.ToString()
+                    && access.AccessLevel == AccessLevel.Read
                 )
             );
+
         return TypedResults.Ok(data.Select(ls => Map.FromEntity(ls)));
     }
 }

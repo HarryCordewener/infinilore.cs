@@ -12,7 +12,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class SeedLoreScopes(ILoreScopesCommands loreScopesCommands, ILogger logger, IDbUnitOfWork<InfiniLoreDbContext> dbUnitOfWork ) : EndpointWithoutRequest {
+public class SeedLoreScopes(ILoreScopesCommands loreScopesCommands, ILogger logger, IDbUnitOfWork<InfiniLoreDbContext> dbUnitOfWork) : EndpointWithoutRequest {
     public override void Configure() {
         Get("/lore-scopes/seed");
         Roles("Admin");
@@ -30,7 +30,7 @@ public class SeedLoreScopes(ILoreScopesCommands loreScopesCommands, ILogger logg
             new LoreScopeModel { Owner = user, Name = "B" },
             new LoreScopeModel { Owner = user, Name = "C" },
             new LoreScopeModel { Owner = user, Name = "D" },
-            new LoreScopeModel { Owner = user, Name = "E" },
+            new LoreScopeModel { Owner = user, Name = "E" }
         ], ct);
 
         await dbUnitOfWork.CommitAsync(ct);

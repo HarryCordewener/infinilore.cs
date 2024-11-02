@@ -37,13 +37,15 @@ public static class Program {
         MsSqlContainer? container = new MsSqlBuilder()
             // .WithLogger(Log.Logger)
             .WithImage("mcr.microsoft.com/mssql/server:2022-CU10-ubuntu-22.04")
+            .WithPassword("AnnaIsTrans4Ever!")
             .WithName("infinilore-production-db")
             .WithReuse(true)
             .Build();
-        
+
         if (container is null) throw new Exception("Could not create MsSqlContainer");
+
         await container.StartAsync();
-        
+
         builder.Services.AddDbContextFactory<InfiniLoreDbContext>(options =>
             options.UseSqlServer(container.GetConnectionString())
         );
@@ -51,18 +53,18 @@ public static class Program {
 
         #region Authentication
         builder.Services.AddAuthenticationJwtBearer(
-            options => {
+            signingOptions: options => {
                 options.SigningKey = builder.Configuration["JWT:Key"];
-            }, 
-            bearerOptions => {
-            bearerOptions.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
-            bearerOptions.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
+            },
+            bearerOptions: bearerOptions => {
+                bearerOptions.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
+                bearerOptions.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
 
-            bearerOptions.TokenValidationParameters.ValidIssuer = builder.Configuration["JWT:Issuer"];
-            bearerOptions.TokenValidationParameters.ValidAudience = builder.Configuration["JWT:Audience"];
+                bearerOptions.TokenValidationParameters.ValidIssuer = builder.Configuration["JWT:Issuer"];
+                bearerOptions.TokenValidationParameters.ValidAudience = builder.Configuration["JWT:Audience"];
 
-            bearerOptions.MapInboundClaims = true;
-        });
+                bearerOptions.MapInboundClaims = true;
+            });
 
         builder.Services.AddAuthentication(o => {
             o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -173,5 +175,4 @@ public static class Program {
     }
 
     private static bool IsApiRequest(RedirectContext<CookieAuthenticationOptions> context) => context is { Request.Path.Value: "/api", Response.StatusCode: 200 };
-
 }

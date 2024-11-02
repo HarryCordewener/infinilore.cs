@@ -6,7 +6,6 @@ using OneOf.Types;
 using System.Diagnostics.CodeAnalysis;
 
 namespace InfiniLore.Server.Contracts.Types.Results;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -20,17 +19,18 @@ public partial class QueryOutput<T> : OneOfBase<Success<T>, None, Error<string>>
     public None AsNone => AsT1;
     public Error<string> AsError => AsT2;
     public string ErrorString => TryPickT2(out Error<string> error, out _) ? error.Value : string.Empty;
-    
+
     public bool TryGetSuccessValue([NotNullWhen(true)] out T? value) {
         value = default;
         if (!IsSuccess) return false;
+
         value = AsSuccess.Value;
-        
+
         // Solves a warning during building
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         return value is not null;
     }
-    
+
     public static implicit operator QueryOutput<T>(string input) => new Error<string>(input);
     public static implicit operator QueryOutput<T>(T item) => new Success<T>(item);
 }

@@ -55,5 +55,4 @@ public class IdentityCreateUserEndpoint(SignInManager<InfiniLoreUser> signInMana
             return TypedResults.BadRequest(problemDetails);
         }
     }
-
 }

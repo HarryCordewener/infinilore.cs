@@ -33,13 +33,14 @@ public class JwtRevokeAllTokensEndpoint(IJwtTokenService jwtTokenService, ILogge
 
         TrueFalseOrError result = await jwtTokenService.RevokeAllTokensFromUserAsync(user, ct);
         switch (result.Value) {
-            case True : {
+            case True: {
                 return TypedResults.Ok();
             }
+
             case False: {
                 return TypedResults.BadRequest(new ProblemDetails { Detail = "Tokens could not be revoked." });
             }
-            
+
             default: {
                 logger.Warning("Unable to revoke tokens. Result: {@Error}", result.ErrorString);
                 return TypedResults.BadRequest(new ProblemDetails { Detail = "Tokens could not be revoked." });

@@ -4,7 +4,6 @@
 using OneOf.Types;
 
 namespace InfiniLore.Server.Contracts.Data.Repositories;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -21,7 +20,7 @@ public readonly record struct PaginationInfo(int PageNumber, int PageSize) {
             error = new Error<string>("Page size must be greater than 0.");
             return false;
         }
-        
+
         error = new Error<string>();
         return true;
     }
