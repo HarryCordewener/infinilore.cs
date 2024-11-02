@@ -7,5 +7,4 @@ namespace InfiniLore.Server.Contracts.Data.Repositories.Commands;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface ILoreScopesCommands : ICommandRepository<LoreScopeModel> {
-}
+public interface ILoreScopesCommands : ICommandRepository<LoreScopeModel>;

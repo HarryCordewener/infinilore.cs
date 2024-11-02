@@ -11,9 +11,7 @@ namespace InfiniLore.Server.Data.Repositories.Query.UserData;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [RegisterService<ILoreScopeQueries>(LifeTime.Scoped)]
-public class LoreScopeQueries(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : QueryRepository<LoreScopeModel>(unitOfWork), ILoreScopeQueries {
-    
-}
+public class LoreScopeQueries(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : QueryRepository<LoreScopeModel>(unitOfWork), ILoreScopeQueries;
 
 
 
