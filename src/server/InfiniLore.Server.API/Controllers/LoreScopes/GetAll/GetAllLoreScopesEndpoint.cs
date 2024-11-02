@@ -1,17 +1,21 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using FastEndpoints.Security;
 using InfiniLore.Server.Contracts.Data.Repositories.Queries;
 using InfiniLore.Server.Contracts.Types.Results;
+using InfiniLore.Server.Data.Models.Account;
+using InfiniLore.Server.Data.Models.Base;
 using InfiniLore.Server.Data.Models.UserData;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 
 namespace InfiniLore.Server.API.Controllers.LoreScopes.GetAll;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetAllLoreScopesEndpoint(ILoreScopeQueries loreScopeQueries) :
+public class GetAllLoreScopesEndpoint(ILoreScopeQueries loreScopeQueries, UserManager<InfiniLoreUser> userManager) :
     Endpoint<
         GetAllLoreScopesRequest,
         Results<
@@ -24,16 +28,33 @@ public class GetAllLoreScopesEndpoint(ILoreScopeQueries loreScopeQueries) :
 
     public override void Configure() {
         Get("/{UserId:guid}/lore-scopes/");
-        // Permissions("read:lore-scopes");
-        AllowAnonymous();
+        Policy(x => x.RequireAssertion(context =>
+            context.User.IsInRole("admin")
+            || context.User.HasPermission("read:lore-scopes")
+        ));
     }
 
     public async override Task<Results<Ok<IEnumerable<LoreScopeResponse>>, NotFound, ForbidHttpResult>> ExecuteAsync(GetAllLoreScopesRequest req, CancellationToken ct) {
-        QueryOutputMany<LoreScopeModel> resultLoreScopes = await loreScopeQueries.TryGetByUserAsync(req.UserId, ct);
-        if (!resultLoreScopes.TryGetSuccessValue(out LoreScopeModel[]? models)) {
-            return TypedResults.NotFound();
+        InfiniLoreUser? user = await userManager.GetUserAsync(HttpContext.User);
+        if (user is null) return TypedResults.NotFound();
+
+        QueryOutputMany<LoreScopeModel> resultLoreScopes;
+        LoreScopeModel[]? models;
+        if (HttpContext.User.IsInRole("admin")) {
+            resultLoreScopes = await loreScopeQueries.TryGetByUserAsync(req.UserId, ct);
+            if (!resultLoreScopes.TryGetSuccessValue(out models)) return TypedResults.NotFound();
+            return TypedResults.Ok(models.Select(ls => Map.FromEntity(ls)));
         }
         
-        return TypedResults.Ok(models.Select(ls => Map.FromEntity(ls)));
+        resultLoreScopes = await loreScopeQueries.TryGetByUserWithUserAccessAsync(req.UserId, user, AccessLevel.Read, ct);
+        if (!resultLoreScopes.TryGetSuccessValue(out models)) return TypedResults.NotFound();
+        
+        IEnumerable<LoreScopeModel> data = models
+            .Where(model => model.UserAccess.Any(access => 
+                access.User.Id == req.UserId.ToString() 
+                && access.AccessLevel == AccessLevel.Read
+                )
+            );
+        return TypedResults.Ok(data.Select(ls => Map.FromEntity(ls)));
     }
 }

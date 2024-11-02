@@ -19,6 +19,7 @@ public class LoreScopeModelConfiguration : UserContentConfiguration<LoreScopeMod
 
         builder.HasMany(model => model.Multiverses)
             .WithOne(multiverse => multiverse.LoreScope)
-            .HasForeignKey(x => x.LoreScopeId);
+            .HasForeignKey(x => x.LoreScopeId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

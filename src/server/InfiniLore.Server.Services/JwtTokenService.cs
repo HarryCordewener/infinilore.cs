@@ -13,12 +13,12 @@ using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using OneOf;
 using OneOf.Types;
 using Serilog;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using OneOf;
 
 namespace InfiniLore.Server.Services;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         byte[] hashBytes = SHA256.HashData(tokenBytes);
         return Convert.ToBase64String(hashBytes);
     }
-    
+
     public async Task<JwtResult> GenerateTokensAsync(InfiniLoreUser user, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
         try {
             string? key = configuration["Jwt:Key"];
@@ -51,14 +51,14 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
             DateTime refreshTokenExpiryUtc = DateTime.UtcNow.AddDays(expiresInDays ?? int.Parse(configuration["Jwt:RefreshExpiresInDays"]!));
 
             string accessToken = GenerateAccessToken(user, roles, permissions, accessTokenExpiryUtc);
-            OneOf<Guid,False> resultGenerate = await GenerateRefreshTokenAsync(user, roles, permissions, refreshTokenExpiryUtc, ct);
+            OneOf<Guid, False> resultGenerate = await GenerateRefreshTokenAsync(user, roles, permissions, refreshTokenExpiryUtc, ct);
             if (resultGenerate.IsT1) return "Refresh token could not be generated";
-            
+
             return new JwtTokenData(
                 accessToken,
-                 accessTokenExpiryUtc,
-                 resultGenerate.AsT0,
-                 refreshTokenExpiryUtc);
+                accessTokenExpiryUtc,
+                resultGenerate.AsT0,
+                refreshTokenExpiryUtc);
 
         }
         catch (Exception ex) {
@@ -92,18 +92,24 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
             Roles = roles,
             Permissions = permissions
         };
-        
+
         CommandOutput resultAddition = await commands.TryAddAsync(refreshToken, ct);
         switch (resultAddition.Value) {
-            case Success: {
-                await unitOfWork.CommitAsync(ct);
-                return token;
-            }
+            case Success:
+                try {
+                    logger.Information("Attempting to commit transaction for user {UserId}", user.Id);
+                    await unitOfWork.CommitAsync(ct);
+                    logger.Information("Transaction committed successfully for user {UserId}", user.Id);
+                    return token;
+                }
+                catch (Exception ex) {
+                    logger.Error(ex, "Error during commit for user {UserId}", user.Id);
+                    return new False();
+                }
 
-            default: {
+            default:
                 logger.Error("Error adding refresh token for user {UserId}", user.Id);
                 return new False();
-            }
         }
     }
 
@@ -111,11 +117,12 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         QueryOutput<JwtRefreshTokenModel> getResult = await queries.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
-            case Error<string> : return getResult.ErrorString;
+            case Error<string>: return getResult.ErrorString;
         }
-        
+
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
         if (oldToken.ExpiresAt < DateTime.UtcNow) return "Refresh token has expired";
+
         await commands.TryPermanentDeleteAsync(oldToken, ct);
 
         return await GenerateTokensAsync(
@@ -131,20 +138,22 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         QueryOutput<JwtRefreshTokenModel> getResult = await queries.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
-            case Error<string> : return getResult.ErrorString;
+            case Error<string>: return getResult.ErrorString;
         }
+
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
         if (oldToken.Owner.Id != user.Id) return "Refresh token does not belong to user";
-        
+
         CommandOutput deleteResult = await commands.TryPermanentDeleteAsync(oldToken, ct);
         if (!deleteResult.IsSuccess) return deleteResult.ErrorString;
+
         return true;
     }
 
     public async Task<TrueFalseOrError> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default) {
-        var deleteResult = await commands.TryPermanentDeleteAllForUserAsync(user, ct);
+        CommandOutput deleteResult = await commands.TryPermanentDeleteAllForUserAsync(user, ct);
         if (!deleteResult.IsSuccess) return deleteResult.ErrorString;
-        
+
         return true;
 
     }

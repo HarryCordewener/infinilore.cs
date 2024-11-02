@@ -3,6 +3,7 @@ using System;
 using InfiniLore.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -11,66 +12,70 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InfiniLore.Server.Data.Migrations
 {
     [DbContext(typeof(InfiniLoreDbContext))]
-    [Migration("20241011161312_JwtFoundation")]
-    partial class JwtFoundation
+    [Migration("20241102190500_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
@@ -79,7 +84,8 @@ namespace InfiniLore.Server.Data.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
 
@@ -88,13 +94,13 @@ namespace InfiniLore.Server.Data.Migrations
                         {
                             Id = "d957c0f8-e90e-4068-a968-4f4b49fc165c",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d8a1242a-64f9-464a-89c5-bfd73630cd34",
+                            ConcurrencyStamp = "0381f490-a73e-4cef-9d5b-d3a5e29c0d8e",
                             Email = "testuser@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TESTUSER@EXAMPLE.COM",
                             NormalizedUserName = "TESTUSER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFex7auDpf5VzGIQub2NxsTmFq7WUb1LmF7YkRhh0Twdtn2s8yEBrNEmrL6qZybg3g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMuJs5NYofXZSPr6Q3Q8nsye0byfxoFW61lEEG9D+BVLSI4dItXw1lM2Vztj05DenQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "d957c0f8-e90e-4068-a968-4f4b49fc165b",
                             TwoFactorEnabled = false,
@@ -102,164 +108,184 @@ namespace InfiniLore.Server.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("InfiniLore.Server.Data.Models.Account.JwtRefreshToken", b =>
+            modelBuilder.Entity("InfiniLore.Server.Data.Models.Account.JwtRefreshTokenModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ExpiresInDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Permissions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Roles")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SoftDeleteDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("TokenHash")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(48)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
 
                     b.HasIndex("TokenHash")
                         .IsUnique();
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("JwtRefreshTokens");
                 });
 
-            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.AuditLog<InfiniLore.Server.Data.Models.UserData.LoreScopeModel>", b =>
+            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.UserContentAccess<InfiniLore.Server.Data.Models.UserData.LoreScopeModel>", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ChangeDate")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("AccessLevel")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ChangeType")
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("LoreScopeModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("SoftDeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ChangedProperties")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("ContentId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContentId");
+                    b.HasIndex("LoreScopeModelId");
 
-                    b.ToTable("LoreScopeAuditLogs");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserContentAccess<LoreScopeModel>");
                 });
 
-            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.AuditLog<InfiniLore.Server.Data.Models.UserData.MultiverseModel>", b =>
+            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.UserContentAccess<InfiniLore.Server.Data.Models.UserData.MultiverseModel>", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ChangeDate")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("AccessLevel")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ChangeType")
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("MultiverseModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("SoftDeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ChangedProperties")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("ContentId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContentId");
+                    b.HasIndex("MultiverseModelId");
 
-                    b.ToTable("MultiverseAuditLogs");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserContentAccess<MultiverseModel>");
                 });
 
-            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.AuditLog<InfiniLore.Server.Data.Models.UserData.UniverseModel>", b =>
+            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.UserContentAccess<InfiniLore.Server.Data.Models.UserData.UniverseModel>", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ChangeDate")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("AccessLevel")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ChangeType")
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("SoftDeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UniverseModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ChangedProperties")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("ContentId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContentId");
+                    b.HasIndex("UniverseModelId");
 
-                    b.ToTable("UniverseAuditLogs");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserContentAccess<UniverseModel>");
                 });
 
             modelBuilder.Entity("InfiniLore.Server.Data.Models.UserData.LoreScopeModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(512)");
 
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("TEXT");
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("SoftDeleteDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(48)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("OwnerId");
 
-                    b.HasIndex("Name", "UserId")
+                    b.HasIndex("Name", "OwnerId")
                         .IsUnique();
+
+                    b.HasIndex("Id", "OwnerId", "IsPublic");
 
                     b.ToTable("LoreScopes");
                 });
@@ -268,34 +294,33 @@ namespace InfiniLore.Server.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("LoreScopeId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("SoftDeleteDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(48)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -304,10 +329,12 @@ namespace InfiniLore.Server.Data.Migrations
 
                     b.HasIndex("LoreScopeId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("OwnerId");
 
                     b.HasIndex("Name", "LoreScopeId")
                         .IsUnique();
+
+                    b.HasIndex("Id", "OwnerId", "IsPublic");
 
                     b.ToTable("Multiverses");
                 });
@@ -316,34 +343,33 @@ namespace InfiniLore.Server.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(512)");
 
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("TEXT");
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("MultiverseId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("SoftDeleteDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(48)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -352,10 +378,12 @@ namespace InfiniLore.Server.Data.Migrations
 
                     b.HasIndex("MultiverseId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("OwnerId");
 
                     b.HasIndex("Name", "MultiverseId")
                         .IsUnique();
+
+                    b.HasIndex("Id", "OwnerId", "IsPublic");
 
                     b.ToTable("Universes");
                 });
@@ -363,38 +391,39 @@ namespace InfiniLore.Server.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
 
                     b.HasData(
                         new
                         {
-                            Id = "4d6b18e7-aef0-4e30-a833-77ad4c0351c9",
+                            Id = "0e8fd862-cd22-446c-9f12-c9b347e40c3c",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "b6c26b9f-e5a5-4901-9282-e09e2b516e94",
+                            Id = "90abc932-bbfd-4db5-a26d-48ee7e24a34f",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -404,17 +433,19 @@ namespace InfiniLore.Server.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoleId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -427,17 +458,19 @@ namespace InfiniLore.Server.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -449,17 +482,17 @@ namespace InfiniLore.Server.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -471,10 +504,10 @@ namespace InfiniLore.Server.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -486,26 +519,41 @@ namespace InfiniLore.Server.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("InfiniLore.Server.Data.Models.Account.JwtRefreshToken", b =>
+            modelBuilder.Entity("InfiniLore.Server.Data.Models.Account.JwtRefreshTokenModel", b =>
                 {
-                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "User")
+                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "Owner")
                         .WithMany("JwtRefreshTokens")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.UserContentAccess<InfiniLore.Server.Data.Models.UserData.LoreScopeModel>", b =>
+                {
+                    b.HasOne("InfiniLore.Server.Data.Models.UserData.LoreScopeModel", null)
+                        .WithMany("UserAccess")
+                        .HasForeignKey("LoreScopeModelId");
+
+                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "User")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -513,42 +561,45 @@ namespace InfiniLore.Server.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.AuditLog<InfiniLore.Server.Data.Models.UserData.LoreScopeModel>", b =>
+            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.UserContentAccess<InfiniLore.Server.Data.Models.UserData.MultiverseModel>", b =>
                 {
-                    b.HasOne("InfiniLore.Server.Data.Models.UserData.LoreScopeModel", "Content")
-                        .WithMany("AuditLogs")
-                        .HasForeignKey("ContentId");
+                    b.HasOne("InfiniLore.Server.Data.Models.UserData.MultiverseModel", null)
+                        .WithMany("UserAccess")
+                        .HasForeignKey("MultiverseModelId");
 
-                    b.Navigation("Content");
+                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.AuditLog<InfiniLore.Server.Data.Models.UserData.MultiverseModel>", b =>
+            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.UserContentAccess<InfiniLore.Server.Data.Models.UserData.UniverseModel>", b =>
                 {
-                    b.HasOne("InfiniLore.Server.Data.Models.UserData.MultiverseModel", "Content")
-                        .WithMany("AuditLogs")
-                        .HasForeignKey("ContentId");
+                    b.HasOne("InfiniLore.Server.Data.Models.UserData.UniverseModel", null)
+                        .WithMany("UserAccess")
+                        .HasForeignKey("UniverseModelId");
 
-                    b.Navigation("Content");
-                });
+                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("InfiniLore.Server.Data.Models.Base.AuditLog<InfiniLore.Server.Data.Models.UserData.UniverseModel>", b =>
-                {
-                    b.HasOne("InfiniLore.Server.Data.Models.UserData.UniverseModel", "Content")
-                        .WithMany("AuditLogs")
-                        .HasForeignKey("ContentId");
-
-                    b.Navigation("Content");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InfiniLore.Server.Data.Models.UserData.LoreScopeModel", b =>
                 {
-                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "User")
+                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "Owner")
                         .WithMany("LoreScopes")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("InfiniLore.Server.Data.Models.UserData.MultiverseModel", b =>
@@ -556,18 +607,18 @@ namespace InfiniLore.Server.Data.Migrations
                     b.HasOne("InfiniLore.Server.Data.Models.UserData.LoreScopeModel", "LoreScope")
                         .WithMany("Multiverses")
                         .HasForeignKey("LoreScopeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "User")
+                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "Owner")
                         .WithMany("Multiverses")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LoreScope");
 
-                    b.Navigation("User");
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("InfiniLore.Server.Data.Models.UserData.UniverseModel", b =>
@@ -575,18 +626,18 @@ namespace InfiniLore.Server.Data.Migrations
                     b.HasOne("InfiniLore.Server.Data.Models.UserData.MultiverseModel", "Multiverse")
                         .WithMany("Universes")
                         .HasForeignKey("MultiverseId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "User")
+                    b.HasOne("InfiniLore.Server.Data.Models.Account.InfiniLoreUser", "Owner")
                         .WithMany("Universes")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Multiverse");
 
-                    b.Navigation("User");
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -653,21 +704,21 @@ namespace InfiniLore.Server.Data.Migrations
 
             modelBuilder.Entity("InfiniLore.Server.Data.Models.UserData.LoreScopeModel", b =>
                 {
-                    b.Navigation("AuditLogs");
-
                     b.Navigation("Multiverses");
+
+                    b.Navigation("UserAccess");
                 });
 
             modelBuilder.Entity("InfiniLore.Server.Data.Models.UserData.MultiverseModel", b =>
                 {
-                    b.Navigation("AuditLogs");
-
                     b.Navigation("Universes");
+
+                    b.Navigation("UserAccess");
                 });
 
             modelBuilder.Entity("InfiniLore.Server.Data.Models.UserData.UniverseModel", b =>
                 {
-                    b.Navigation("AuditLogs");
+                    b.Navigation("UserAccess");
                 });
 #pragma warning restore 612, 618
         }

@@ -4,6 +4,7 @@
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories.Commands;
 using InfiniLore.Server.Contracts.Types.Results;
+using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models.Account;
 using OneOf.Types;
 
@@ -44,17 +45,11 @@ public class JwtRefreshTokenCommands(IDbUnitOfWork<InfiniLoreDbContext> unitOfWo
         return new Success();
     }
     
-    public ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(InfiniLoreUser user, CancellationToken ct = default) 
-        => TryPermanentDeleteAllForUserAsync(user.Id, ct);
-
-    public ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(Guid userId, CancellationToken ct = default)
-        => TryPermanentDeleteAllForUserAsync(userId.ToString(), ct);
-
-    public async ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(string userId, CancellationToken ct = default) {
+    public async ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(UserUnion userUnion, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
         
         int recordsAffected = await dbContext.JwtRefreshTokens
-            .Where(m => m.OwnerId == userId)
+            .Where(m => m.OwnerId == userUnion.AsUserId)
             .ExecuteDeleteAsync(cancellationToken: ct);
         
         if (recordsAffected <= 0) return "No models were deleted";

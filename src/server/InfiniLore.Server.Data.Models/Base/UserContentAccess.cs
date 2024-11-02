@@ -10,12 +10,12 @@ namespace InfiniLore.Server.Data.Models.Base;
 // ---------------------------------------------------------------------------------------------------------------------
 public class UserContentAccess<T> : BaseContent<T> where T : BaseContent<T> {
     public required InfiniLoreUser User { get; set; }
-    public required AccessLevel AccessLevel { get; set; } = AccessLevel.None;
+    public required AccessLevel AccessLevel { get; set; } 
 }
 
 public enum AccessLevel {
-    None,
     Read,
     Write,
+    Manage,
     Owner
 }

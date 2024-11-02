@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Testcontainers.MsSql;
 using IAssemblyEntry=InfiniLore.Server.API.IAssemblyEntry;
 
 namespace InfiniLore.Server;
@@ -33,7 +34,19 @@ public static class Program {
         // TODO: Add Kestrel SLL
 
         #region Database
-        builder.Services.AddDbContextFactory<InfiniLoreDbContext>();
+        MsSqlContainer? container = new MsSqlBuilder()
+            // .WithLogger(Log.Logger)
+            .WithImage("mcr.microsoft.com/mssql/server:2022-CU10-ubuntu-22.04")
+            .WithName("infinilore-production-db")
+            .WithReuse(true)
+            .Build();
+        
+        if (container is null) throw new Exception("Could not create MsSqlContainer");
+        await container.StartAsync();
+        
+        builder.Services.AddDbContextFactory<InfiniLoreDbContext>(options =>
+            options.UseSqlServer(container.GetConnectionString())
+        );
         #endregion
 
         #region Authentication

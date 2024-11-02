@@ -25,12 +25,6 @@ public class InfiniLoreDbContext : IdentityDbContext<InfiniLoreUser, IdentityRol
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
-    protected override void OnConfiguring(DbContextOptionsBuilder options) {
-        base.OnConfiguring(options);
-
-        options.UseSqlite("Data Source=app.db");
-    }
-
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
 

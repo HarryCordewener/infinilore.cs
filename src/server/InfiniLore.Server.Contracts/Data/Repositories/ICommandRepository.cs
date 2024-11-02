@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Data.Models.Base;
 using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Data.Models.Account;
+using InfiniLore.Server.Contracts.Types.Unions;
 
 namespace InfiniLore.Server.Contracts.Data.Repositories;
 
@@ -43,8 +43,6 @@ public interface ICommandHasTryPermanentDeleteAsync<in T> where T : BaseContent<
     ValueTask<CommandOutput> TryPermanentDeleteRangeAsync(IEnumerable<T> models, CancellationToken ct = default);
 }
 
-public interface ICommandHasTryPermanentDeleteAllForUserAsync<in T> where T : UserContent<T> {
-    ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(InfiniLoreUser user, CancellationToken ct = default);
-    ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(Guid userId, CancellationToken ct = default);
-    ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(string userId, CancellationToken ct = default);
+public interface ICommandHasTryPermanentDeleteAllForUserAsync<in T> where T : BaseContent<T>, IHasOwner {
+    ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(UserUnion userUnion, CancellationToken ct = default);
 }

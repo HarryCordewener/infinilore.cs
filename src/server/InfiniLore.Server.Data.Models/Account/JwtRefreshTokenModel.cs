@@ -8,7 +8,10 @@ namespace InfiniLore.Server.Data.Models.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class JwtRefreshTokenModel : UserContent<JwtRefreshTokenModel> {
+public class JwtRefreshTokenModel : BaseContent<JwtRefreshTokenModel>, IHasOwner {
+    public required InfiniLoreUser Owner { get; set; }
+    public string OwnerId { get; set; } = null!;
+    
     [MaxLength(64)] public required string TokenHash { get; init; }
     public required DateTime ExpiresAt { get; init; }
 

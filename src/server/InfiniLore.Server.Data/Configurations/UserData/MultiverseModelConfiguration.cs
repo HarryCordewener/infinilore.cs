@@ -20,7 +20,7 @@ public class MultiverseModelConfiguration : UserContentConfiguration<MultiverseM
 
         builder.HasMany(model => model.Universes)
             .WithOne(universe => universe.Multiverse)
-            .HasForeignKey(x => x.MultiverseId);
-
+            .HasForeignKey(x => x.MultiverseId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
