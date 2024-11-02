@@ -3,97 +3,61 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories.Commands;
-using InfiniLore.Server.Contracts.Data.Repositories.Queries;
+using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
-using Microsoft.Data.Sqlite;
-using Serilog;
-using System.Security.Cryptography;
-using System.Text;
+using OneOf.Types;
 
 namespace InfiniLore.Server.Data.Repositories.Command.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [RegisterService<IJwtRefreshTokenCommands>(LifeTime.Scoped)]
-public class JwtRefreshTokenCommands(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ILogger logger, IJwtRefreshTokenQueries queries) : IJwtRefreshTokenCommands {
-    private static string HashToken(Guid token) {
-        byte[] tokenBytes = Encoding.UTF8.GetBytes(token.ToString());
-        byte[] hashBytes = SHA256.HashData(tokenBytes);
-        return Convert.ToBase64String(hashBytes);
+public class JwtRefreshTokenCommands(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IJwtRefreshTokenCommands {
+    public async ValueTask<CommandOutput> TryAddAsync(JwtRefreshTokenModel model, CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
+        if (await dbContext.JwtRefreshTokens.AnyAsync(m => m.Id == model.Id, cancellationToken: ct)) return "Model already exists";
+        await dbContext.JwtRefreshTokens.AddAsync(model, ct);
+        return new Success();
     }
     
-    #region AddAsync
-    public async Task<bool> AddAsync(string userId, Guid token, DateTime expiresAt, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
-        InfiniLoreUser? user = await dbContext.Users.FindAsync([userId], ct);
-
-        if (user != null) return await AddAsync(user, token, expiresAt, roles, permissions, expiresInDays, ct);
-
-        logger.Warning("User with ID {UserId} not found", userId);
-        return false;
-
+    public async ValueTask<CommandOutput> TryAddRangeAsync(IEnumerable<JwtRefreshTokenModel> models, CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
+        if (await dbContext.JwtRefreshTokens.AnyAsync(m => models.Any(m2 => m2.Id == m.Id), cancellationToken: ct)) return "One or more Models already exist";
+        await dbContext.JwtRefreshTokens.AddRangeAsync(models, ct);
+        return new Success();
     }
 
-    public async Task<bool> AddAsync(InfiniLoreUser user, Guid token, DateTime expiresAt, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
-        try {
-            InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
-            string hashedToken = HashToken(token);
-
-            bool tokenExists = await dbContext.JwtRefreshTokens.AnyAsync(predicate: t => t.TokenHash == hashedToken, ct);
-            if (tokenExists) {
-                logger.Warning("Refresh token already exists for user {UserId}", user.Id);
-                return false;
-            }
-
-            user.JwtRefreshTokens.Add(new JwtRefreshToken {
-                User = user,
-                TokenHash = hashedToken,
-                ExpiresAt = expiresAt,
-                Roles = roles,
-                Permissions = permissions,
-                ExpiresInDays = expiresInDays
-            });
-
-            dbContext.Users.Update(user);
-
-            await dbContext.SaveChangesAsync(ct);
-            return true;
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is SqliteException { SqliteErrorCode: 19 } sqliteEx) {
-            logger.Warning(ex, "Unique constraint violation: {Message}", sqliteEx.Message);
-            return false;
-        }
-        catch (Exception ex) {
-            logger.Warning(ex, "Error adding refresh token to database");
-            return false;
-        }
+    public async ValueTask<CommandOutput> TryPermanentDeleteAsync(JwtRefreshTokenModel model, CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
+        JwtRefreshTokenModel? existing = await dbContext.JwtRefreshTokens.FindAsync([model.Id], cancellationToken:ct);
+        
+        if (existing == null) return "Model does not exist";
+        dbContext.JwtRefreshTokens.Remove(existing);
+        return new Success();
     }
-    #endregion
+    
+    public async ValueTask<CommandOutput> TryPermanentDeleteRangeAsync(IEnumerable<JwtRefreshTokenModel> models, CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
+        int recordsAffected = await dbContext.JwtRefreshTokens.ExecuteDeleteAsync(cancellationToken: ct);
 
-    #region RemoveAsync
-    public async Task<bool> DeleteAsync(Guid token, CancellationToken ct = default) {
-        if (await queries.GetAsync(token, ct) is not {} tokenData) return false;
-
-        return await DeleteAsync(tokenData, ct);
+        if (recordsAffected <= 0) return "No models were deleted";
+        return new Success();
     }
+    
+    public ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(InfiniLoreUser user, CancellationToken ct = default) 
+        => TryPermanentDeleteAllForUserAsync(user.Id, ct);
 
-    public async Task<bool> DeleteAsync(JwtRefreshToken token, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
+    public ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(Guid userId, CancellationToken ct = default)
+        => TryPermanentDeleteAllForUserAsync(userId.ToString(), ct);
 
-        dbContext.JwtRefreshTokens.Remove(token);
-        return true;
-    }
-    #endregion
-
-    #region RemoveAllAsync
-    public async Task<bool> DeleteAllAsync(string userId, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
-
-        int recordAffected = await dbContext.JwtRefreshTokens
-            .Where(t => t.User.Id == userId)
+    public async ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(string userId, CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
+        
+        int recordsAffected = await dbContext.JwtRefreshTokens
+            .Where(m => m.OwnerId == userId)
             .ExecuteDeleteAsync(cancellationToken: ct);
-
-        return recordAffected > 0;
+        
+        if (recordsAffected <= 0) return "No models were deleted";
+        return new Success();
     }
-    #endregion
 }

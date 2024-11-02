@@ -4,9 +4,10 @@
 using CodeOfChaos.Extensions;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
+using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
 using InfiniLore.Server.Data.Models.Base;
-using InfiniLoreLib.Results;
+
 using OneOf.Types;
 using System.Linq.Expressions;
 

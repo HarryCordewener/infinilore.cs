@@ -3,6 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories.Queries;
+using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,17 +20,18 @@ public class JwtRefreshTokenQueries(IDbUnitOfWork<InfiniLoreDbContext> unitOfWor
         byte[] hashBytes = SHA256.HashData(tokenBytes);
         return Convert.ToBase64String(hashBytes);
     }
-    
-    #region GetAsync
-    public async Task<JwtRefreshToken?> GetAsync(Guid refreshtoken, CancellationToken ct = default) {
-        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync();
+
+    public async ValueTask<QueryOutput<JwtRefreshTokenModel>> TryGetByIdAsync(Guid refreshtoken, CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
         string hashedToken = HashToken(refreshtoken);
 
-        JwtRefreshToken? tokenData = await dbContext.JwtRefreshTokens
-            .Include(t => t.User)
+        JwtRefreshTokenModel? tokenData = await dbContext.JwtRefreshTokens
+            .Include(t => t.Owner)
             .FirstOrDefaultAsync(predicate: t => t.TokenHash == hashedToken, ct);
-
+        
+        if (tokenData == null) {
+            return "Token not found.";
+        }
         return tokenData;
     }
-    #endregion
 }

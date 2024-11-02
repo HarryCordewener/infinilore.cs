@@ -13,5 +13,5 @@ public class InfiniLoreUser : IdentityUser {
     public ICollection<MultiverseModel> Multiverses { get; init; } = [];
     public ICollection<UniverseModel> Universes { get; init; } = [];
 
-    public ICollection<JwtRefreshToken> JwtRefreshTokens { get; init; } = [];
+    public ICollection<JwtRefreshTokenModel> JwtRefreshTokens { get; init; } = [];
 }

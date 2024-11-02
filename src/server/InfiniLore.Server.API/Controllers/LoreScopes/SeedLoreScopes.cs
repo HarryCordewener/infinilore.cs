@@ -25,7 +25,7 @@ public class SeedLoreScopes(ILoreScopesCommands loreScopesCommands, ILogger logg
         InfiniLoreDbContext db = await dbUnitOfWork.GetDbContextAsync(ct);
         if (await db.Users.FirstOrDefaultAsync(predicate: u => u.UserName == "testuser", ct) is not {} user) return;
 
-        await loreScopesCommands.TryAddRange([
+        await loreScopesCommands.TryAddRangeAsync([
             new LoreScopeModel { Owner = user, Name = "A" },
             new LoreScopeModel { Owner = user, Name = "B" },
             new LoreScopeModel { Owner = user, Name = "C" },

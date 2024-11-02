@@ -3,8 +3,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
+using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Base;
-using InfiniLoreLib.Results;
+
 using OneOf.Types;
 
 namespace InfiniLore.Server.Data.Repositories;
@@ -20,7 +21,7 @@ public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> un
     // -----------------------------------------------------------------------------------------------------------------
     public async ValueTask<CommandOutput> TryAddAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
-        if (dbSet.Any(m => m.Id == model.Id)) return "Model already exists";
+        if (await dbSet.AnyAsync(m => m.Id == model.Id, cancellationToken: ct)) return "Model already exists";
 
         await dbSet.AddAsync(model, ct);
         return new Success();
@@ -59,14 +60,14 @@ public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> un
         return new Success();
     }
     
-    public async ValueTask<CommandOutput> TryAddRange(IEnumerable<T> models, CancellationToken ct = default) {
+    public async ValueTask<CommandOutput> TryAddRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
-        if (dbSet.Any(m => models.Any(m2 => m2.Id == m.Id))) return "One or more Models already exist";
+        if (await dbSet.AnyAsync(m => models.Any(m2 => m2.Id == m.Id), cancellationToken: ct)) return "One or more Models already exist";
         await dbSet.AddRangeAsync(models, ct);
         return new Success();
     }
 
-    public async ValueTask<CommandOutput> TryDeleteRange(IEnumerable<T> models, CancellationToken ct = default) {
+    public async ValueTask<CommandOutput> TryDeleteRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         IEnumerable<Guid> ids = models.Select(model => model.Id);
 

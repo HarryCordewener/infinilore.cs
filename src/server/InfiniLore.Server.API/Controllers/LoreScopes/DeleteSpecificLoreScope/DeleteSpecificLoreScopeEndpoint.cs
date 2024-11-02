@@ -4,9 +4,9 @@
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories.Commands;
 using InfiniLore.Server.Contracts.Data.Repositories.Queries;
+using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.UserData;
-using InfiniLoreLib.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 

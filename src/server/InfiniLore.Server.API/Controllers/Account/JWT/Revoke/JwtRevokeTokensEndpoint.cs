@@ -2,12 +2,12 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Services;
+using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
-using InfiniLoreLib.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
+using OneOf.Types;
 using System.Security.Claims;
 
 namespace InfiniLore.Server.API.Controllers.Account.JWT.Revoke;
@@ -33,19 +33,28 @@ public class JwtRevokeTokensEndpoint(IJwtTokenService jwtTokenService, ILogger l
 
         List<ProblemDetails.Error> errors = [];
         foreach (Guid refreshToken in req.RefreshTokens) {
-            BoolResult boolResult = await jwtTokenService.RevokeTokensAsync(user, refreshToken, ct);
-            if (!boolResult.IsFailure) continue;
-
-            logger.Warning("Unable to revoke tokens for refreshToken {@Token}. Result: {@BoolResult}", refreshToken, boolResult.ErrorMessage);
-            errors.Add(new ProblemDetails.Error {
-                    Name = "Unable to revoke tokens.",
-                    Reason = boolResult.ErrorMessage ?? string.Empty
+            TrueFalseOrError result = await jwtTokenService.RevokeTokensAsync(user, refreshToken, ct);
+            switch (result.Value) {
+                case True: {
+                    continue;
                 }
-            );
+
+                case False: {
+                    errors.Add(new ProblemDetails.Error {
+                        Name = "Unable to revoke tokens.",
+                        Reason = "Unable to revoke tokens."
+                    });
+                    break;
+                }
+
+                default: {
+                    logger.Warning("Unable to revoke tokens for refreshToken {@Token}. Result: {@BoolResult}", refreshToken, result.ErrorString);
+                    break;
+                }
+            }
         }
 
-        // if (errors.IsNullOrEmpty()) return TypedResults.Ok();
-
+        if (errors.Count == 0) return TypedResults.Ok();
         return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to revoke tokens.", Errors = errors });
     }
 }

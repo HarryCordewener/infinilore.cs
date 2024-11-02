@@ -8,9 +8,9 @@ namespace InfiniLore.Server.Data.Configurations.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class JwtRefreshTokenConfiguration : IEntityTypeConfiguration<JwtRefreshToken> {
+public class JwtRefreshTokenConfiguration : IEntityTypeConfiguration<JwtRefreshTokenModel> {
 
-    public void Configure(EntityTypeBuilder<JwtRefreshToken> builder) {
+    public void Configure(EntityTypeBuilder<JwtRefreshTokenModel> builder) {
         builder.HasIndex(token => token.TokenHash)
             .IsUnique();
     }

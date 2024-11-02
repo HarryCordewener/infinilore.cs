@@ -2,11 +2,12 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Services;
+using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
-using InfiniLoreLib.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using OneOf.Types;
 
 namespace InfiniLore.Server.API.Controllers.Account.JWT.Revoke;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -30,10 +31,19 @@ public class JwtRevokeAllTokensEndpoint(IJwtTokenService jwtTokenService, ILogge
             return TypedResults.BadRequest(new ProblemDetails { Detail = "User not found." });
         }
 
-        BoolResult boolResult = await jwtTokenService.RevokeAllTokensFromUserAsync(user, ct);
-        if (!boolResult.IsFailure) return TypedResults.Ok();
-
-        logger.Warning("Unable to revoke tokens. Result: {@BoolResult}", boolResult.ErrorMessage);
-        return TypedResults.BadRequest(new ProblemDetails { Detail = "Tokens could not be revoked." });
+        TrueFalseOrError result = await jwtTokenService.RevokeAllTokensFromUserAsync(user, ct);
+        switch (result.Value) {
+            case True : {
+                return TypedResults.Ok();
+            }
+            case False: {
+                return TypedResults.BadRequest(new ProblemDetails { Detail = "Tokens could not be revoked." });
+            }
+            
+            default: {
+                logger.Warning("Unable to revoke tokens. Result: {@Error}", result.ErrorString);
+                return TypedResults.BadRequest(new ProblemDetails { Detail = "Tokens could not be revoked." });
+            }
+        }
     }
 }

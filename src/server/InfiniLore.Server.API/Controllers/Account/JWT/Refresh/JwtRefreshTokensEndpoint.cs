@@ -2,7 +2,8 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Services;
-using InfiniLoreLib.Results;
+using InfiniLore.Server.Contracts.Types;
+using InfiniLore.Server.Contracts.Types.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -26,24 +27,22 @@ public class JwtRefreshTokensEndpoint(IJwtTokenService jwtTokenService, ILogger 
         logger.Information("Generating tokens for refreshToken {@Token}", req.RefreshToken);
         
         JwtResult jwtResult = await jwtTokenService.RefreshTokensAsync(req.RefreshToken, ct);
-        if (jwtResult is {
-                IsSuccess: true,
-                AccessTokenExpiryUtc: {} accessTokenExpiryUtc,
-                RefreshToken: {} refreshToken,
-                RefreshTokenExpiryUtc: {} refreshTokenExpiryUtc,
-                AccessToken: {} accessToken
-            }) {
-            logger.Information("Tokens generated successfully for refreshToken {@Token}", req.RefreshToken);
-            return TypedResults.Ok(new JwtResponse(
-                accessToken, 
-                accessTokenExpiryUtc, 
-                refreshToken,
-                refreshTokenExpiryUtc
-            ));
+        switch (jwtResult.Value) {
+            case JwtTokenData data: {
+                logger.Information("Tokens generated successfully for refreshToken {@Token}", req.RefreshToken);
+                return TypedResults.Ok(new JwtResponse(
+                    data.AccessToken, 
+                    data.AccessTokenExpiryUTC, 
+                    data.RefreshToken,
+                    data.RefreshTokenExpiryUTC
+                ));
+            }
+                
+            default: {
+                logger.Warning("Unable to generate tokens for refreshToken {@Token}. Result: {@JwtResult}", req.RefreshToken, jwtResult.ErrorString);
+                return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to generate tokens." });   
+            }
         }
-
-        logger.Warning("Unable to generate tokens for refreshToken {@Token}. Result: {@JwtResult}", req.RefreshToken, jwtResult);
-        return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to generate tokens." });
 
     }
 }
