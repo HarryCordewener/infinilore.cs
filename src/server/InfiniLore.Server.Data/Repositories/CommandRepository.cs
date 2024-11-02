@@ -50,7 +50,39 @@ public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> un
         dbSet.Update(await update(existing));
         return new Success();
     }
-    
+
+    public async ValueTask<CommandOutput> TryAddOrUpdateRangeAsync(IEnumerable<T> models, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+        var modelsToAdd = new List<T>();
+        var modelsToUpdate = new List<T>();
+        
+        IEnumerable<T> userContents = models as T[] ?? models.ToArray();
+        List<Guid> modelIds = userContents.Select(m => m.Id).Where(id => id != Guid.Empty).ToList();
+
+        DbSet<T> dbSet = await GetDbSetAsync();
+        List<T> existingModels = await dbSet.Where(m => modelIds.Contains(m.Id)).ToListAsync(ct);
+
+        Dictionary<Guid, T> existingModelDict = existingModels.ToDictionary(keySelector: m => m.Id, elementSelector: m => m);
+
+        foreach (T model in userContents) {
+            if (model.Id == Guid.Empty) {
+                modelsToAdd.Add(model);
+                continue;
+            }
+
+            if (existingModelDict.TryGetValue(model.Id, out T? existingModel)) {
+                modelsToUpdate.Add(await update(existingModel));
+                continue;
+            }
+
+            modelsToAdd.Add(model);
+        }
+
+        if (modelsToAdd.Count != 0) await dbSet.AddRangeAsync(modelsToAdd, ct);
+        if (modelsToUpdate.Count != 0) dbSet.UpdateRange(modelsToUpdate);
+
+        return new Success();
+    }
+
     public async ValueTask<CommandOutput> TryDeleteAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T? existing = await dbSet.FindAsync([model.Id], cancellationToken:ct);

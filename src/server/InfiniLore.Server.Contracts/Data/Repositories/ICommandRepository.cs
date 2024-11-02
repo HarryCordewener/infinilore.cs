@@ -29,6 +29,7 @@ public interface ICommandHasTryUpdateAsync<T> where T : BaseContent<T> {
 
 public interface ICommandHasTryAddOrUpdateAsync<T> where T : BaseContent<T> {
     ValueTask<CommandOutput> TryAddOrUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default);
+    ValueTask<CommandOutput> TryAddOrUpdateRangeAsync(IEnumerable<T> models, Func<T, ValueTask<T>> update, CancellationToken ct = default);
 }
 
 public interface ICommandHasTryDeleteAsync<in T> where T : BaseContent<T> {
