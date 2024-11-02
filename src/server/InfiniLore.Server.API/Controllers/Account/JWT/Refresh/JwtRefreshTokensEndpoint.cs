@@ -32,9 +32,9 @@ public class JwtRefreshTokensEndpoint(IJwtTokenService jwtTokenService, ILogger 
                 logger.Information("Tokens generated successfully for refreshToken {@Token}", req.RefreshToken);
                 return TypedResults.Ok(new JwtResponse(
                     data.AccessToken, 
-                    data.AccessTokenExpiryUTC, 
+                    data.AccessTokenExpiryUtc, 
                     data.RefreshToken,
-                    data.RefreshTokenExpiryUTC
+                    data.RefreshTokenExpiryUtc
                 ));
             }
                 

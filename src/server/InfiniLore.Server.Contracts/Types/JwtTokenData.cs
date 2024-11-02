@@ -8,7 +8,7 @@ namespace InfiniLore.Server.Contracts.Types;
 // ---------------------------------------------------------------------------------------------------------------------
 public record struct JwtTokenData(
     string AccessToken,
-    DateTime AccessTokenExpiryUTC,
+    DateTime AccessTokenExpiryUtc,
     Guid RefreshToken,
-    DateTime RefreshTokenExpiryUTC
+    DateTime RefreshTokenExpiryUtc
 );

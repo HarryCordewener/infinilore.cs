@@ -43,7 +43,7 @@ public class JwtCreateTokensEndpoint(IApiSignInService apiSignInService, IJwtTok
             switch (jwtResult.Value) {
                 case JwtTokenData data: {
                     logger.Information("JWT tokens generated successfully for user {Username}.", req.Username);
-                    return TypedResults.Ok(new JwtResponse(data.AccessToken, data.AccessTokenExpiryUTC, data.RefreshToken, data.RefreshTokenExpiryUTC));
+                    return TypedResults.Ok(new JwtResponse(data.AccessToken, data.AccessTokenExpiryUtc, data.RefreshToken, data.RefreshTokenExpiryUtc));
                 }
                 
                 default: {
