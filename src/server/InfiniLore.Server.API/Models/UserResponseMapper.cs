@@ -1,0 +1,16 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// Imports
+// ---------------------------------------------------------------------------------------------------------------------
+using InfiniLore.Server.Data.Models.Account;
+
+namespace InfiniLore.Server.API.Controllers.Account.Identity.CreateUser;
+// ---------------------------------------------------------------------------------------------------------------------
+// Code
+// ---------------------------------------------------------------------------------------------------------------------
+[UsedImplicitly]
+public class UserResponseMapper : ResponseMapper<UserResponse, InfiniLoreUser> {
+    public override UserResponse FromEntity(InfiniLoreUser user) => new(
+        Guid.Parse(user.Id), 
+        user.UserName ?? "UNDEFINED"
+    );
+}
