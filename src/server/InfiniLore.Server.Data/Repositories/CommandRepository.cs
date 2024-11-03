@@ -92,9 +92,16 @@ public abstract class CommandRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> un
 
     public async ValueTask<CommandOutput> TryAddRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
-        if (await dbSet.AnyAsync(predicate: m => models.Any(m2 => m2.Id == m.Id), ct)) return "One or more Models already exist";
+        IEnumerable<T> userContents = models as T[] ?? models.ToArray();
+        List<Guid> modelIds = userContents.Select(m => m.Id).ToList();
 
-        await dbSet.AddRangeAsync(models, ct);
+        // Get all models in the db that match any Ids of the passed-in models
+        List<T> existingModels = await dbSet.Where(m => modelIds.Contains(m.Id)).ToListAsync(ct);
+
+        if (existingModels.Count > 0) 
+            return "One or more Models already exist";
+
+        await dbSet.AddRangeAsync(userContents, ct);
         return new Success();
     }
 

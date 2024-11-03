@@ -1,0 +1,8 @@
+{
+  "defaults": {
+    "methodDisplay": "method",
+    "methodDisplayOptions": "none"
+  },
+  "collectionOrderer": "Tests.InfiniLore.Server.Data.CollectionOrderer, Test.InfiniLore.Server.Data",
+  "testCaseOrderer": "Tests.InfiniLore.Server.Data.TestClassOrderer, Test.InfiniLore.Server.Data"
+}

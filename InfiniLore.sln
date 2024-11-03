@@ -43,7 +43,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniLore.Server.Data.Mode
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniLore.Server.Services", "src\server\InfiniLore.Server.Services\InfiniLore.Server.Services.csproj", "{53583961-44BE-46D6-A870-9191E5BBDB7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.InfiniLore.Server.Api", "tests\Tests.InfiniLore.Server.Api\Tests.InfiniLore.Server.Api.csproj", "{188801E5-1506-4822-9B69-F8EE242855D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.InfiniLore.Server.Data", "tests\Tests.InfiniLore.Server.Data\Tests.InfiniLore.Server.Data.csproj", "{188801E5-1506-4822-9B69-F8EE242855D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
