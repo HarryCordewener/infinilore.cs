@@ -35,19 +35,19 @@ public class GetSpecificUserEndpoint(ILogger logger, IUserRepository queries)
             }
 
             case { UserId: {} userId, Username: null }: {
-                QueryOutput<InfiniLoreUser> result = await queries.TryGetByIdAsync(userId, ct);
+                QueryResult<InfiniLoreUser> result = await queries.TryGetByIdAsync(userId, ct);
                 await SendResult(result, problemDetails, ct);
                 return;
             }
 
             case { UserId: null, Username: {} username }: {
-                QueryOutput<InfiniLoreUser> result = await queries.TryGetByUserNameAsync(username, ct);
+                QueryResult<InfiniLoreUser> result = await queries.TryGetByUserNameAsync(username, ct);
                 await SendResult(result, problemDetails, ct);
                 return;
             }
 
             case { UserId : {} userId, Username: {} username }: {
-                QueryOutputMany<InfiniLoreUser> result = await queries.TryGetByQueryAsync(predicate: user => user.Id == userId.ToString() && user.UserName == username, ct);
+                QueryResultMany<InfiniLoreUser> result = await queries.TryGetByQueryAsync(predicate: user => user.Id == userId.ToString() && user.UserName == username, ct);
                 if (!result.TryGetSuccessValue(out InfiniLoreUser[]? users)) {
                     await SendAsync(TypedResults.BadRequest(problemDetails), cancellation: ct);
                     return;
@@ -59,7 +59,7 @@ public class GetSpecificUserEndpoint(ILogger logger, IUserRepository queries)
         }
     }
 
-    private async Task SendResult(QueryOutput<InfiniLoreUser> result, ProblemDetails problemDetails, CancellationToken ct) {
+    private async Task SendResult(QueryResult<InfiniLoreUser> result, ProblemDetails problemDetails, CancellationToken ct) {
         await result.Match(
             // Success
             f0: async success => {

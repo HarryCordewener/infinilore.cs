@@ -45,7 +45,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         Assert.True(commandResult.IsSuccess);
 
         // Verify
-        QueryOutput<TModel> addedModel = await Repository.TryGetByIdAsync(model.Id);
+        QueryResult<TModel> addedModel = await Repository.TryGetByIdAsync(model.Id);
         Assert.True(addedModel.IsSuccess);
         Assert.True(addedModel.TryGetSuccessValue(out TModel? addedModelValue));
         Assert.Equal(model.Id, addedModelValue.Id);
@@ -63,7 +63,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
 
         // Verify
         foreach (TModel model in userContents) {
-            QueryOutput<TModel> addedModel = await Repository.TryGetByIdAsync(model.Id);
+            QueryResult<TModel> addedModel = await Repository.TryGetByIdAsync(model.Id);
             Assert.True(addedModel.IsSuccess);
             Assert.True(addedModel.TryGetSuccessValue(out TModel? addedModelValue));
             Assert.Equal(model.Id, addedModelValue.Id);
@@ -84,7 +84,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         Assert.True(commandResult.IsSuccess);
 
         // Verify
-        QueryOutput<TModel> updatedModel = await Repository.TryGetByIdAsync(model.Id);
+        QueryResult<TModel> updatedModel = await Repository.TryGetByIdAsync(model.Id);
         Assert.True(updatedModel.IsSuccess);
         Assert.True(updatedModel.TryGetSuccessValue(out TModel? value));
         Assert.True(validateFunc(value));
@@ -105,7 +105,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         Assert.True(commandResult.IsSuccess);
 
         // Verify
-        QueryOutput<TModel> deletedModel = await Repository.TryGetByIdAsync(model.Id);
+        QueryResult<TModel> deletedModel = await Repository.TryGetByIdAsync(model.Id);
         Assert.True(deletedModel.IsNone);
     }
     #endregion
@@ -116,7 +116,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         await AddModelToDatabaseAsync(model);
 
         // Act
-        QueryOutput<TModel> result = await Repository.TryGetByIdAsync(model.Id);
+        QueryResult<TModel> result = await Repository.TryGetByIdAsync(model.Id);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -129,7 +129,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         await AddModelToDatabaseAsync(model);
 
         // Act
-        QueryOutputMany<TModel> result = await Repository.TryGetByUserAsync(userUnion);
+        QueryResultMany<TModel> result = await Repository.TryGetByUserAsync(userUnion);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -139,7 +139,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
 
     public async Task CanGetAllAsync(IEnumerable<TModel> models) {
         // Arrange
-        QueryOutputMany<TModel> originalAmountResult = await Repository.TryGetAllAsync();
+        QueryResultMany<TModel> originalAmountResult = await Repository.TryGetAllAsync();
         Assert.True(originalAmountResult.TryGetSuccessValue(out TModel[]? originalModels));
         int originalAmount = originalModels.Length;// We need to do this because we are using the same database for all tests
 
@@ -149,7 +149,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         }
 
         // Act
-        QueryOutputMany<TModel> result = await Repository.TryGetAllAsync();
+        QueryResultMany<TModel> result = await Repository.TryGetAllAsync();
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -162,7 +162,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         await AddModelToDatabaseAsync(model);
 
         // Act
-        QueryOutputMany<TModel> result = await Repository.TryGetByCriteriaAsync(predicate);
+        QueryResultMany<TModel> result = await Repository.TryGetByCriteriaAsync(predicate);
 
         // Assert
         Assert.True(result.IsSuccess);

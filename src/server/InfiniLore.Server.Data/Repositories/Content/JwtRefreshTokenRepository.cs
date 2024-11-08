@@ -6,6 +6,7 @@ using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models.Account;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using OneOf.Types;
 using System.Security.Cryptography;
 using System.Text;
@@ -24,6 +25,14 @@ public class JwtRefreshTokenRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOf
 
         await dbContext.JwtRefreshTokens.AddAsync(model, ct);
         return new Success();
+    }
+    
+    public async ValueTask<CommandResult<JwtRefreshTokenModel>> TryAddWithResultAsync(JwtRefreshTokenModel model, CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
+        if (await dbContext.JwtRefreshTokens.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";
+
+        EntityEntry<JwtRefreshTokenModel> result = await dbContext.JwtRefreshTokens.AddAsync(model, ct);
+        return result;
     }
 
     public async ValueTask<CommandOutput> TryAddRangeAsync(IEnumerable<JwtRefreshTokenModel> models, CancellationToken ct = default) {
@@ -67,7 +76,7 @@ public class JwtRefreshTokenRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOf
     #endregion
 
     #region Queries
-    public async ValueTask<QueryOutput<JwtRefreshTokenModel>> TryGetByIdAsync(Guid refreshtoken, CancellationToken ct = default) {
+    public async ValueTask<QueryResult<JwtRefreshTokenModel>> TryGetByIdAsync(Guid refreshtoken, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
         string hashedToken = HashToken(refreshtoken);
 

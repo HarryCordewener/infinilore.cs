@@ -24,6 +24,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\InfiniLore.Server.Data\InfiniLore.Server.Data.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Server.Services\InfiniLore.Server.Services.csproj" />
     </ItemGroup>
 
     <ItemGroup>

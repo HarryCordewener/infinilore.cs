@@ -19,10 +19,10 @@ public interface IUserContentRepository<T> :
 #region Queries
 #region Default
 public interface IQueryHasTryGetByUserAsync<T> where T : UserContent<T> {
-    ValueTask<QueryOutputMany<T>> TryGetByUserAsync(UserUnion userUnion, CancellationToken ct = default);
-    ValueTask<QueryOutputMany<T>> TryGetByUserAsync(UserUnion userUnion, PaginationInfo pageInfo, CancellationToken ct = default);
-    ValueTask<QueryOutputMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, CancellationToken ct = default);
-    ValueTask<QueryOutputMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, PaginationInfo pageInfo, CancellationToken ct = default);
+    ValueTask<QueryResultMany<T>> TryGetByUserAsync(UserUnion userUnion, CancellationToken ct = default);
+    ValueTask<QueryResultMany<T>> TryGetByUserAsync(UserUnion userUnion, PaginationInfo pageInfo, CancellationToken ct = default);
+    ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, CancellationToken ct = default);
+    ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, PaginationInfo pageInfo, CancellationToken ct = default);
 }
 #endregion
 #endregion

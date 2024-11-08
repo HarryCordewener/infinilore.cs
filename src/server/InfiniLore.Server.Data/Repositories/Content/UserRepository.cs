@@ -15,7 +15,7 @@ namespace InfiniLore.Server.Data.Repositories.Content;
 // ---------------------------------------------------------------------------------------------------------------------
 [RegisterService<IUserRepository>(LifeTime.Singleton)]
 public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUserRepository {
-    public async ValueTask<QueryOutput<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default) {
+    public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
         string id = userId.AsUserId;
 
@@ -29,7 +29,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
         return new Success<InfiniLoreUser>(result);
     }
 
-    public async ValueTask<QueryOutput<InfiniLoreUser>> TryGetByUserNameAsync(string userName, CancellationToken ct = default) {
+    public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByUserNameAsync(string userName, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
 
         InfiniLoreUser? result = await dbContext.Users
@@ -42,7 +42,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
         return new Success<InfiniLoreUser>(result);
     }
 
-    public async ValueTask<QueryOutputMany<InfiniLoreUser>> TryGetByQueryAsync(Expression<Func<InfiniLoreUser, bool>> predicate, CancellationToken ct = default) {
+    public async ValueTask<QueryResultMany<InfiniLoreUser>> TryGetByQueryAsync(Expression<Func<InfiniLoreUser, bool>> predicate, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
 
         InfiniLoreUser[] result = await dbContext.Users

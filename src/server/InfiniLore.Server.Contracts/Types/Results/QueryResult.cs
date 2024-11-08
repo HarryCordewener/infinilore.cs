@@ -10,7 +10,7 @@ namespace InfiniLore.Server.Contracts.Types.Results;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [GenerateOneOf]
-public partial class QueryOutput<T> : OneOfBase<Success<T>, None, Error<string>> {
+public partial class QueryResult<T> : OneOfBase<Success<T>, None, Error<string>> {
     public bool IsSuccess => IsT0;
     public bool IsNone => IsT1;
     public bool IsError => IsT2;
@@ -31,6 +31,6 @@ public partial class QueryOutput<T> : OneOfBase<Success<T>, None, Error<string>>
         return value is not null;
     }
 
-    public static implicit operator QueryOutput<T>(string input) => new Error<string>(input);
-    public static implicit operator QueryOutput<T>(T item) => new Success<T>(item);
+    public static implicit operator QueryResult<T>(string input) => new Error<string>(input);
+    public static implicit operator QueryResult<T>(T item) => new Success<T>(item);
 }

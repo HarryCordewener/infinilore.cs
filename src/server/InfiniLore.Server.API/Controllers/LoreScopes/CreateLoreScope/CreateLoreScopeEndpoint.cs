@@ -1,12 +1,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Data.Models.UserData;
+using InfiniLore.Server.Services.CQRS.Requests;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using OneOf;
 using OneOf.Types;
-using NotFound=Microsoft.AspNetCore.Http.HttpResults.NotFound;
 
 namespace InfiniLore.Server.API.Controllers.LoreScopes.CreateLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -16,8 +16,8 @@ public class CreateLoreScopeEndpoint(IMediator mediator) :
     Endpoint<
         CreateLoreScopeRequest,
         Results<
-            Ok,
-            NotFound
+            Ok<Guid>,
+            BadRequest
         >,
         LoreScopeResponseMapper
     > {
@@ -27,13 +27,12 @@ public class CreateLoreScopeEndpoint(IMediator mediator) :
         AllowAnonymous();
     }
 
-    // public override Task HandleAsync(CreateLoreScopeRequest req, CancellationToken ct) {
-    //      mediator.
-    // }
-}
-
-public record CreateLoreScopeCommand(Dictionary<string, string> data) : IRequest<OneOf<Success<LoreScopeModel>, Error>>;
-
-public class CreateLoreScopeHandler : IRequestHandler<CreateLoreScopeCommand, OneOf<Success<LoreScopeModel>, Error>> {
-    public async Task<OneOf<Success<LoreScopeModel>, Error>> Handle(CreateLoreScopeCommand request, CancellationToken cancellationToken) => new Error();
+    public async override Task HandleAsync(CreateLoreScopeRequest req, CancellationToken ct) {
+        OneOf<Success<Guid>, Error<string>> result = await mediator.Send(new CreateLoreScopeCommand(req.Model), ct);
+        if (!result.IsT0) {
+            await SendAsync(TypedResults.BadRequest(), cancellation: ct);
+            return;
+        }
+        await SendAsync(TypedResults.Ok(result.AsT0.Value), cancellation: ct);
+    }
 }

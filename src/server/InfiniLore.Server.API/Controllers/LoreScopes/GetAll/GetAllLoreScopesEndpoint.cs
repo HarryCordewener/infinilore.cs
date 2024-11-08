@@ -38,7 +38,7 @@ public class GetAllLoreScopesEndpoint(ILoreScopeRepository loreScopeQueries, Use
         InfiniLoreUser? user = await userManager.GetUserAsync(HttpContext.User);
         if (user is null) return TypedResults.NotFound();
 
-        QueryOutputMany<LoreScopeModel> resultLoreScopes;
+        QueryResultMany<LoreScopeModel> resultLoreScopes;
         LoreScopeModel[]? models;
         if (HttpContext.User.IsInRole("admin")) {
             resultLoreScopes = await loreScopeQueries.TryGetByUserAsync(req.UserId, ct);

@@ -11,7 +11,7 @@ namespace InfiniLore.Server.Contracts.Data.Repositories;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public interface IUserRepository {
-    ValueTask<QueryOutput<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion id, CancellationToken ct = default);
-    ValueTask<QueryOutput<InfiniLoreUser>> TryGetByUserNameAsync(string userName, CancellationToken ct = default);
-    ValueTask<QueryOutputMany<InfiniLoreUser>> TryGetByQueryAsync(Expression<Func<InfiniLoreUser, bool>> predicate, CancellationToken ct = default);
+    ValueTask<QueryResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion id, CancellationToken ct = default);
+    ValueTask<QueryResult<InfiniLoreUser>> TryGetByUserNameAsync(string userName, CancellationToken ct = default);
+    ValueTask<QueryResultMany<InfiniLoreUser>> TryGetByQueryAsync(Expression<Func<InfiniLoreUser, bool>> predicate, CancellationToken ct = default);
 }

@@ -27,7 +27,7 @@ public class GetSpecificLoreScopeEndpoint(ILoreScopeRepository loreScopeQueries)
     }
 
     public async override Task<Results<Ok<LoreScopeResponse>, NotFound>> ExecuteAsync(GetSpecificLoreScopeRequest req, CancellationToken ct) {
-        QueryOutput<LoreScopeModel> resultLoreScope = await loreScopeQueries.TryGetByIdAsync(req.LoreScopeId, ct);
+        QueryResult<LoreScopeModel> resultLoreScope = await loreScopeQueries.TryGetByIdAsync(req.LoreScopeId, ct);
         return resultLoreScope.Match<Results<Ok<LoreScopeResponse>, NotFound>>(
             f0: success => TypedResults.Ok(Map.FromEntity(success.Value)),
             f1: _ => TypedResults.NotFound(),

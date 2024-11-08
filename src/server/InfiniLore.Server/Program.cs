@@ -10,6 +10,8 @@ using InfiniLore.Server.Components;
 using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.Account;
 using InfiniLore.Server.Services;
+using InfiniLore.Server.Services.CQRS;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -125,6 +127,7 @@ public static class Program {
         builder.Services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssemblyContaining<Services.IAssemblyEntry>();
         });
+        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
         #endregion
 
         builder.Services.RegisterServicesFromInfiniLoreServerData();

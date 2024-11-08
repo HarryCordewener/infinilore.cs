@@ -62,7 +62,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
     }
 
     public async Task<JwtResult> RefreshTokensAsync(Guid refreshToken, CancellationToken ct = default) {
-        QueryOutput<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
+        QueryResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
             case Error<string>: return getResult.ErrorString;
@@ -83,7 +83,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
     }
 
     public async Task<TrueFalseOrError> RevokeTokensAsync(InfiniLoreUser user, Guid refreshToken, CancellationToken ct = default) {
-        QueryOutput<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
+        QueryResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
             case Error<string>: return getResult.ErrorString;

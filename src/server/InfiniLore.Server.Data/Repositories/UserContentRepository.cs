@@ -12,7 +12,7 @@ namespace InfiniLore.Server.Data.Repositories;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : BaseContentRepository<T>(unitOfWork), IUserContentRepository<T> where T : UserContent<T> {
-    public async virtual ValueTask<QueryOutputMany<T>> TryGetByUserAsync(UserUnion userUnion, CancellationToken ct) {
+    public async virtual ValueTask<QueryResultMany<T>> TryGetByUserAsync(UserUnion userUnion, CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
             .Where(ls => ls.OwnerId == userUnion.AsUserId)
@@ -23,7 +23,7 @@ public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             : new None();
     }
 
-    public async ValueTask<QueryOutputMany<T>> TryGetByUserAsync(UserUnion userUnion, PaginationInfo pageInfo, CancellationToken ct = default) {
+    public async ValueTask<QueryResultMany<T>> TryGetByUserAsync(UserUnion userUnion, PaginationInfo pageInfo, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
             .Where(ls => ls.OwnerId == userUnion.AsUserId)
@@ -36,7 +36,7 @@ public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             : new None();
     }
 
-    public async ValueTask<QueryOutputMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, CancellationToken ct) {
+    public async ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
 
         T[] result = await dbSet
@@ -51,7 +51,7 @@ public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             : new None();
     }
 
-    public async ValueTask<QueryOutputMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, PaginationInfo pageInfo, CancellationToken ct) {
+    public async ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, PaginationInfo pageInfo, CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
 
         T[] result = await dbSet

@@ -32,7 +32,7 @@ public class DeleteSpecificLoreScopeEndpoint(IDbUnitOfWork<InfiniLoreDbContext> 
     public async override Task<Results<Ok, NotFound>> ExecuteAsync(DeleteSpecificLoreScopeRequest req, CancellationToken ct) {
         await unitOfWork.BeginTransactionAsync(ct);
 
-        QueryOutput<LoreScopeModel> resultUser = await repository.TryGetByIdAsync(req.UserId, ct);
+        QueryResult<LoreScopeModel> resultUser = await repository.TryGetByIdAsync(req.UserId, ct);
         if (!resultUser.TryGetSuccessValue(out LoreScopeModel? loreScope)) {
             return TypedResults.NotFound();// Fine for now
         }
