@@ -2,6 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
+using InfiniLore.Server.Contracts.Data.Repositories.Queries;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models.Account;
@@ -13,7 +14,8 @@ namespace InfiniLore.Server.Data.Repositories.Query.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class UserQueries(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork)  {
+[RegisterService<IUserQueries>(LifeTime.Singleton)]
+public class UserQueries(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUserQueries  {
     public async ValueTask<QueryOutput<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
         string id = userId.AsUserId;
