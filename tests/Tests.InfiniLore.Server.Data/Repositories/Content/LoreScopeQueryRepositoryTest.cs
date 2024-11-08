@@ -19,15 +19,15 @@ public class LoreScopeQueryRepositoryTest(DatabaseFixture fixture) : UserContent
     [Theory]
     [MemberData(nameof(LoreScopeCommandTestData.GetSingleModels), MemberType = typeof(LoreScopeCommandTestData))]
     public override Task TestCanCreateSingleModel(LoreScopeModel model) => CanCreateSingleModel(model);
-    
+
     [Theory]
     [MemberData(nameof(LoreScopeCommandTestData.GetMultipleModels), MemberType = typeof(LoreScopeCommandTestData))]
     public override Task TestCanCreateMultipleModels(IEnumerable<LoreScopeModel> models) => CanCreateMultipleModels(models);
-    
+
     [Theory]
     [MemberData(nameof(LoreScopeCommandTestData.GetUpdate), MemberType = typeof(LoreScopeCommandTestData))]
     public override Task TestCanUpdateModel(LoreScopeModel model, Func<LoreScopeModel, ValueTask<LoreScopeModel>> updateFunc, Func<LoreScopeModel, bool> validateFunc) => CanUpdateModel(model, updateFunc, validateFunc);
-    
+
     [Theory]
     [MemberData(nameof(LoreScopeCommandTestData.GetDeletes), MemberType = typeof(LoreScopeCommandTestData))]
     public override Task TestCanDeleteModel(LoreScopeModel model) => CanDeleteModel(model);
@@ -37,15 +37,15 @@ public class LoreScopeQueryRepositoryTest(DatabaseFixture fixture) : UserContent
     [Theory]
     [MemberData(nameof(LoreScopeQueryTestData.GetSingleModels), MemberType = typeof(LoreScopeQueryTestData))]
     public override Task TestCanGetByIdAsync(LoreScopeModel model) => CanGetByIdAsync(model);
-    
+
     [Theory]
     [MemberData(nameof(LoreScopeQueryTestData.GetUserModels), MemberType = typeof(LoreScopeQueryTestData))]
     public override Task TestCanGetByUserAsync(UserUnion userUnion, LoreScopeModel model) => CanGetByUserAsync(userUnion, model);
-    
+
     [Theory]
     [MemberData(nameof(LoreScopeQueryTestData.GetMultipleModels), MemberType = typeof(LoreScopeQueryTestData))]
     public override Task TestCanGetAllAsync(IEnumerable<LoreScopeModel> models) => CanGetAllAsync(models);
-    
+
     [Theory]
     [MemberData(nameof(LoreScopeQueryTestData.GetCriteriaModels), MemberType = typeof(LoreScopeQueryTestData))]
     public override Task TestCanGetByCriteriaAsync(Expression<Func<LoreScopeModel, bool>> predicate, LoreScopeModel model) => CanGetByCriteriaAsync(predicate, model);

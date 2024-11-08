@@ -11,7 +11,7 @@ namespace Tests.InfiniLore.Server.Data.Data;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public static class LoreScopeQueryTestData {
-    
+
     public static TheoryData<LoreScopeModel> GetSingleModels() {
         var data = new TheoryData<LoreScopeModel>();
 
@@ -33,7 +33,7 @@ public static class LoreScopeQueryTestData {
 
         return data;
     }
-    
+
     public static TheoryData<UserUnion, LoreScopeModel> GetUserModels() {
         var data = new TheoryData<UserUnion, LoreScopeModel>();
 
@@ -48,7 +48,7 @@ public static class LoreScopeQueryTestData {
 
         return data;
     }
-    
+
     public static TheoryData<IEnumerable<LoreScopeModel>> GetMultipleModels() {
         var data = new TheoryData<IEnumerable<LoreScopeModel>>();
 
@@ -77,15 +77,14 @@ public static class LoreScopeQueryTestData {
 
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 
-        var model = new LoreScopeModel
-        {
+        var model = new LoreScopeModel {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope with Criteria",
             Description = "Test Query Scope Description with Criteria",
             Owner = user1
         };
 
-        data.Add(scope => scope.Name == "Test Query Scope with Criteria", model);
+        data.Add(p1: scope => scope.Name == "Test Query Scope with Criteria", model);
 
         return data;
     }

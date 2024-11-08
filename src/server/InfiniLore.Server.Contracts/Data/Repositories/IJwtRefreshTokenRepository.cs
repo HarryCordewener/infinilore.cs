@@ -7,7 +7,7 @@ namespace InfiniLore.Server.Contracts.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface IJwtRefreshTokenRepository : 
+public interface IJwtRefreshTokenRepository :
     IQueryHasTryGetByIdAsync<JwtRefreshTokenModel>,
     ICommandHasTryAddAsync<JwtRefreshTokenModel>,
     ICommandHasTryPermanentDeleteAsync<JwtRefreshTokenModel>,

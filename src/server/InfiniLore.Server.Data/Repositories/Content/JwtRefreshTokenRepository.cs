@@ -65,7 +65,7 @@ public class JwtRefreshTokenRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOf
         return new Success();
     }
     #endregion
-    
+
     #region Queries
     public async ValueTask<QueryOutput<JwtRefreshTokenModel>> TryGetByIdAsync(Guid refreshtoken, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);

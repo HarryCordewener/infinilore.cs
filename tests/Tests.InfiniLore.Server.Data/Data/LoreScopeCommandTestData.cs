@@ -31,7 +31,7 @@ public static class LoreScopeCommandTestData {
 
         return data;
     }
-    
+
     public static TheoryData<IEnumerable<LoreScopeModel>> GetMultipleModels() {
         var data = new TheoryData<IEnumerable<LoreScopeModel>>();
 
@@ -51,7 +51,7 @@ public static class LoreScopeCommandTestData {
                 Owner = user1
             }
         });
-        
+
         data.Add(new List<LoreScopeModel> {
             new() {
                 Name = "Test Scope Without Server Side Id",
@@ -70,7 +70,7 @@ public static class LoreScopeCommandTestData {
 
     public static TheoryData<LoreScopeModel, Func<LoreScopeModel, ValueTask<LoreScopeModel>>, Func<LoreScopeModel, bool>> GetUpdate() {
         var data = new TheoryData<LoreScopeModel, Func<LoreScopeModel, ValueTask<LoreScopeModel>>, Func<LoreScopeModel, bool>>();
-        
+
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 
         data.Add(
@@ -80,12 +80,11 @@ public static class LoreScopeCommandTestData {
                 Description = "Test Scope Description 5",
                 Owner = user1
             },
-            async model =>
-            {
+            p2: async model => {
                 model.Description = "Updated Scope Description 5";
                 return await Task.FromResult(model);
             },
-            model => model.Description == "Updated Scope Description 5"
+            p3: model => model.Description == "Updated Scope Description 5"
         );
 
         return data;

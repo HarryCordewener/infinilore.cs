@@ -5,31 +5,31 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>b66030d9-dd4d-418e-9b45-ed964bbc8e4e</UserSecretsId>
-        
+
         <!-- OpenAPI Document -->
         <!-- <OpenApiDocumentsDirectory>./</OpenApiDocumentsDirectory>-->
         <!-- <OpenApiGenerateDocumentsOptions>&#45;&#45;file-name infinilore-api</OpenApiGenerateDocumentsOptions>-->
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCore.SwaggerUI.Themes" Version="1.0.0" />
-        <PackageReference Include="FastEndpoints" Version="5.30.0" />
-        <PackageReference Include="FastEndpoints.Security" Version="5.30.0" />
-        <PackageReference Include="FastEndpoints.Swagger" Version="5.30.0" />
-        <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
-        <PackageReference Include="MediatR" Version="12.4.1" />
-        <PackageReference Include="Serilog" Version="4.1.0" />
-        <PackageReference Include="CodeOfChaos.Extensions.AspNetCore" Version="0.2.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.10" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10" PrivateAssets="All" />
-        <PackageReference Include="Testcontainers.MsSql" Version="4.0.0" />
+        <PackageReference Include="AspNetCore.SwaggerUI.Themes" Version="1.0.0"/>
+        <PackageReference Include="FastEndpoints" Version="5.30.0"/>
+        <PackageReference Include="FastEndpoints.Security" Version="5.30.0"/>
+        <PackageReference Include="FastEndpoints.Swagger" Version="5.30.0"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2024.3.0"/>
+        <PackageReference Include="MediatR" Version="12.4.1"/>
+        <PackageReference Include="Serilog" Version="4.1.0"/>
+        <PackageReference Include="CodeOfChaos.Extensions.AspNetCore" Version="0.2.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.10"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10" PrivateAssets="All"/>
+        <PackageReference Include="Testcontainers.MsSql" Version="4.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\client\InfiniLore.WasmClient\InfiniLore.WasmClient.csproj" />
-        <ProjectReference Include="..\InfiniLore.Server.API\InfiniLore.Server.API.csproj" />
-        <ProjectReference Include="..\InfiniLore.Server.Data\InfiniLore.Server.Data.csproj" />
-        <ProjectReference Include="..\InfiniLore.Server.Services\InfiniLore.Server.Services.csproj" />
+        <ProjectReference Include="..\..\client\InfiniLore.WasmClient\InfiniLore.WasmClient.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Server.API\InfiniLore.Server.API.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Server.Data\InfiniLore.Server.Data.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Server.Services\InfiniLore.Server.Services.csproj"/>
     </ItemGroup>
 
 </Project>

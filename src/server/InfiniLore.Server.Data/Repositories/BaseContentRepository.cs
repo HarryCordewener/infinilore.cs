@@ -9,7 +9,6 @@ using OneOf.Types;
 using System.Linq.Expressions;
 
 namespace InfiniLore.Server.Data.Repositories;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -96,7 +95,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         // Get all models in the db that match any Ids of the passed-in models
         List<T> existingModels = await dbSet.Where(m => modelIds.Contains(m.Id)).ToListAsync(ct);
 
-        if (existingModels.Count > 0) 
+        if (existingModels.Count > 0)
             return "One or more Models already exist";
 
         await dbSet.AddRangeAsync(userContents, ct);

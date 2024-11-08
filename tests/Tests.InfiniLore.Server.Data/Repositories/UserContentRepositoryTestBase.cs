@@ -17,9 +17,9 @@ namespace Tests.InfiniLore.Server.Data.Repositories;
 public abstract class UserContentRepositoryTestBase<TRepository, TModel>(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>
     where TRepository : IUserContentRepository<TModel>
     where TModel : UserContent<TModel> {
-    
+
     [UsedImplicitly] protected readonly TRepository Repository = fixture.ServiceProvider.GetRequiredService<TRepository>();
-    [UsedImplicitly] protected readonly IDbUnitOfWork<InfiniLoreDbContext>  UnitOfWork = fixture.ServiceProvider.GetRequiredService<IDbUnitOfWork<InfiniLoreDbContext>>();
+    [UsedImplicitly] protected readonly IDbUnitOfWork<InfiniLoreDbContext> UnitOfWork = fixture.ServiceProvider.GetRequiredService<IDbUnitOfWork<InfiniLoreDbContext>>();
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
@@ -28,7 +28,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
     [UsedImplicitly] public abstract Task TestCanCreateMultipleModels(IEnumerable<TModel> models);
     [UsedImplicitly] public abstract Task TestCanUpdateModel(TModel model, Func<TModel, ValueTask<TModel>> updateFunc, Func<TModel, bool> validateFunc);
     [UsedImplicitly] public abstract Task TestCanDeleteModel(TModel model);
-    
+
     [UsedImplicitly] public abstract Task TestCanGetByIdAsync(TModel model);
     [UsedImplicitly] public abstract Task TestCanGetByUserAsync(UserUnion userUnion, TModel model);
     [UsedImplicitly] public abstract Task TestCanGetAllAsync(IEnumerable<TModel> models);
@@ -39,7 +39,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         // Act
         CommandOutput commandResult = await Repository.TryAddAsync(model);
         bool commitResult = await UnitOfWork.TryCommitAsync();
-        
+
         // Assert
         Assert.True(commitResult);
         Assert.True(commandResult.IsSuccess);
@@ -50,17 +50,17 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         Assert.True(addedModel.TryGetSuccessValue(out TModel? addedModelValue));
         Assert.Equal(model.Id, addedModelValue.Id);
     }
-    
+
     public async Task CanCreateMultipleModels(IEnumerable<TModel> models) {
         // Act
         IEnumerable<TModel> userContents = models as TModel[] ?? models.ToArray();
         CommandOutput commandResult = await Repository.TryAddRangeAsync(userContents);
         bool commitResult = await UnitOfWork.TryCommitAsync();
-        
+
         // Assert
         Assert.True(commitResult);
         Assert.True(commandResult.IsSuccess);
-        
+
         // Verify
         foreach (TModel model in userContents) {
             QueryOutput<TModel> addedModel = await Repository.TryGetByIdAsync(model.Id);
@@ -77,19 +77,19 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         // Act
         CommandOutput commandResult = await Repository.TryUpdateAsync(model, updateFunc);
         bool commitResult2 = await UnitOfWork.TryCommitAsync();
-        
+
         // Assert
         Assert.True(commitResult);
         Assert.True(commitResult2);
         Assert.True(commandResult.IsSuccess);
-        
+
         // Verify
         QueryOutput<TModel> updatedModel = await Repository.TryGetByIdAsync(model.Id);
         Assert.True(updatedModel.IsSuccess);
         Assert.True(updatedModel.TryGetSuccessValue(out TModel? value));
         Assert.True(validateFunc(value));
     }
-    
+
     public async Task CanDeleteModel(TModel model) {
         // Arrange
         await Repository.TryAddAsync(model);
@@ -98,7 +98,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         // Act
         CommandOutput commandResult = await Repository.TryDeleteAsync(model);
         bool commitResult2 = await UnitOfWork.TryCommitAsync();
-        
+
         // Assert
         Assert.True(commitResult);
         Assert.True(commitResult2);
@@ -109,7 +109,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         Assert.True(deletedModel.IsNone);
     }
     #endregion
-    
+
     #region Queries
     public async Task CanGetByIdAsync(TModel model) {
         // Arrange
@@ -134,15 +134,15 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         // Assert
         Assert.True(result.IsSuccess);
         Assert.True(result.TryGetSuccessValue(out TModel[]? values));
-        Assert.Contains(values, m => m.Id == model.Id);
+        Assert.Contains(values, filter: m => m.Id == model.Id);
     }
 
     public async Task CanGetAllAsync(IEnumerable<TModel> models) {
         // Arrange
         QueryOutputMany<TModel> originalAmountResult = await Repository.TryGetAllAsync();
         Assert.True(originalAmountResult.TryGetSuccessValue(out TModel[]? originalModels));
-        int originalAmount = originalModels.Length; // We need to do this because we are using the same database for all tests
-        
+        int originalAmount = originalModels.Length;// We need to do this because we are using the same database for all tests
+
         IEnumerable<TModel> userContents = models as TModel[] ?? models.ToArray();
         foreach (TModel model in userContents) {
             await AddModelToDatabaseAsync(model);
@@ -167,7 +167,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         // Assert
         Assert.True(result.IsSuccess);
         Assert.True(result.TryGetSuccessValue(out TModel[]? values));
-        Assert.Contains(values, m => m.Id == model.Id);
+        Assert.Contains(values, filter: m => m.Id == model.Id);
     }
 
     private async Task AddModelToDatabaseAsync(TModel model) {

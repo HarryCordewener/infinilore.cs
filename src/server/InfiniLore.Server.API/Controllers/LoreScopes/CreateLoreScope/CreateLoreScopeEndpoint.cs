@@ -9,7 +9,6 @@ using OneOf.Types;
 using NotFound=Microsoft.AspNetCore.Http.HttpResults.NotFound;
 
 namespace InfiniLore.Server.API.Controllers.LoreScopes.CreateLoreScope;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -31,14 +30,10 @@ public class CreateLoreScopeEndpoint(IMediator mediator) :
     // public override Task HandleAsync(CreateLoreScopeRequest req, CancellationToken ct) {
     //      mediator.
     // }
-
 }
 
 public record CreateLoreScopeCommand(Dictionary<string, string> data) : IRequest<OneOf<Success<LoreScopeModel>, Error>>;
 
 public class CreateLoreScopeHandler : IRequestHandler<CreateLoreScopeCommand, OneOf<Success<LoreScopeModel>, Error>> {
-    public async Task<OneOf<Success<LoreScopeModel>, Error>> Handle(CreateLoreScopeCommand request, CancellationToken cancellationToken) {
-        return new Error();
-    }
+    public async Task<OneOf<Success<LoreScopeModel>, Error>> Handle(CreateLoreScopeCommand request, CancellationToken cancellationToken) => new Error();
 }
-

@@ -123,8 +123,7 @@ public static class Program {
 
         #region MediatR
         builder.Services.AddMediatR(cfg => {
-            cfg.RegisterServicesFromAssemblyContaining<IAssemblyEntry>();
-            cfg.RegisterServicesFromAssemblyContaining<API.IAssemblyEntry>();
+            cfg.RegisterServicesFromAssemblyContaining<Services.IAssemblyEntry>();
         });
         #endregion
 

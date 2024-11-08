@@ -10,7 +10,7 @@ namespace InfiniLore.Server.API.Models;
 [UsedImplicitly]
 public class UserResponseMapper : ResponseMapper<UserResponse, InfiniLoreUser> {
     public override UserResponse FromEntity(InfiniLoreUser user) => new(
-        Guid.Parse(user.Id), 
+        Guid.Parse(user.Id),
         user.UserName ?? "UNDEFINED"
     );
 }

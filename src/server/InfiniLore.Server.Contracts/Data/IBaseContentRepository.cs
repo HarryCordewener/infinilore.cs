@@ -10,7 +10,7 @@ namespace InfiniLore.Server.Contracts.Data;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface IBaseContentRepository<T> : 
+public interface IBaseContentRepository<T> :
     ICommandHasTryAddAsync<T>,
     ICommandHasTryUpdateAsync<T>,
     ICommandHasTryAddOrUpdateAsync<T>,
@@ -18,7 +18,6 @@ public interface IBaseContentRepository<T> :
     IQueryHasTryGetByIdAsync<T>,
     IQueryHasTryGetAllAsync<T>,
     IQueryHasTryGetByCriteriaAsync<T>
-
     where T : BaseContent<T>;
 
 #region Commands
@@ -41,7 +40,7 @@ public interface ICommandHasTryDeleteAsync<in T> where T : BaseContent<T> {
     ValueTask<CommandOutput> TryDeleteAsync(T model, CancellationToken ct = default);
     ValueTask<CommandOutput> TryDeleteRangeAsync(IEnumerable<T> models, CancellationToken ct = default);
 }
-#endregion 
+#endregion
 #region Special
 public interface ICommandHasTryPermanentDeleteAsync<in T> where T : BaseContent<T> {
     ValueTask<CommandOutput> TryPermanentDeleteAsync(T model, CancellationToken ct = default);
@@ -53,7 +52,6 @@ public interface ICommandHasTryPermanentDeleteAllForUserAsync<in T> where T : Ba
 }
 #endregion
 #endregion
-
 #region Queries
 #region Default
 public interface IQueryHasTryGetByIdAsync<T> where T : BaseContent<T> {
@@ -72,10 +70,5 @@ public interface IQueryHasTryGetByCriteriaAsync<T> where T : BaseContent<T> {
     ValueTask<QueryOutputMany<T>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct = default, Expression<Func<T, object>>? orderBy = null);
     ValueTask<QueryOutputMany<T>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct = default, Expression<Func<T, object>>? orderBy = null);
 }
-#endregion 
-#region Special
-
 #endregion
 #endregion
-
-
