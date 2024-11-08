@@ -2,7 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
-using InfiniLore.Server.Contracts.Data.Repositories.Commands;
+using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.UserData;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +12,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class SeedLoreScopes(ILoreScopesCommands loreScopesCommands, ILogger logger, IDbUnitOfWork<InfiniLoreDbContext> dbUnitOfWork) : EndpointWithoutRequest {
+public class SeedLoreScopes(ILoreScopeRepository repository, ILogger logger, IDbUnitOfWork<InfiniLoreDbContext> dbUnitOfWork) : EndpointWithoutRequest {
     public override void Configure() {
         Get("/lore-scopes/seed");
         Roles("Admin");
@@ -25,7 +25,7 @@ public class SeedLoreScopes(ILoreScopesCommands loreScopesCommands, ILogger logg
         InfiniLoreDbContext db = await dbUnitOfWork.GetDbContextAsync(ct);
         if (await db.Users.FirstOrDefaultAsync(predicate: u => u.UserName == "testuser", ct) is not {} user) return;
 
-        await loreScopesCommands.TryAddRangeAsync([
+        await repository.TryAddRangeAsync([
             new LoreScopeModel { Owner = user, Name = "A" },
             new LoreScopeModel { Owner = user, Name = "B" },
             new LoreScopeModel { Owner = user, Name = "C" },

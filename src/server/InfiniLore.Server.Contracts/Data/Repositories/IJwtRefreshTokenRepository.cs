@@ -1,13 +1,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Contracts.Data;
-using InfiniLore.Server.Contracts.Data.Repositories.Queries;
-using InfiniLore.Server.Data.Models.UserData;
+using InfiniLore.Server.Data.Models.Account;
 
-namespace InfiniLore.Server.Data.Repositories.Query.UserData;
+namespace InfiniLore.Server.Contracts.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[RegisterService<ILoreScopeQueries>(LifeTime.Scoped)]
-public class LoreScopeQueries(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : QueryRepository<LoreScopeModel>(unitOfWork), ILoreScopeQueries;
+public interface IJwtRefreshTokenRepository : 
+    IQueryHasTryGetByIdAsync<JwtRefreshTokenModel>,
+    ICommandHasTryAddAsync<JwtRefreshTokenModel>,
+    ICommandHasTryPermanentDeleteAsync<JwtRefreshTokenModel>,
+    ICommandHasTryPermanentDeleteAllForUserAsync<JwtRefreshTokenModel>;

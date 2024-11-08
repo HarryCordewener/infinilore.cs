@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Testcontainers.MsSql;
-using IAssemblyEntry=InfiniLore.Server.API.IAssemblyEntry;
 
 namespace InfiniLore.Server;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -120,6 +119,13 @@ public static class Program {
             });
 
         builder.Services.AddIdentityApiEndpoints<InfiniLoreUser>();
+        #endregion
+
+        #region MediatR
+        builder.Services.AddMediatR(cfg => {
+            cfg.RegisterServicesFromAssemblyContaining<IAssemblyEntry>();
+            cfg.RegisterServicesFromAssemblyContaining<API.IAssemblyEntry>();
+        });
         #endregion
 
         builder.Services.RegisterServicesFromInfiniLoreServerData();

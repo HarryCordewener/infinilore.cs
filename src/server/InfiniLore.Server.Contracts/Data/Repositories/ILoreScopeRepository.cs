@@ -1,13 +1,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Data.Models.Account;
+using InfiniLore.Server.Data.Models.UserData;
 
-namespace InfiniLore.Server.Contracts.Data.Repositories.Commands;
+namespace InfiniLore.Server.Contracts.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface IJwtRefreshTokenCommands :
-    ICommandHasTryAddAsync<JwtRefreshTokenModel>,
-    ICommandHasTryPermanentDeleteAsync<JwtRefreshTokenModel>,
-    ICommandHasTryPermanentDeleteAllForUserAsync<JwtRefreshTokenModel>;
+public interface ILoreScopeRepository : IUserContentRepository<LoreScopeModel>;

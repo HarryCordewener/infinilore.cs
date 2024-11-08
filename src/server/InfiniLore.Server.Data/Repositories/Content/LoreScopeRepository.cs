@@ -1,10 +1,13 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Data.Models.Account;
+using InfiniLore.Server.Contracts.Data;
+using InfiniLore.Server.Contracts.Data.Repositories;
+using InfiniLore.Server.Data.Models.UserData;
 
-namespace InfiniLore.Server.Contracts.Data.Repositories.Queries;
+namespace InfiniLore.Server.Data.Repositories.Content;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface IJwtRefreshTokenQueries : IQueryHasTryGetByIdAsync<JwtRefreshTokenModel>;
+[RegisterService<ILoreScopeRepository>(LifeTime.Scoped)]
+public class LoreScopeRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : UserContentRepository<LoreScopeModel>(unitOfWork), ILoreScopeRepository;

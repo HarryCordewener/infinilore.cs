@@ -4,7 +4,7 @@
 using InfiniLore.Server.Data.Models.Account;
 using InfiniLore.Server.Data.Models.UserData;
 
-namespace Tests.InfiniLore.Server.Data.Data.Commands;
+namespace Tests.InfiniLore.Server.Data.Data;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------

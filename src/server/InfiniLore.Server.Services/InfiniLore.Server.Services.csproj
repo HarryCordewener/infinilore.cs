@@ -24,4 +24,9 @@
         <ProjectReference Include="..\InfiniLore.Server.Data\InfiniLore.Server.Data.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="RequestHandlers\Commands\" />
+      <Folder Include="RequestHandlers\Queries\" />
+    </ItemGroup>
+
 </Project>

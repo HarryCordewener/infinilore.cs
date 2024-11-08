@@ -2,7 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using FastEndpoints.Security;
-using InfiniLore.Server.Contracts.Data.Repositories.Queries;
+using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
 using InfiniLore.Server.Data.Models.Base;
@@ -15,7 +15,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.GetAll;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetAllLoreScopesEndpoint(ILoreScopeQueries loreScopeQueries, UserManager<InfiniLoreUser> userManager) :
+public class GetAllLoreScopesEndpoint(ILoreScopeRepository loreScopeQueries, UserManager<InfiniLoreUser> userManager) :
     Endpoint<
         GetAllLoreScopesRequest,
         Results<

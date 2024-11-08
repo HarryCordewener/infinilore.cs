@@ -1,19 +1,21 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Contracts.Data.Repositories.Commands;
-using InfiniLore.Server.Contracts.Data.Repositories.Queries;
+using InfiniLore.Server.Contracts.Data.Repositories;
+using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models.UserData;
-using Tests.InfiniLore.Server.Data.Data.Commands;
+using System.Linq.Expressions;
+using Tests.InfiniLore.Server.Data.Data;
 
-namespace Tests.InfiniLore.Server.Data.Repositories.Commands;
+namespace Tests.InfiniLore.Server.Data.Repositories.Content;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[Collection(CollectionOrderer.CommandTestCollection)]
+[Collection(CollectionOrderer.QueryTestCollection)]
 [TestClassPriority(0)]
-public class LoreScopeCommandRepositoryTest(DatabaseFixture fixture) : CommandRepositoryTestBase<ILoreScopeQueries, ILoreScopesCommands, LoreScopeModel>(fixture) {
+public class LoreScopeQueryRepositoryTest(DatabaseFixture fixture) : UserContentRepositoryTestBase<ILoreScopeRepository, LoreScopeModel>(fixture) {
 
+    #region Commands
     [Theory]
     [MemberData(nameof(LoreScopeCommandTestData.GetSingleModels), MemberType = typeof(LoreScopeCommandTestData))]
     public override Task TestCanCreateSingleModel(LoreScopeModel model) => CanCreateSingleModel(model);
@@ -29,4 +31,23 @@ public class LoreScopeCommandRepositoryTest(DatabaseFixture fixture) : CommandRe
     [Theory]
     [MemberData(nameof(LoreScopeCommandTestData.GetDeletes), MemberType = typeof(LoreScopeCommandTestData))]
     public override Task TestCanDeleteModel(LoreScopeModel model) => CanDeleteModel(model);
+    #endregion
+
+    #region Queries
+    [Theory]
+    [MemberData(nameof(LoreScopeQueryTestData.GetSingleModels), MemberType = typeof(LoreScopeQueryTestData))]
+    public override Task TestCanGetByIdAsync(LoreScopeModel model) => CanGetByIdAsync(model);
+    
+    [Theory]
+    [MemberData(nameof(LoreScopeQueryTestData.GetUserModels), MemberType = typeof(LoreScopeQueryTestData))]
+    public override Task TestCanGetByUserAsync(UserUnion userUnion, LoreScopeModel model) => CanGetByUserAsync(userUnion, model);
+    
+    [Theory]
+    [MemberData(nameof(LoreScopeQueryTestData.GetMultipleModels), MemberType = typeof(LoreScopeQueryTestData))]
+    public override Task TestCanGetAllAsync(IEnumerable<LoreScopeModel> models) => CanGetAllAsync(models);
+    
+    [Theory]
+    [MemberData(nameof(LoreScopeQueryTestData.GetCriteriaModels), MemberType = typeof(LoreScopeQueryTestData))]
+    public override Task TestCanGetByCriteriaAsync(Expression<Func<LoreScopeModel, bool>> predicate, LoreScopeModel model) => CanGetByCriteriaAsync(predicate, model);
+    #endregion
 }

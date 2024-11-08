@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Contracts.Data.Repositories.Queries;
+using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.UserData;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +11,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.GetSpecificLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetSpecificLoreScopeEndpoint(ILoreScopeQueries loreScopeQueries) :
+public class GetSpecificLoreScopeEndpoint(ILoreScopeRepository loreScopeQueries) :
     Endpoint<
         GetSpecificLoreScopeRequest,
         Results<

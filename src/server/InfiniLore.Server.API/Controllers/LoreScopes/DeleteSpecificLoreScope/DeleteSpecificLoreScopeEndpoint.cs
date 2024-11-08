@@ -2,8 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
-using InfiniLore.Server.Contracts.Data.Repositories.Commands;
-using InfiniLore.Server.Contracts.Data.Repositories.Queries;
+using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.UserData;
@@ -14,7 +13,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.DeleteSpecificLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class DeleteSpecificLoreScopeEndpoint(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ILoreScopeQueries loreScopeQueries, ILoreScopesCommands loreScopeCommands) :
+public class DeleteSpecificLoreScopeEndpoint(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ILoreScopeRepository repository) :
     Endpoint<
         DeleteSpecificLoreScopeRequest,
         Results<
@@ -33,12 +32,12 @@ public class DeleteSpecificLoreScopeEndpoint(IDbUnitOfWork<InfiniLoreDbContext> 
     public async override Task<Results<Ok, NotFound>> ExecuteAsync(DeleteSpecificLoreScopeRequest req, CancellationToken ct) {
         await unitOfWork.BeginTransactionAsync(ct);
 
-        QueryOutput<LoreScopeModel> resultUser = await loreScopeQueries.TryGetByIdAsync(req.UserId, ct);
+        QueryOutput<LoreScopeModel> resultUser = await repository.TryGetByIdAsync(req.UserId, ct);
         if (!resultUser.TryGetSuccessValue(out LoreScopeModel? loreScope)) {
             return TypedResults.NotFound();// Fine for now
         }
 
-        CommandOutput resultDelete = await loreScopeCommands.TryDeleteAsync(loreScope, ct);
+        CommandOutput resultDelete = await repository.TryDeleteAsync(loreScope, ct);
         if (resultDelete.IsError) return TypedResults.NotFound();
 
         await unitOfWork.CommitAsync(ct);

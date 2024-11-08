@@ -5,9 +5,8 @@ using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models.Account;
 using InfiniLore.Server.Data.Models.UserData;
 using System.Linq.Expressions;
-using Tests.InfiniLore.Server.Data.Data.Commands;
 
-namespace Tests.InfiniLore.Server.Data.Data.Queries;
+namespace Tests.InfiniLore.Server.Data.Data;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------

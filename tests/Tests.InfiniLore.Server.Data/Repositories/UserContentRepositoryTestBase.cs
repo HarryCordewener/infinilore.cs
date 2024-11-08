@@ -2,7 +2,6 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
-using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data;
@@ -15,23 +14,103 @@ namespace Tests.InfiniLore.Server.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class QueryRepositoryTestBase<TQueryRepository,TCommandRepository, TModel>(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>
-    where TQueryRepository : IQueryRepository<TModel>
-    where TCommandRepository : ICommandRepository<TModel>
+public abstract class UserContentRepositoryTestBase<TRepository, TModel>(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>
+    where TRepository : IUserContentRepository<TModel>
     where TModel : UserContent<TModel> {
     
-    [UsedImplicitly] protected readonly TQueryRepository Repository = fixture.ServiceProvider.GetRequiredService<TQueryRepository>();
+    [UsedImplicitly] protected readonly TRepository Repository = fixture.ServiceProvider.GetRequiredService<TRepository>();
     [UsedImplicitly] protected readonly IDbUnitOfWork<InfiniLoreDbContext>  UnitOfWork = fixture.ServiceProvider.GetRequiredService<IDbUnitOfWork<InfiniLoreDbContext>>();
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
+    [UsedImplicitly] public abstract Task TestCanCreateSingleModel(TModel model);
+    [UsedImplicitly] public abstract Task TestCanCreateMultipleModels(IEnumerable<TModel> models);
+    [UsedImplicitly] public abstract Task TestCanUpdateModel(TModel model, Func<TModel, ValueTask<TModel>> updateFunc, Func<TModel, bool> validateFunc);
+    [UsedImplicitly] public abstract Task TestCanDeleteModel(TModel model);
     
     [UsedImplicitly] public abstract Task TestCanGetByIdAsync(TModel model);
     [UsedImplicitly] public abstract Task TestCanGetByUserAsync(UserUnion userUnion, TModel model);
     [UsedImplicitly] public abstract Task TestCanGetAllAsync(IEnumerable<TModel> models);
     [UsedImplicitly] public abstract Task TestCanGetByCriteriaAsync(Expression<Func<TModel, bool>> predicate, TModel model);
 
+    #region Commands
+    public async Task CanCreateSingleModel(TModel model) {
+        // Act
+        CommandOutput commandResult = await Repository.TryAddAsync(model);
+        bool commitResult = await UnitOfWork.TryCommitAsync();
+        
+        // Assert
+        Assert.True(commitResult);
+        Assert.True(commandResult.IsSuccess);
+
+        // Verify
+        QueryOutput<TModel> addedModel = await Repository.TryGetByIdAsync(model.Id);
+        Assert.True(addedModel.IsSuccess);
+        Assert.True(addedModel.TryGetSuccessValue(out TModel? addedModelValue));
+        Assert.Equal(model.Id, addedModelValue.Id);
+    }
+    
+    public async Task CanCreateMultipleModels(IEnumerable<TModel> models) {
+        // Act
+        IEnumerable<TModel> userContents = models as TModel[] ?? models.ToArray();
+        CommandOutput commandResult = await Repository.TryAddRangeAsync(userContents);
+        bool commitResult = await UnitOfWork.TryCommitAsync();
+        
+        // Assert
+        Assert.True(commitResult);
+        Assert.True(commandResult.IsSuccess);
+        
+        // Verify
+        foreach (TModel model in userContents) {
+            QueryOutput<TModel> addedModel = await Repository.TryGetByIdAsync(model.Id);
+            Assert.True(addedModel.IsSuccess);
+            Assert.True(addedModel.TryGetSuccessValue(out TModel? addedModelValue));
+            Assert.Equal(model.Id, addedModelValue.Id);
+        }
+    }
+    public async Task CanUpdateModel(TModel model, Func<TModel, ValueTask<TModel>> updateFunc, Func<TModel, bool> validateFunc) {
+        // Arrange
+        await Repository.TryAddAsync(model);
+        bool commitResult = await UnitOfWork.TryCommitAsync();
+
+        // Act
+        CommandOutput commandResult = await Repository.TryUpdateAsync(model, updateFunc);
+        bool commitResult2 = await UnitOfWork.TryCommitAsync();
+        
+        // Assert
+        Assert.True(commitResult);
+        Assert.True(commitResult2);
+        Assert.True(commandResult.IsSuccess);
+        
+        // Verify
+        QueryOutput<TModel> updatedModel = await Repository.TryGetByIdAsync(model.Id);
+        Assert.True(updatedModel.IsSuccess);
+        Assert.True(updatedModel.TryGetSuccessValue(out TModel? value));
+        Assert.True(validateFunc(value));
+    }
+    
+    public async Task CanDeleteModel(TModel model) {
+        // Arrange
+        await Repository.TryAddAsync(model);
+        bool commitResult = await UnitOfWork.TryCommitAsync();
+
+        // Act
+        CommandOutput commandResult = await Repository.TryDeleteAsync(model);
+        bool commitResult2 = await UnitOfWork.TryCommitAsync();
+        
+        // Assert
+        Assert.True(commitResult);
+        Assert.True(commitResult2);
+        Assert.True(commandResult.IsSuccess);
+
+        // Verify
+        QueryOutput<TModel> deletedModel = await Repository.TryGetByIdAsync(model.Id);
+        Assert.True(deletedModel.IsNone);
+    }
+    #endregion
+    
+    #region Queries
     public async Task CanGetByIdAsync(TModel model) {
         // Arrange
         await AddModelToDatabaseAsync(model);
@@ -92,8 +171,9 @@ public abstract class QueryRepositoryTestBase<TQueryRepository,TCommandRepositor
     }
 
     private async Task AddModelToDatabaseAsync(TModel model) {
-        var repository = fixture.ServiceProvider.GetRequiredService<TCommandRepository>();
+        var repository = fixture.ServiceProvider.GetRequiredService<TRepository>();
         await repository.TryAddAsync(model);
         await UnitOfWork.TryCommitAsync();
     }
+    #endregion
 }

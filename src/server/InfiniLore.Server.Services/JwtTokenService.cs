@@ -4,8 +4,7 @@
 using FastEndpoints;
 using FastEndpoints.Security;
 using InfiniLore.Server.Contracts.Data;
-using InfiniLore.Server.Contracts.Data.Repositories.Commands;
-using InfiniLore.Server.Contracts.Data.Repositories.Queries;
+using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Services;
 using InfiniLore.Server.Contracts.Types;
 using InfiniLore.Server.Contracts.Types.Results;
@@ -25,7 +24,7 @@ namespace InfiniLore.Server.Services;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [RegisterService<IJwtTokenService>(LifeTime.Scoped)]
-public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, IConfiguration configuration, IJwtRefreshTokenCommands commands, IJwtRefreshTokenQueries queries, ILogger logger, UserManager<InfiniLoreUser> userManager) : IJwtTokenService {
+public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, IConfiguration configuration, IJwtRefreshTokenRepository repository, ILogger logger, UserManager<InfiniLoreUser> userManager) : IJwtTokenService {
 
     public async Task<JwtResult> GenerateTokensAsync(InfiniLoreUser user, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
         try {
@@ -63,7 +62,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
     }
 
     public async Task<JwtResult> RefreshTokensAsync(Guid refreshToken, CancellationToken ct = default) {
-        QueryOutput<JwtRefreshTokenModel> getResult = await queries.TryGetByIdAsync(refreshToken, ct);
+        QueryOutput<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
             case Error<string>: return getResult.ErrorString;
@@ -72,7 +71,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
         if (oldToken.ExpiresAt < DateTime.UtcNow) return "Refresh token has expired";
 
-        await commands.TryPermanentDeleteAsync(oldToken, ct);
+        await repository.TryPermanentDeleteAsync(oldToken, ct);
 
         return await GenerateTokensAsync(
             oldToken.Owner,
@@ -84,7 +83,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
     }
 
     public async Task<TrueFalseOrError> RevokeTokensAsync(InfiniLoreUser user, Guid refreshToken, CancellationToken ct = default) {
-        QueryOutput<JwtRefreshTokenModel> getResult = await queries.TryGetByIdAsync(refreshToken, ct);
+        QueryOutput<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
             case Error<string>: return getResult.ErrorString;
@@ -93,14 +92,14 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
         if (oldToken.Owner.Id != user.Id) return "Refresh token does not belong to user";
 
-        CommandOutput deleteResult = await commands.TryPermanentDeleteAsync(oldToken, ct);
+        CommandOutput deleteResult = await repository.TryPermanentDeleteAsync(oldToken, ct);
         if (!deleteResult.IsSuccess) return deleteResult.ErrorString;
 
         return true;
     }
 
     public async Task<TrueFalseOrError> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default) {
-        CommandOutput deleteResult = await commands.TryPermanentDeleteAllForUserAsync(user, ct);
+        CommandOutput deleteResult = await repository.TryPermanentDeleteAllForUserAsync(user, ct);
         if (!deleteResult.IsSuccess) return deleteResult.ErrorString;
 
         return true;
@@ -138,7 +137,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
             Permissions = permissions
         };
 
-        CommandOutput resultAddition = await commands.TryAddAsync(refreshToken, ct);
+        CommandOutput resultAddition = await repository.TryAddAsync(refreshToken, ct);
         switch (resultAddition.Value) {
             case Success:
                 try {

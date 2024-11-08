@@ -1,8 +1,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.API.Controllers.Account.Identity.CreateUser;
-using InfiniLore.Server.Contracts.Data.Repositories.Queries;
+using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +12,7 @@ namespace InfiniLore.Server.API.Controllers.Account.Identity.GetSpecificUser;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetSpecificUserEndpoint(ILogger logger, IUserQueries queries)
+public class GetSpecificUserEndpoint(ILogger logger, IUserRepository queries)
     : Endpoint<
         GetSpecificUserRequest,
         Results<

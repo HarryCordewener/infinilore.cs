@@ -1,8 +1,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-namespace InfiniLore.Server.Contracts.Data.Repositories.Commands;
+using Microsoft.AspNetCore.Mvc;
+
+namespace InfiniLore.Server.API.Controllers.LoreScopes.CreateLoreScope;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface IInfiniLoreUserCommands;
+[UsedImplicitly]
+public record CreateLoreScopeRequest([FromRoute] Guid UserId, [FromRoute] Guid LoreScopeId);
