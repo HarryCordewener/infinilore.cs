@@ -21,6 +21,11 @@ public class GetSpecificUserEndpoint(ILogger logger, IUserRepository queries)
         UserResponseMapper
     > {
 
+    public override void Configure() {
+        Get("/account/identity/");
+        AllowAnonymous();
+    }
+
 
     public async override Task HandleAsync(GetSpecificUserRequest req, CancellationToken ct) {
         var problemDetails = new ProblemDetails {

@@ -6,6 +6,7 @@ using CodeOfChaos.Extensions.AspNetCore;
 using FastEndpoints;
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
+using InfiniLore.Server.API;
 using InfiniLore.Server.Components;
 using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.Account;
@@ -83,13 +84,25 @@ public static class Program {
 
         builder.Services.ConfigureApplicationCookie(
             cookieOptions => {
-                cookieOptions.Events.OnRedirectToLogin = context => {
-                    if (IsApiRequest(context)) context.Response.StatusCode = 401;
+                // ReSharper disable once RedundantLambdaParameterType
+                cookieOptions.Events.OnRedirectToLogin = (RedirectContext<CookieAuthenticationOptions> context) => {
+                    if (IsApiRequest(context)) {
+                        context.Response.StatusCode = 401;
+                    }
+                    else {
+                        context.Response.Redirect(context.RedirectUri);
+                    }
                     return Task.CompletedTask;
                 };
 
-                cookieOptions.Events.OnRedirectToAccessDenied = context => {
-                    if (IsApiRequest(context)) context.Response.StatusCode = 403;
+                // ReSharper disable once RedundantLambdaParameterType
+                cookieOptions.Events.OnRedirectToAccessDenied = (RedirectContext<CookieAuthenticationOptions> context) => {
+                    if (IsApiRequest(context)) {
+                        context.Response.StatusCode = 403;
+                    }
+                    else {
+                        context.Response.Redirect(context.RedirectUri);
+                    }
                     return Task.CompletedTask;
                 };
             });
@@ -106,19 +119,21 @@ public static class Program {
         #endregion
 
         #region API
-        builder.Services
-            .AddFastEndpoints(options => {
+        builder.Services.AddFastEndpoints(options => {
                 options.Assemblies = [
-                    typeof(IAssemblyEntry).Assembly
+                    typeof(API.IAssemblyEntry).Assembly
                 ];
-            })
-            .SwaggerDocument(options => {
-                options.DocumentSettings = settings => {
-                    settings.Version = "v1";
-                    settings.Title = "InfiniLore API v1";
-                    settings.Description = "An ASP.NET Core Web API for managing InfiniLore";
-                };
             });
+        
+        builder.Services.AddOpenApi();
+        builder.Services.AddOpenApiDocument((settings, provider) => {
+            settings.Version = "v1";
+            settings.Title = "InfiniLore API";
+            settings.Description = "An ASP.NET Core Web API for managing InfiniLore";
+            settings.EnableFastEndpoints(options => {
+            
+            }, provider);
+        });
 
         builder.Services.AddIdentityApiEndpoints<InfiniLoreUser>();
         #endregion
@@ -127,6 +142,7 @@ public static class Program {
         builder.Services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssemblyContaining<Services.IAssemblyEntry>();
         });
+
         builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
         #endregion
 
@@ -149,23 +165,31 @@ public static class Program {
         app.UseHttpsRedirection();
 
         app.UseStaticFiles();
+        app.MapStaticAssets();
         app.UseAntiforgery();
 
         app.UseAuthentication();
         app.UseAuthorization();
-
+        
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode()
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(WasmClient.IAssemblyEntry).Assembly);
-
+        
         app.UseFastEndpoints(ctx => {
             ctx.Endpoints.RoutePrefix = "api";
+            ctx.Binding.ReflectionCache
+                .AddFromInfiniLoreServerAPI()
+                .AddFromInfiniLoreServerData()
+                .AddFromInfiniLoreServerServices()
+            ;
+            ctx.Errors.UseProblemDetails();
         });
 
-        app.UseOpenApi();
+        app.MapOpenApi();
+        
         app.UseSwaggerUI(ModernStyle.Dark, setupAction: ctx => {
-            ctx.SwaggerEndpoint("/swagger/v1/swagger.json", "InfiniLore API v1");
+            ctx.SwaggerEndpoint("/openapi/v1.json", "InfiniLore API v1");
             ctx.RoutePrefix = "swagger";
         });
 

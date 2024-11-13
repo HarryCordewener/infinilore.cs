@@ -13,7 +13,7 @@ namespace InfiniLore.Server.Data.Repositories.Content;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[RegisterService<IUserRepository>(LifeTime.Singleton)]
+[RegisterService<IUserRepository>(LifeTime.Scoped)]
 public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUserRepository {
     public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>b66030d9-dd4d-418e-9b45-ed964bbc8e4e</UserSecretsId>
@@ -13,15 +13,17 @@
 
     <ItemGroup>
         <PackageReference Include="AspNetCore.SwaggerUI.Themes" Version="1.0.0"/>
-        <PackageReference Include="FastEndpoints" Version="5.30.0"/>
-        <PackageReference Include="FastEndpoints.Security" Version="5.30.0"/>
-        <PackageReference Include="FastEndpoints.Swagger" Version="5.30.0"/>
+        <PackageReference Include="FastEndpoints" Version="5.31.0" />
+        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0" />
+        <PackageReference Include="FastEndpoints.Security" Version="5.31.0" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="5.31.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2024.3.0"/>
         <PackageReference Include="MediatR" Version="12.4.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
         <PackageReference Include="Serilog" Version="4.1.0"/>
         <PackageReference Include="CodeOfChaos.Extensions.AspNetCore" Version="0.2.1"/>
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.10"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10" PrivateAssets="All"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" PrivateAssets="All" />
         <PackageReference Include="Testcontainers.MsSql" Version="4.0.0"/>
     </ItemGroup>
 
