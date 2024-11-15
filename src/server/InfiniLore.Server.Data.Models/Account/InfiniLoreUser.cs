@@ -17,6 +17,6 @@ public class InfiniLoreUser : IdentityUser {
     // -----------------------------------------------------------------------------------------------------------------
     // Constructors
     // -----------------------------------------------------------------------------------------------------------------
-    public InfiniLoreUser() {}
-    public InfiniLoreUser(string username) : base(username) {} // Solves an issue with FastEndpoints
+    // public InfiniLoreUser() {}
+    // public InfiniLoreUser(string username) : base(username) {} // Solves an issue with FastEndpoints
 }

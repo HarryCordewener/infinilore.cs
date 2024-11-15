@@ -8,8 +8,8 @@
 
     <ItemGroup>
         <PackageReference Include="CodeOfChaos.Extensions" Version="0.13.0"/>
-        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0" />
-        <PackageReference Include="FastEndpoints.Generator" Version="5.31.0">
+        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.8-beta" />
+        <PackageReference Include="FastEndpoints.Generator" Version="5.31.0.8-beta">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
