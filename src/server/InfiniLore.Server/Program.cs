@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using Testcontainers.MsSql;
 
@@ -35,19 +34,14 @@ public static class Program {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         builder.OverrideLoggingAsSeriLog();
 
-        // TODO: Add Kestrel SLL
-
         #region Database
-        MsSqlContainer? container = new MsSqlBuilder()
+        MsSqlContainer container = new MsSqlBuilder()
             // .WithLogger(Log.Logger)
             .WithImage("mcr.microsoft.com/mssql/server:2022-CU10-ubuntu-22.04")
             .WithPassword("AnnaIsTrans4Ever!")
             .WithName("infinilore-production-db")
             .WithReuse(true)
             .Build();
-
-        if (container is null) throw new Exception("Could not create MsSqlContainer");
-
         await container.StartAsync();
 
         builder.Services.AddDbContextFactory<InfiniLoreDbContext>(options =>
@@ -75,8 +69,6 @@ public static class Program {
             o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         });
-
-        // TODO Add google oauth login
 
         builder.Services.AddIdentityCore<InfiniLoreUser>(options => {
                 options.SignIn.RequireConfirmedAccount = false;

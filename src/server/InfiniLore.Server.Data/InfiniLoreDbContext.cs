@@ -32,14 +32,11 @@ public class InfiniLoreDbContext : IdentityDbContext<InfiniLoreUser, IdentityRol
         builder.ApplyConfigurationsFromAssembly(typeof(IAssemblyEntry).Assembly);
 
         // SEEDING DATA
-        // TODO Move seeding data to a proper service
-
         builder.Entity<IdentityRole>().HasData(
             new IdentityRole("admin") { NormalizedName = "ADMIN" },
             new IdentityRole("user") { NormalizedName = "USER" }
         );
 
-        #region Test User
         var testUser = new InfiniLoreUser {
             Id = "d957c0f8-e90e-4068-a968-4f4b49fc165c",
             UserName = "testuser",
@@ -54,7 +51,5 @@ public class InfiniLoreDbContext : IdentityDbContext<InfiniLoreUser, IdentityRol
         testUser.PasswordHash = hasher.HashPassword(testUser, "Test@1234");
 
         builder.Entity<InfiniLoreUser>().HasData(testUser);
-        #endregion
-
     }
 }
