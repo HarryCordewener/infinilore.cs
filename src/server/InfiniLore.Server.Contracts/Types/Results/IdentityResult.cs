@@ -4,7 +4,6 @@
 using AterraEngine.Unions;
 using InfiniLore.Server.Data.Models.Account;
 
-
 namespace InfiniLore.Server.Contracts.Types.Results;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code

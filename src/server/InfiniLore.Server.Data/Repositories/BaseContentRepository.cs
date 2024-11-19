@@ -22,7 +22,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         await dbSet.AddAsync(model, ct);
         return new Success();
     }
-    
+
     public async ValueTask<CommandResult<T>> TryAddWithResultAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         if (await dbSet.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";

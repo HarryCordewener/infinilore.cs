@@ -14,8 +14,6 @@ public interface IUserContentRepository<T> :
     IQueryHasTryGetByUserAsync<T>
     where T : UserContent;
 
-#region Commands
-#endregion
 #region Queries
 #region Default
 public interface IQueryHasTryGetByUserAsync<T> where T : UserContent {

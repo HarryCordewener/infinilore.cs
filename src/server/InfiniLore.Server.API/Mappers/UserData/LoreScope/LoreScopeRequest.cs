@@ -4,17 +4,14 @@
 using InfiniLore.Server.API.Mappers.Base;
 
 namespace InfiniLore.Server.API.Mappers.UserData.LoreScope;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public record LoreScopeRequest(
     Guid? Id,
     string OwnerId,
-    
     string Name,
     string? Description
-    
 ) : UserContentRequest(
     Id,
     OwnerId

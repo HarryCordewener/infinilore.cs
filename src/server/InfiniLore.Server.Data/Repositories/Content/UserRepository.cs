@@ -25,6 +25,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
             .FirstOrDefaultAsync(predicate: u => u.Id == id, ct);
 
         if (result is null) return new None();
+
         return result;
     }
 
@@ -37,6 +38,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
             .FirstOrDefaultAsync(predicate: u => u.Id == userName, ct);
 
         if (result is null) return new None();
+
         return result;
     }
 
@@ -50,6 +52,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
             .ToArrayAsync(ct);
 
         if (result.Length == 0) return new None();
+
         return result;
     }
 }

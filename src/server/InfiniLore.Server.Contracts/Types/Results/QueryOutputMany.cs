@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using AterraEngine.Unions;
 
+using AterraEngine.Unions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace InfiniLore.Server.Contracts.Types.Results;

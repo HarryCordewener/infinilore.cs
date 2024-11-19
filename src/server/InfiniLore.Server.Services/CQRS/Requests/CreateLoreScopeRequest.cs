@@ -5,9 +5,7 @@ using AterraEngine.Unions;
 using InfiniLore.Server.Data.Models.UserData;
 using MediatR;
 
-
 namespace InfiniLore.Server.Services.CQRS.Requests;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------

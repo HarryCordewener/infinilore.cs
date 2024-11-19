@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+
 using AterraEngine.Unions;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-
 using System.Diagnostics.CodeAnalysis;
 
 namespace InfiniLore.Server.Contracts.Types.Results;
@@ -18,7 +18,7 @@ public readonly partial struct CommandResult<T>() : IUnion<Success<EntityEntry<T
         if (!IsSuccess) return false;
 
         value = AsSuccess.Value;
-        
+
         // Solves a warning during building
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         return value is not null;

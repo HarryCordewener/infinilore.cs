@@ -92,6 +92,7 @@ public static class Program {
                     else {
                         context.Response.Redirect(context.RedirectUri);
                     }
+
                     return Task.CompletedTask;
                 };
 
@@ -103,6 +104,7 @@ public static class Program {
                     else {
                         context.Response.Redirect(context.RedirectUri);
                     }
+
                     return Task.CompletedTask;
                 };
             });
@@ -141,7 +143,7 @@ public static class Program {
         builder.Services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssemblyContaining<Services.IAssemblyEntry>();
         });
-        
+
         builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
         #endregion
 
@@ -169,7 +171,7 @@ public static class Program {
 
         app.UseAuthentication();
         app.UseAuthorization();
-        
+
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode()
             .AddInteractiveWebAssemblyRenderMode()
@@ -182,9 +184,10 @@ public static class Program {
                 .AddFromInfiniLoreServerData()
                 .AddFromInfiniLoreServerServices()
                 ;
+
             ctx.Errors.UseProblemDetails();
         });
-        
+
         app.UseOpenApi();
         app.UseSwaggerUI(ModernStyle.Dark, setupAction: ctx => {
             ctx.SwaggerEndpoint("v1/swagger.json", "InfiniLore API v1");
@@ -193,7 +196,7 @@ public static class Program {
 
         await using AsyncServiceScope scope = app.Services.CreateAsyncScope();// CreateAsyncScope
         await Task.WhenAll(
-            MigrateDatabaseAsync(app), // Db Migrations on startup
+            MigrateDatabaseAsync(app),// Db Migrations on startup
             app.RunAsync()
         );
     }

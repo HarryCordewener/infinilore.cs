@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+
 using AterraEngine.Unions;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
@@ -10,11 +11,9 @@ using InfiniLore.Server.Data.Models.UserData;
 using InfiniLore.Server.Services.CQRS.Requests;
 using MediatR;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-
 using Serilog;
 
 namespace InfiniLore.Server.Services.CQRS.Handlers.Commands;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -25,7 +24,7 @@ public class CreateLoreScopeHandler(ILoreScopeRepository repository, IDbUnitOfWo
             if (!result.TryGetSuccessValue(out EntityEntry<LoreScopeModel>? loreScope)) {
                 return new Error<string>($"Could not add lore scope: {result.ErrorString}");
             }
-            
+
             await unitOfWork.CommitAsync(ct);
             return new Success<Guid>(loreScope.Entity.Id);
         }

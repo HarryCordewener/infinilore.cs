@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+
 using AterraEngine.Unions;
 using FastEndpoints;
 using FastEndpoints.Security;
@@ -13,7 +14,6 @@ using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-
 using Serilog;
 using System.Security.Claims;
 using System.Security.Cryptography;
