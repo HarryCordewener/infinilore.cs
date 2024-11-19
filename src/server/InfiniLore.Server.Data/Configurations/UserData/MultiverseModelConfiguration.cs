@@ -9,12 +9,10 @@ namespace InfiniLore.Server.Data.Configurations.UserData;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class MultiverseModelConfiguration : BaseContentConfiguration<MultiverseModel> {
+public class MultiverseModelConfiguration : UserContentConfiguration<MultiverseModel> {
 
     public override void Configure(EntityTypeBuilder<MultiverseModel> builder) {
-        HasSoftDeleteAsQueryFilter(builder);
-        HasUniqueIdAsKey(builder);
-        HasAuditLogs(builder);
+        base.Configure(builder);
 
         builder.HasQueryFilter(model => model.SoftDeleteDate == null);
 
@@ -22,7 +20,7 @@ public class MultiverseModelConfiguration : BaseContentConfiguration<MultiverseM
 
         builder.HasMany(model => model.Universes)
             .WithOne(universe => universe.Multiverse)
-            .HasForeignKey(x => x.MultiverseId);
-
+            .HasForeignKey(x => x.MultiverseId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

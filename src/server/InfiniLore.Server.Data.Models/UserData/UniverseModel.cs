@@ -8,7 +8,7 @@ namespace InfiniLore.Server.Data.Models.UserData;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class UniverseModel : UserContent<UniverseModel> {
+public class UniverseModel : UserContent {
     public required MultiverseModel Multiverse { get; set; }
     public Guid MultiverseId { get; set; }
 

@@ -9,12 +9,10 @@ namespace InfiniLore.Server.Data.Configurations.UserData;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class UniverseModelConfiguration : BaseContentConfiguration<UniverseModel> {
+public class UniverseModelConfiguration : UserContentConfiguration<UniverseModel> {
 
     public override void Configure(EntityTypeBuilder<UniverseModel> builder) {
-        HasSoftDeleteAsQueryFilter(builder);
-        HasUniqueIdAsKey(builder);
-        HasAuditLogs(builder);
+        base.Configure(builder);
 
         builder.HasQueryFilter(model => model.SoftDeleteDate == null);
 

@@ -3,6 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
 using Microsoft.EntityFrameworkCore.Storage;
+using Serilog;
 
 namespace InfiniLore.Server.Data;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -11,69 +12,95 @@ namespace InfiniLore.Server.Data;
 
 /// <inheritdoc cref="InfiniLore.Server.Contracts.Data.IDbUnitOfWork{T}" />
 [RegisterService<IDbUnitOfWork<InfiniLoreDbContext>>(LifeTime.Scoped)]
-public class InfiniLoreDbUnitOfWork(IDbContextFactory<InfiniLoreDbContext> dbContextFactory) : IDbUnitOfWork<InfiniLoreDbContext> {
-    /// <inheritdoc/>
-    public InfiniLoreDbContext Db { get; } = dbContextFactory.CreateDbContext();
-
-    /// <summary>
-    /// Represents the current database transaction for the DbContext.
-    /// This variable is used to manage transactions including beginning, committing, and rolling back as needed.
-    /// It is nullable and will be null when there is no active transaction.
-    /// </summary>
+public class InfiniLoreDbUnitOfWork(IDbContextFactory<InfiniLoreDbContext> dbContextFactory, ILogger logger) : IDbUnitOfWork<InfiniLoreDbContext> {
+    private InfiniLoreDbContext? _db;
     private IDbContextTransaction? _transaction;
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
-    /// <inheritdoc/>
-    public async Task<int> SaveChangesAsync(CancellationToken ct = default) => await Db.SaveChangesAsync(ct);
-
-    /// <inheritdoc/>
-    public async Task BeginTransactionAsync(CancellationToken ct = default) {
-        _transaction = await Db.Database.BeginTransactionAsync(ct);
-    }
-
-    /// <inheritdoc/>
-    public Task CommitTransactionAsync(CancellationToken ct = default) => TryCommitTransactionAsync(ct);
-
-    /// <inheritdoc/>
-    public async Task<bool> TryCommitTransactionAsync(CancellationToken ct = default) {
-        if (_transaction == null) return false;
+    /// <inheritdoc />
+    public async Task CommitAsync(CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await GetDbContextAsync(ct);
+        if (_transaction == null) {
+            await dbContext.SaveChangesAsync(ct);
+            return;
+        }
 
         await _transaction.CommitAsync(ct);
-        await _transaction.DisposeAsync();
         _transaction = null;
-        return true;
     }
 
-    /// <inheritdoc/>
-    public Task RollbackTransactionAsync(CancellationToken ct = default) => TryRollbackTransactionAsync(ct);
+    /// <inheritdoc />
+    public async Task<bool> TryCommitAsync(CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await GetDbContextAsync(ct);
+        try {
+            if (_transaction == null) {
+                await dbContext.SaveChangesAsync(ct);
+                return true;
+            }
 
-    /// <inheritdoc/>
-    public async Task<bool> TryRollbackTransactionAsync(CancellationToken ct = default) {
+            await _transaction.CommitAsync(ct);
+            _transaction = null;
+            return true;
+
+        }
+        catch (Exception ex) {
+            logger.Error(ex, "Error while committing transaction");
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task BeginTransactionAsync(CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await GetDbContextAsync(ct);
+        _transaction = await dbContext.Database.BeginTransactionAsync(ct);
+    }
+
+    /// <inheritdoc />
+    public Task RollbackAsync(CancellationToken ct = default) => TryRollbackAsync(ct);
+
+    /// <inheritdoc />
+    public async Task<bool> TryRollbackAsync(CancellationToken ct = default) {
         if (_transaction == null) return false;
 
         await _transaction.RollbackAsync(ct);
-        await _transaction.DisposeAsync();
         _transaction = null;
         return true;
     }
 
-    /// <inheritdoc/>
-    public InfiniLoreDbContext GetDbContext() => Db;
+    /// <inheritdoc />
+    public async Task<bool> TryRollbackToSavepointAsync(string name, CancellationToken ct = default) {
+        if (_transaction == null) return false;
+
+        await _transaction.RollbackToSavepointAsync(name, ct);
+        return true;
+    }
+
+    /// <inheritdoc />
+    public async Task<InfiniLoreDbContext> GetDbContextAsync(CancellationToken ct = default) =>
+        _db ??= await dbContextFactory.CreateDbContextAsync(ct);
+
+    /// <inheritdoc />
+    public async Task CreateSavepointAsync(string name, CancellationToken ct = default) {
+        await (_transaction?.CreateSavepointAsync(name, ct) ?? Task.CompletedTask);
+    }
 
     /// <summary>
-    /// Disposes the resources used by the <see cref="InfiniLoreDbUnitOfWork"/>.
+    ///     Asynchronously disposes the current resources.
+    ///     This method ensures the associated `InfiniLoreDbContext` and any
+    ///     active transactions are properly disposed asynchronously.
     /// </summary>
-    /// <remarks>
-    /// This method disposes the underlying <see cref="InfiniLoreDbContext"/> and
-    /// the current transaction if it exists. It also suppresses the finalization of this instance
-    /// by calling <see cref="GC.SuppressFinalize(object)"/>.
-    /// </remarks>
-    public void Dispose() {
-        Db.Dispose();
-        _transaction?.Dispose();
+    public async ValueTask DisposeAsync() {
+        if (_db != null) await _db.DisposeAsync();
+        if (_transaction != null) await _transaction.DisposeAsync();
 
+        GC.SuppressFinalize(this);
+    }
+
+    public void Dispose() {
+        _db?.Dispose();
+        _transaction?.Dispose();
         GC.SuppressFinalize(this);
     }
 }

@@ -1,19 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints.Attributes" Version="5.30.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8"/>
+        <PackageReference Include="AterraEngine.Unions" Version="1.0.0" />
+        <PackageReference Include="AterraEngine.Unions.Generators" Version="1.0.0" />
+        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.10-beta"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\lib\InfiniLoreLib\InfiniLoreLib.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.Data.Models\InfiniLore.Server.Data.Models.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="API\"/>
     </ItemGroup>
 
 </Project>

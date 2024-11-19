@@ -9,17 +9,17 @@ namespace InfiniLore.Server.Data.Configurations.UserData;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class LoreScopeModelConfiguration : BaseContentConfiguration<LoreScopeModel> {
-    public override void Configure(EntityTypeBuilder<LoreScopeModel> builder) {
-        HasSoftDeleteAsQueryFilter(builder);
-        HasUniqueIdAsKey(builder);
-        HasAuditLogs(builder);
+public class LoreScopeModelConfiguration : UserContentConfiguration<LoreScopeModel> {
 
-        builder.HasIndex(model => new { model.Name, model.UserId })
+    public override void Configure(EntityTypeBuilder<LoreScopeModel> builder) {
+        base.Configure(builder);
+
+        builder.HasIndex(model => new { model.Name, model.OwnerId })
             .IsUnique();
 
         builder.HasMany(model => model.Multiverses)
             .WithOne(multiverse => multiverse.LoreScope)
-            .HasForeignKey(x => x.LoreScopeId);
+            .HasForeignKey(x => x.LoreScopeId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

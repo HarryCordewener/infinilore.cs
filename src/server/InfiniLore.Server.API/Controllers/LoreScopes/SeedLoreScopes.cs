@@ -1,6 +1,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using InfiniLore.Server.Contracts.Data;
+using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.UserData;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +12,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class SeedLoreScopes(IDbContextFactory<InfiniLoreDbContext> dbContextFactory, ILogger logger) : EndpointWithoutRequest {
+public class SeedLoreScopes(ILoreScopeRepository repository, ILogger logger, IDbUnitOfWork<InfiniLoreDbContext> dbUnitOfWork) : EndpointWithoutRequest {
     public override void Configure() {
         Get("/lore-scopes/seed");
         Roles("Admin");
@@ -20,16 +22,17 @@ public class SeedLoreScopes(IDbContextFactory<InfiniLoreDbContext> dbContextFact
         logger.Information("User is authenticated: {IsAuthenticated}", User.Identity is { IsAuthenticated: true });
         logger.Information("User roles: {Roles}", string.Join(", ", User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value)));
 
-        await using InfiniLoreDbContext dbContext = await dbContextFactory.CreateDbContextAsync(ct);
+        InfiniLoreDbContext db = await dbUnitOfWork.GetDbContextAsync(ct);
+        if (await db.Users.FirstOrDefaultAsync(predicate: u => u.UserName == "testuser", ct) is not {} user) return;
 
-        if (await dbContext.Users.FirstOrDefaultAsync(predicate: u => u.UserName == "testuser", ct) is not {} user) return;
+        await repository.TryAddRangeAsync([
+            new LoreScopeModel { Owner = user, Name = "A" },
+            new LoreScopeModel { Owner = user, Name = "B" },
+            new LoreScopeModel { Owner = user, Name = "C" },
+            new LoreScopeModel { Owner = user, Name = "D" },
+            new LoreScopeModel { Owner = user, Name = "E" }
+        ], ct);
 
-        dbContext.LoreScopes.Add(new LoreScopeModel { User = user, Name = "A" });
-        dbContext.LoreScopes.Add(new LoreScopeModel { User = user, Name = "B" });
-        dbContext.LoreScopes.Add(new LoreScopeModel { User = user, Name = "C" });
-        dbContext.LoreScopes.Add(new LoreScopeModel { User = user, Name = "D" });
-        dbContext.LoreScopes.Add(new LoreScopeModel { User = user, Name = "E" });
-
-        await dbContext.SaveChangesAsync(ct);
+        await dbUnitOfWork.CommitAsync(ct);
     }
 }

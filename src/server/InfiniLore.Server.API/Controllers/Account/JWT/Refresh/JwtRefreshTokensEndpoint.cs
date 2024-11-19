@@ -2,16 +2,16 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Services;
-using InfiniLoreLib.Results;
+using InfiniLore.Server.Contracts.Types;
+using InfiniLore.Server.Contracts.Types.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace InfiniLore.Server.API.Controllers.Account.JWT.Refresh;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class JwtRefreshTokensEndpoint(IJwtTokenService jwtTokenService, ILogger logger) 
+public class JwtRefreshTokensEndpoint(IJwtTokenService jwtTokenService, ILogger logger)
     : Endpoint<
         JwtRefreshTokensRequest,
         Results<
@@ -25,20 +25,24 @@ public class JwtRefreshTokensEndpoint(IJwtTokenService jwtTokenService, ILogger 
     }
     public async override Task<Results<BadRequest<ProblemDetails>, Ok<JwtResponse>>> ExecuteAsync(JwtRefreshTokensRequest req, CancellationToken ct) {
         logger.Information("Generating tokens for refreshToken {@Token}", req.RefreshToken);
+
         JwtResult jwtResult = await jwtTokenService.RefreshTokensAsync(req.RefreshToken, ct);
+        switch (jwtResult.Value) {
+            case JwtTokenData data: {
+                logger.Information("Tokens generated successfully for refreshToken {@Token}", req.RefreshToken);
+                return TypedResults.Ok(new JwtResponse(
+                    data.AccessToken,
+                    data.AccessTokenExpiryUtc,
+                    data.RefreshToken,
+                    data.RefreshTokenExpiryUtc
+                ));
+            }
 
-        if (!jwtResult.IsFailure) {
-            logger.Information("Tokens generated successfully for refreshToken {@Token}", req.RefreshToken);
-            return TypedResults.Ok(new JwtResponse(
-                jwtResult.AccessToken!,
-                (DateTime)jwtResult.AccessTokenExpiryUtc!,
-                (Guid)jwtResult.RefreshToken!,
-                (DateTime)jwtResult.RefreshTokenExpiryUtc!
-            ));
+            default: {
+                logger.Warning("Unable to generate tokens for refreshToken {@Token}. Result: {@JwtResult}", req.RefreshToken, jwtResult.ErrorString);
+                return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to generate tokens." });
+            }
         }
-
-        logger.Warning("Unable to generate tokens for refreshToken {@Token}. Result: {@JwtResult}", req.RefreshToken, jwtResult);
-        return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to generate tokens." });
 
     }
 }

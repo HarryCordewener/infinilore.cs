@@ -1,20 +1,22 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+
+using AterraEngine.Unions;
 using InfiniLore.Server.Contracts.Services;
+using InfiniLore.Server.Contracts.Types;
+using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
-using InfiniLoreLib.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using ProblemDetails=FastEndpoints.ProblemDetails;
-using SignInResult=Microsoft.AspNetCore.Identity.SignInResult;
+using Microsoft.EntityFrameworkCore;
 
 namespace InfiniLore.Server.API.Controllers.Account.JWT.Create;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class JwtCreateTokensEndpoint(SignInManager<InfiniLoreUser> signInManager, IJwtTokenService jwtTokenService, ILogger logger)
+public class JwtCreateTokensEndpoint(IApiSignInService apiSignInService, IJwtTokenService jwtTokenService, ILogger logger, UserManager<InfiniLoreUser> userManager)
     : Endpoint<
         JwtCreateTokensRequest,
         Results<
@@ -28,39 +30,38 @@ public class JwtCreateTokensEndpoint(SignInManager<InfiniLoreUser> signInManager
     }
 
     public async override Task<Results<BadRequest<ProblemDetails>, Ok<JwtResponse>>> ExecuteAsync(JwtCreateTokensRequest req, CancellationToken ct) {
-        logger.Information("Processing JWT token creation for user {@Username}", req.Username);
+        try {
+            UserIdentityResult signInResult = await apiSignInService.SignInAsync(req.Username, req.Password, ct).ConfigureAwait(false);
 
-        if (await signInManager.UserManager.FindByNameAsync(req.Username) is not {} user ) {
-            logger.Warning("User {@Username} not found", req.Username);
-            return TypedResults.BadRequest(new ProblemDetails { Detail = "Invalid username" });
+            switch (signInResult.Value) {
+                case Error<string>:
+                    logger.Warning("Sign-in failed for user {Username}. Error: {ErrorMessage}", req.Username, signInResult.ErrorString);
+                    return TypedResults.BadRequest(new ProblemDetails { Detail = signInResult.ErrorString });
+            }
+
+            InfiniLoreUser user = signInResult.AsSuccess.Value;
+
+            // Check user integrity before generating tokens
+            if (!await userManager.Users.AnyAsync(predicate: u => u.NormalizedUserName == user.NormalizedUserName, ct)) {
+                logger.Error("User with NormalizedUserName {NormalizedUserName} not found.", user.NormalizedUserName);
+                return TypedResults.BadRequest(new ProblemDetails { Detail = "User not found." });
+            }
+
+            JwtResult jwtResult = await jwtTokenService.GenerateTokensAsync(user, req.Roles, req.Permissions, req.RefreshExpiresInDays, ct).ConfigureAwait(false);
+
+            switch (jwtResult.Value) {
+                case JwtTokenData data:
+                    logger.Information("JWT tokens generated successfully for user {Username}.", req.Username);
+                    return TypedResults.Ok(new JwtResponse(data.AccessToken, data.AccessTokenExpiryUtc, data.RefreshToken, data.RefreshTokenExpiryUtc));
+
+                default:
+                    logger.Warning("Token generation failed for user {Username}. Error: {ErrorMessage}", req.Username, jwtResult.IsError ? jwtResult.ErrorString : "Unknown error.");
+                    return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to generate tokens." });
+            }
         }
-
-        if (!await signInManager.CanSignInAsync(user)) {
-            logger.Warning("User {@Username} cannot sign in", req.Username);
-            return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to sign in." });
+        catch (Exception ex) {
+            logger.Error(ex, "An unexpected error occurred while processing JWT token creation for user {Username}", req.Username);
+            return TypedResults.BadRequest(new ProblemDetails { Detail = "An unexpected error occurred." });
         }
-
-        SignInResult signInResult = await signInManager.CheckPasswordSignInAsync(user, req.Password, false);
-        if (!signInResult.Succeeded) {
-            logger.Warning("Invalid password for user {@Username}", req.Username);
-            return TypedResults.BadRequest(new ProblemDetails { Detail = "Invalid username or password." });
-        }
-
-        logger.Information("Generating tokens for user {@Username}", req.Username);
-        JwtResult jwtResult = await jwtTokenService.GenerateTokensAsync(user, req.Roles, req.Permissions, req.RefreshExpiresInDays,  ct);
-
-        if (!jwtResult.IsFailure) {
-            logger.Information("Tokens generated successfully for user {@Username}", req.Username);
-            return TypedResults.Ok(new JwtResponse(
-                jwtResult.AccessToken!,
-                (DateTime)jwtResult.AccessTokenExpiryUtc!,
-                (Guid)jwtResult.RefreshToken!,
-                (DateTime)jwtResult.RefreshTokenExpiryUtc!
-            ));
-        }
-
-        logger.Warning("Unable to generate tokens for user {@Username}. Result: {@JwtResult}", req.Username, jwtResult.ErrorMessage);
-        return TypedResults.BadRequest(new ProblemDetails { Detail = "Unable to generate tokens." });
-
     }
 }

@@ -8,7 +8,9 @@ namespace InfiniLore.Server.Data.Models.Base;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class UserContent<T> : BaseContent<T> where T : BaseContent<T> {
-    public required InfiniLoreUser User { get; set; }
-    [MaxLength(48)] public string UserId { get; set; } = null!;
+public abstract class UserContent : BaseContent, IHasOwner {
+    public bool IsPublic { get; set; }
+    public ICollection<UserContentAccess> UserAccess { get; set; } = [];
+    public required virtual InfiniLoreUser Owner { get; set; } = null!;
+    [MaxLength(450)] public string OwnerId { get; set; } = null!;
 }

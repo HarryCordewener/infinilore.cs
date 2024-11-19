@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Contracts.Repositories;
+using InfiniLore.Server.Contracts.Data.Repositories;
+using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.UserData;
-using InfiniLoreLib.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -11,7 +11,7 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.GetSpecificLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetSpecificLoreScopeEndpoint(IInfiniLoreUserRepository userRepository) :
+public class GetSpecificLoreScopeEndpoint(ILoreScopeRepository loreScopeQueries) :
     Endpoint<
         GetSpecificLoreScopeRequest,
         Results<
@@ -27,12 +27,11 @@ public class GetSpecificLoreScopeEndpoint(IInfiniLoreUserRepository userReposito
     }
 
     public async override Task<Results<Ok<LoreScopeResponse>, NotFound>> ExecuteAsync(GetSpecificLoreScopeRequest req, CancellationToken ct) {
-        ResultMany<LoreScopeModel> result = await userRepository.GetLoreScopesAsync(req.UserId, ct);
-        if (result.IsFailure || result.Values is null) return TypedResults.NotFound();
-
-        LoreScopeModel? scope = result.Values.FirstOrDefault(x => x.Id == req.LoreScopeId);
-        if (scope is null) return TypedResults.NotFound();
-
-        return TypedResults.Ok(Map.FromEntity(scope));
+        QueryResult<LoreScopeModel> resultLoreScope = await loreScopeQueries.TryGetByIdAsync(req.LoreScopeId, ct);
+        return resultLoreScope.Match<Results<Ok<LoreScopeResponse>, NotFound>>(
+            successCase: success => TypedResults.Ok(Map.FromEntity(success.Value)),
+            noneCase: _ => TypedResults.NotFound(),
+            errorCase: _ => TypedResults.NotFound()
+        );
     }
 }
