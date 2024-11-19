@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using AterraEngine.Unions;
 using FastEndpoints;
 using FastEndpoints.Security;
 using InfiniLore.Server.Contracts.Data;
@@ -12,8 +13,7 @@ using InfiniLore.Server.Data;
 using InfiniLore.Server.Data.Models.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using OneOf;
-using OneOf.Types;
+
 using Serilog;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -45,7 +45,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
             DateTime refreshTokenExpiryUtc = DateTime.UtcNow.AddDays(expiresInDays ?? int.Parse(configuration["Jwt:RefreshExpiresInDays"]!));
 
             string accessToken = GenerateAccessToken(user, roles, permissions, accessTokenExpiryUtc);
-            OneOf<Guid, False> resultGenerate = await GenerateRefreshTokenAsync(user, roles, permissions, refreshTokenExpiryUtc, ct);
+            Union<Guid, False> resultGenerate = await GenerateRefreshTokenAsync(user, roles, permissions, refreshTokenExpiryUtc, ct);
             if (resultGenerate.IsT1) return "Refresh token could not be generated";
 
             return new JwtTokenData(
@@ -127,7 +127,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         return jwtToken;
     }
 
-    private async Task<OneOf<Guid, False>> GenerateRefreshTokenAsync(InfiniLoreUser user, string[] roles, string[] permissions, DateTime expiresAt, CancellationToken ct = default) {
+    private async Task<Union<Guid, False>> GenerateRefreshTokenAsync(InfiniLoreUser user, string[] roles, string[] permissions, DateTime expiresAt, CancellationToken ct = default) {
         var token = Guid.NewGuid();
         var refreshToken = new JwtRefreshTokenModel {
             Owner = user,

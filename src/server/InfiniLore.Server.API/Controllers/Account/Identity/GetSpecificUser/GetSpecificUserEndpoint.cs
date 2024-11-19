@@ -65,17 +65,17 @@ public class GetSpecificUserEndpoint(ILogger logger, IUserRepository queries)
     }
 
     private async Task SendResult(QueryResult<InfiniLoreUser> result, ProblemDetails problemDetails, CancellationToken ct) {
-        await result.Match(
+        await result.SwitchAsync(
             // Success
-            f0: async success => {
+            async success => {
                 InfiniLoreUser user = success.Value;
                 await SendAsync(TypedResults.Ok(await Map.FromEntityAsync(user, ct)), cancellation: ct);
             },
             // None
-            f1: async _ => await SendAsync(TypedResults.BadRequest(problemDetails), cancellation: ct),
+            async _ => await SendAsync(TypedResults.BadRequest(problemDetails), cancellation: ct),
 
             // Error
-            f2: async _ => {
+            async _ => {
                 logger.Error("Unexpected error during retrieval of User, with {error}", result.ErrorString);
                 await SendAsync(TypedResults.BadRequest(problemDetails), cancellation: ct);
             }

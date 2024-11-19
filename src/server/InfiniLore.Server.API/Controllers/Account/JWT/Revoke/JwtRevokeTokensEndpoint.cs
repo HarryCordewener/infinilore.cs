@@ -1,13 +1,13 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using AterraEngine.Unions;
 using InfiniLore.Server.Contracts.Services;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Account;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using OneOf.Types;
 using System.Security.Claims;
 
 namespace InfiniLore.Server.API.Controllers.Account.JWT.Revoke;

@@ -1,12 +1,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using AterraEngine.Unions;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models.Account;
-using OneOf.Types;
 using System.Linq.Expressions;
 
 namespace InfiniLore.Server.Data.Repositories.Content;
@@ -25,8 +25,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
             .FirstOrDefaultAsync(predicate: u => u.Id == id, ct);
 
         if (result is null) return new None();
-
-        return new Success<InfiniLoreUser>(result);
+        return result;
     }
 
     public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByUserNameAsync(string userName, CancellationToken ct = default) {
@@ -38,8 +37,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
             .FirstOrDefaultAsync(predicate: u => u.Id == userName, ct);
 
         if (result is null) return new None();
-
-        return new Success<InfiniLoreUser>(result);
+        return result;
     }
 
     public async ValueTask<QueryResultMany<InfiniLoreUser>> TryGetByQueryAsync(Expression<Func<InfiniLoreUser, bool>> predicate, CancellationToken ct = default) {
@@ -52,7 +50,6 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
             .ToArrayAsync(ct);
 
         if (result.Length == 0) return new None();
-
-        return new Success<InfiniLoreUser[]>(result);
+        return result;
     }
 }

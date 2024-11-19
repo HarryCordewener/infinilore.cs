@@ -39,7 +39,7 @@ public static class LoreScopeQueryTestData {
 
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 
-        data.Add(new UserUnion(user1), new LoreScopeModel {
+        data.Add(user1, new LoreScopeModel {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope for User 1",
             Description = "Test Query Scope Description for User 1",

@@ -1,19 +1,18 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using OneOf;
+using AterraEngine.Unions;
 
 namespace InfiniLore.Server.Contracts.Types.Unions;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[GenerateOneOf]
-public partial class UserIdUnion : OneOfBase<Guid, string> {
-    public bool IsGuid => IsT0;
-    public bool IsString => IsT1;
-
-    public Guid AsGuid => AsT0;
-    public string AsString => AsT1;
-
-    public string AsUserId => IsGuid ? AsGuid.ToString() : AsString;
+public readonly partial struct UserIdUnion() : IUnion<Guid, string> {
+     public string AsUserId {
+          get {
+               if (IsGuid) return AsGuid.ToString();
+               if (IsString) return AsString;
+               throw new ArgumentException("Union does not contain a value");
+          }
+     }
 }

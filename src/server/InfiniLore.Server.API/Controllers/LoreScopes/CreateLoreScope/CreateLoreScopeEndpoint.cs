@@ -1,14 +1,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using AterraEngine.Unions;
 using InfiniLore.Server.API.Mappers.UserData.LoreScope;
 using InfiniLore.Server.Data.Models.UserData;
 using InfiniLore.Server.Services.CQRS.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
-using OneOf;
-using OneOf.Types;
+
 
 namespace InfiniLore.Server.API.Controllers.LoreScopes.CreateLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ public class CreateLoreScopeEndpoint(IMediator mediator) :
 
     public async override Task HandleAsync(LoreScopeRequest req, CancellationToken ct) {
         LoreScopeModel model = Map.ToEntity(req);
-        OneOf<Success<Guid>, Error<string>> result = await mediator.Send(new CreateLoreScopeCommand(model), ct);
+        Union<Success<Guid>, Error<string>> result = await mediator.Send(new CreateLoreScopeCommand(model), ct);
         
         if (!result.IsT0) {
             await SendAsync(TypedResults.BadRequest(), cancellation: ct);
