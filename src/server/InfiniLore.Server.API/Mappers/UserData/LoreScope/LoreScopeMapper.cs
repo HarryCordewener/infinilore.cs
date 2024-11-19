@@ -21,6 +21,7 @@ public class LoreScopeMapper() : Mapper<LoreScopeRequest, LoreScopeResponse, Lor
     
     public override LoreScopeModel ToEntity(LoreScopeRequest request) => new() {
         Id = request.Id ?? Guid.CreateVersion7(),
+        Owner = null!,
         OwnerId = request.OwnerId,
         Name = request.Name,
         Description = request.Description ?? string.Empty

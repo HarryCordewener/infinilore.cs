@@ -17,5 +17,5 @@ public class JwtRefreshTokenModel : BaseContent, IHasOwner {
     public string[] Permissions { get; init; } = [];
     public int? ExpiresInDays { get; init; }
     public required InfiniLoreUser Owner { get; set; }
-    [MaxLength(64)] public string OwnerId { get; set; } = null!;
+    [MaxLength(450)] public string OwnerId { get; set; } = null!;
 }

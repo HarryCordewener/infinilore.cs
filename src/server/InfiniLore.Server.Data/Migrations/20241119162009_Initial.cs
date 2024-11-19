@@ -163,12 +163,12 @@ namespace InfiniLore.Server.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TokenHash = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Roles = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Permissions = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExpiresInDays = table.Column<int>(type: "int", nullable: true),
+                    OwnerId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     SoftDeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -192,8 +192,8 @@ namespace InfiniLore.Server.Data.Migrations
                     Description = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     SoftDeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsPublic = table.Column<bool>(type: "bit", nullable: false)
+                    IsPublic = table.Column<bool>(type: "bit", nullable: false),
+                    OwnerId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -216,8 +216,8 @@ namespace InfiniLore.Server.Data.Migrations
                     Description = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     SoftDeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsPublic = table.Column<bool>(type: "bit", nullable: false)
+                    IsPublic = table.Column<bool>(type: "bit", nullable: false),
+                    OwnerId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -236,33 +236,6 @@ namespace InfiniLore.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserContentAccess<LoreScopeModel>",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    AccessLevel = table.Column<int>(type: "int", nullable: false),
-                    LoreScopeModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SoftDeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserContentAccess<LoreScopeModel>", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserContentAccess<LoreScopeModel>_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserContentAccess<LoreScopeModel>_LoreScopes_LoreScopeModelId",
-                        column: x => x.LoreScopeModelId,
-                        principalTable: "LoreScopes",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Universes",
                 columns: table => new
                 {
@@ -272,8 +245,8 @@ namespace InfiniLore.Server.Data.Migrations
                     Description = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     SoftDeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsPublic = table.Column<bool>(type: "bit", nullable: false)
+                    IsPublic = table.Column<bool>(type: "bit", nullable: false),
+                    OwnerId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -292,54 +265,39 @@ namespace InfiniLore.Server.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserContentAccess<MultiverseModel>",
+                name: "UserContentAccess",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     AccessLevel = table.Column<int>(type: "int", nullable: false),
+                    LoreScopeModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     MultiverseModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SoftDeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserContentAccess<MultiverseModel>", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserContentAccess<MultiverseModel>_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserContentAccess<MultiverseModel>_Multiverses_MultiverseModelId",
-                        column: x => x.MultiverseModelId,
-                        principalTable: "Multiverses",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserContentAccess<UniverseModel>",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    AccessLevel = table.Column<int>(type: "int", nullable: false),
                     UniverseModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     SoftDeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserContentAccess<UniverseModel>", x => x.Id);
+                    table.PrimaryKey("PK_UserContentAccess", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserContentAccess<UniverseModel>_AspNetUsers_UserId",
+                        name: "FK_UserContentAccess_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserContentAccess<UniverseModel>_Universes_UniverseModelId",
+                        name: "FK_UserContentAccess_LoreScopes_LoreScopeModelId",
+                        column: x => x.LoreScopeModelId,
+                        principalTable: "LoreScopes",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserContentAccess_Multiverses_MultiverseModelId",
+                        column: x => x.MultiverseModelId,
+                        principalTable: "Multiverses",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserContentAccess_Universes_UniverseModelId",
                         column: x => x.UniverseModelId,
                         principalTable: "Universes",
                         principalColumn: "Id");
@@ -350,14 +308,14 @@ namespace InfiniLore.Server.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "0e8fd862-cd22-446c-9f12-c9b347e40c3c", null, "admin", "ADMIN" },
-                    { "90abc932-bbfd-4db5-a26d-48ee7e24a34f", null, "user", "USER" }
+                    { "29df80bf-d99d-43a6-81dc-59c6789ade52", null, "user", "USER" },
+                    { "5fc8e903-7056-4867-9a71-76ca90933975", null, "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "d957c0f8-e90e-4068-a968-4f4b49fc165c", 0, "0381f490-a73e-4cef-9d5b-d3a5e29c0d8e", "testuser@example.com", true, false, null, "TESTUSER@EXAMPLE.COM", "TESTUSER", "AQAAAAIAAYagAAAAEMuJs5NYofXZSPr6Q3Q8nsye0byfxoFW61lEEG9D+BVLSI4dItXw1lM2Vztj05DenQ==", null, false, "d957c0f8-e90e-4068-a968-4f4b49fc165b", false, "testuser" });
+                values: new object[] { "d957c0f8-e90e-4068-a968-4f4b49fc165c", 0, "7a34b4a4-e719-46cb-a9d4-c35276d8a6fa", "testuser@example.com", true, false, null, "TESTUSER@EXAMPLE.COM", "TESTUSER", "AQAAAAIAAYagAAAAEC+sOw2MBeNcxALpUcQwOVp74Si6KBDJj2I82ZFgbK9JT0IApb+QP+JzLKUaEdAg1A==", null, false, "d957c0f8-e90e-4068-a968-4f4b49fc165b", false, "testuser" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -486,33 +444,23 @@ namespace InfiniLore.Server.Data.Migrations
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserContentAccess<LoreScopeModel>_LoreScopeModelId",
-                table: "UserContentAccess<LoreScopeModel>",
+                name: "IX_UserContentAccess_LoreScopeModelId",
+                table: "UserContentAccess",
                 column: "LoreScopeModelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserContentAccess<LoreScopeModel>_UserId",
-                table: "UserContentAccess<LoreScopeModel>",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserContentAccess<MultiverseModel>_MultiverseModelId",
-                table: "UserContentAccess<MultiverseModel>",
+                name: "IX_UserContentAccess_MultiverseModelId",
+                table: "UserContentAccess",
                 column: "MultiverseModelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserContentAccess<MultiverseModel>_UserId",
-                table: "UserContentAccess<MultiverseModel>",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserContentAccess<UniverseModel>_UniverseModelId",
-                table: "UserContentAccess<UniverseModel>",
+                name: "IX_UserContentAccess_UniverseModelId",
+                table: "UserContentAccess",
                 column: "UniverseModelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserContentAccess<UniverseModel>_UserId",
-                table: "UserContentAccess<UniverseModel>",
+                name: "IX_UserContentAccess_UserId",
+                table: "UserContentAccess",
                 column: "UserId");
         }
 
@@ -538,13 +486,7 @@ namespace InfiniLore.Server.Data.Migrations
                 name: "JwtRefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "UserContentAccess<LoreScopeModel>");
-
-            migrationBuilder.DropTable(
-                name: "UserContentAccess<MultiverseModel>");
-
-            migrationBuilder.DropTable(
-                name: "UserContentAccess<UniverseModel>");
+                name: "UserContentAccess");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

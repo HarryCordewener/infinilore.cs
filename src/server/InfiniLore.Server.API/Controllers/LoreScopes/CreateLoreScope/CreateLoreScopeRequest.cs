@@ -1,16 +1,17 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Data.Models.Account;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
-namespace InfiniLore.Server.Data.Models.Base;
+namespace InfiniLore.Server.API.Controllers.LoreScopes.CreateLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class UserContent : BaseContent, IHasOwner {
-    public bool IsPublic { get; set; }
-    public ICollection<UserContentAccess> UserAccess { get; set; } = [];
-    public required virtual InfiniLoreUser Owner { get; set; } = null!;
-    [MaxLength(450)] public string OwnerId { get; set; } = null!;
-}
+[UsedImplicitly]
+public record CreateLoreScopeRequest(
+    [property: FromRoute] Guid UserId,
+    Guid LoreScopeId,
+    string OwnerId,
+    string Name,
+    string? Description
+);

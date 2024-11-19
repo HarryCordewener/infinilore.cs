@@ -38,7 +38,7 @@ public class DatabaseFixture : IAsyncLifetime {
         ServiceProvider = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
         InfiniLoreDbContext db = await ServiceProvider.GetRequiredService<IDbUnitOfWork<InfiniLoreDbContext>>().GetDbContextAsync();
-        await db.Database.MigrateAsync();
+        await db.Database.EnsureCreatedAsync();
         await db.SaveChangesAsync();
         DbContext = db;
     }
