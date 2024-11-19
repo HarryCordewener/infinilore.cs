@@ -91,13 +91,13 @@ namespace InfiniLore.Server.Data.Migrations
                         {
                             Id = "d957c0f8-e90e-4068-a968-4f4b49fc165c",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7a34b4a4-e719-46cb-a9d4-c35276d8a6fa",
+                            ConcurrencyStamp = "3977386f-eb7b-4c12-b435-19ee021ee5f5",
                             Email = "testuser@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TESTUSER@EXAMPLE.COM",
                             NormalizedUserName = "TESTUSER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC+sOw2MBeNcxALpUcQwOVp74Si6KBDJj2I82ZFgbK9JT0IApb+QP+JzLKUaEdAg1A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGi84KGOoV/HPPk5GHyGbVia1dZWfEQzrCDbqkQ6H3R1/EiyZDCZ6RzVeibtBVEuTQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "d957c0f8-e90e-4068-a968-4f4b49fc165b",
                             TwoFactorEnabled = false,
@@ -366,13 +366,13 @@ namespace InfiniLore.Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5fc8e903-7056-4867-9a71-76ca90933975",
+                            Id = "e8ce5ced-3c52-4677-a650-c52de2cd7727",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "29df80bf-d99d-43a6-81dc-59c6789ade52",
+                            Id = "2352a1cc-342a-42e4-9dca-3004fc9b075c",
                             Name = "user",
                             NormalizedName = "USER"
                         });

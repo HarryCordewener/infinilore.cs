@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using Testcontainers.MsSql;
 
@@ -26,7 +28,7 @@ namespace InfiniLore.Server;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public static class Program {
-    public async static Task Main(string[] args) {
+    public static async Task Main(string[] args) {
         // -------------------------------------------------------------------------------------------------------------
         // Builder
         // -------------------------------------------------------------------------------------------------------------
@@ -50,6 +52,7 @@ public static class Program {
 
         builder.Services.AddDbContextFactory<InfiniLoreDbContext>(options =>
             options.UseSqlServer(container.GetConnectionString())
+                .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
         );
         #endregion
 
@@ -154,6 +157,7 @@ public static class Program {
         // App
         // -------------------------------------------------------------------------------------------------------------
         WebApplication app = builder.Build();
+        await MigrateDatabaseAsync(app);
 
         if (app.Environment.IsDevelopment()) {
             app.UseWebAssemblyDebugging();
@@ -194,14 +198,12 @@ public static class Program {
             ctx.RoutePrefix = "swagger";
         });
 
-        await using AsyncServiceScope scope = app.Services.CreateAsyncScope();// CreateAsyncScope
-        await Task.WhenAll(
-            MigrateDatabaseAsync(app),// Db Migrations on startup
-            app.RunAsync()
-        );
+        await app.RunAsync();
     }
 
-    private async static Task MigrateDatabaseAsync(WebApplication app) {
+    private async static ValueTask MigrateDatabaseAsync(WebApplication app) {
+        // Create a localised scope so we can get the DbContextFactory correctly.
+        await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
         await using InfiniLoreDbContext db = await app.Services.GetRequiredService<IDbContextFactory<InfiniLoreDbContext>>().CreateDbContextAsync();
         await db.Database.MigrateAsync();
         await db.SaveChangesAsync();
