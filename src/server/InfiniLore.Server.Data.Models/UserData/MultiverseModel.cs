@@ -8,7 +8,7 @@ namespace InfiniLore.Server.Data.Models.UserData;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class MultiverseModel : UserContent<MultiverseModel> {
+public class MultiverseModel : UserContent {
     public required LoreScopeModel LoreScope { get; set; }
     public Guid LoreScopeId { get; set; }
 

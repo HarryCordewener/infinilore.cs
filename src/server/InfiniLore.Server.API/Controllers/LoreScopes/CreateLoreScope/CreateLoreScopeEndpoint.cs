@@ -1,6 +1,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using InfiniLore.Server.API.Mappers.UserData.LoreScope;
+using InfiniLore.Server.Data.Models.UserData;
 using InfiniLore.Server.Services.CQRS.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -14,21 +16,23 @@ namespace InfiniLore.Server.API.Controllers.LoreScopes.CreateLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 public class CreateLoreScopeEndpoint(IMediator mediator) :
     Endpoint<
-        CreateLoreScopeRequest,
+        LoreScopeRequest, // Uses the generic request type to map the request to the entity model, aka no special request class needed.
         Results<
             Ok<Guid>,
             BadRequest
         >,
-        LoreScopeResponseMapper
+        LoreScopeMapper
     > {
 
     public override void Configure() {
-        Post("/{UserId:guid}/lore-scopes/{LoreScopeId:guid}");
+        Post("/{UserId:guid}/lore-scopes");
         AllowAnonymous();
     }
 
-    public async override Task HandleAsync(CreateLoreScopeRequest req, CancellationToken ct) {
-        OneOf<Success<Guid>, Error<string>> result = await mediator.Send(new CreateLoreScopeCommand(req.Model), ct);
+    public async override Task HandleAsync(LoreScopeRequest req, CancellationToken ct) {
+        LoreScopeModel model = Map.ToEntity(req);
+        OneOf<Success<Guid>, Error<string>> result = await mediator.Send(new CreateLoreScopeCommand(model), ct);
+        
         if (!result.IsT0) {
             await SendAsync(TypedResults.BadRequest(), cancellation: ct);
             return;

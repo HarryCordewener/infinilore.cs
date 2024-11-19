@@ -26,11 +26,11 @@ public class SeedLoreScopes(ILoreScopeRepository repository, ILogger logger, IDb
         if (await db.Users.FirstOrDefaultAsync(predicate: u => u.UserName == "testuser", ct) is not {} user) return;
 
         await repository.TryAddRangeAsync([
-            new LoreScopeModel { Owner = user, Name = "A" },
-            new LoreScopeModel { Owner = user, Name = "B" },
-            new LoreScopeModel { Owner = user, Name = "C" },
-            new LoreScopeModel { Owner = user, Name = "D" },
-            new LoreScopeModel { Owner = user, Name = "E" }
+            new LoreScopeModel { OwnerId = user.Id, Name = "A" },
+            new LoreScopeModel { OwnerId = user.Id, Name = "B" },
+            new LoreScopeModel { OwnerId = user.Id, Name = "C" },
+            new LoreScopeModel { OwnerId = user.Id, Name = "D" },
+            new LoreScopeModel { OwnerId = user.Id, Name = "E" }
         ], ct);
 
         await dbUnitOfWork.CommitAsync(ct);

@@ -21,7 +21,7 @@ namespace InfiniLore.Server.Services.CQRS.Handlers.Commands;
 public class CreateLoreScopeHandler(ILoreScopeRepository repository, IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ILogger logger) : IRequestHandler<CreateLoreScopeCommand, OneOf<Success<Guid>, Error<string>>> {
     public async Task<OneOf<Success<Guid>, Error<string>>> Handle(CreateLoreScopeCommand request, CancellationToken ct) {
         try {
-            CommandResult<LoreScopeModel> result = await repository.TryAddWithResultAsync(request.model, ct);
+            CommandResult<LoreScopeModel> result = await repository.TryAddWithResultAsync(request.Model, ct);
             if (!result.TryGetSuccessValue(out EntityEntry<LoreScopeModel>? loreScope)) {
                 return new Error<string>($"Could not add lore scope: {result.ErrorString}");
             }

@@ -13,7 +13,7 @@ namespace InfiniLore.Server.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : Repository<T>(unitOfWork), IBaseContentRepository<T> where T : BaseContent<T> {
+public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : Repository<T>(unitOfWork), IBaseContentRepository<T> where T : BaseContent {
     #region Commands
     public async ValueTask<CommandOutput> TryAddAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
@@ -22,6 +22,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         await dbSet.AddAsync(model, ct);
         return new Success();
     }
+    
     public async ValueTask<CommandResult<T>> TryAddWithResultAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         if (await dbSet.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";

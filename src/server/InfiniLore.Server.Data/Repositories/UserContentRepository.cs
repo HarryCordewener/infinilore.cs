@@ -11,7 +11,7 @@ namespace InfiniLore.Server.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : BaseContentRepository<T>(unitOfWork), IUserContentRepository<T> where T : UserContent<T> {
+public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : BaseContentRepository<T>(unitOfWork), IUserContentRepository<T> where T : UserContent {
     public async virtual ValueTask<QueryResultMany<T>> TryGetByUserAsync(UserUnion userUnion, CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet

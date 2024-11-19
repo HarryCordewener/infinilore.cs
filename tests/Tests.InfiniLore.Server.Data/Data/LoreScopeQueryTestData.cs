@@ -21,14 +21,14 @@ public static class LoreScopeQueryTestData {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope 1",
             Description = "Test Query Scope Description 1",
-            Owner = user1
+            OwnerId = user1.Id
         });
 
         data.Add(new LoreScopeModel {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope 2",
             Description = "Test Query Scope Description 2",
-            Owner = user1
+            OwnerId = user1.Id
         });
 
         return data;
@@ -43,7 +43,7 @@ public static class LoreScopeQueryTestData {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope for User 1",
             Description = "Test Query Scope Description for User 1",
-            Owner = user1
+            OwnerId = user1.Id
         });
 
         return data;
@@ -59,13 +59,13 @@ public static class LoreScopeQueryTestData {
                 Id = Guid.NewGuid(),
                 Name = "Test Query Scope 3",
                 Description = "Test Query Scope Description 3",
-                Owner = user1
+                OwnerId = user1.Id
             },
             new() {
                 Id = Guid.NewGuid(),
                 Name = "Test Query Scope 4",
                 Description = "Test Query Scope Description 4",
-                Owner = user1
+                OwnerId = user1.Id
             }
         });
 
@@ -81,7 +81,7 @@ public static class LoreScopeQueryTestData {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope with Criteria",
             Description = "Test Query Scope Description with Criteria",
-            Owner = user1
+            OwnerId = user1.Id
         };
 
         data.Add(p1: scope => scope.Name == "Test Query Scope with Criteria", model);

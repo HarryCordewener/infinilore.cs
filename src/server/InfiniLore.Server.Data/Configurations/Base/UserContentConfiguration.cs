@@ -8,7 +8,7 @@ namespace InfiniLore.Server.Data.Configurations.Base;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class UserContentConfiguration<T> : BaseContentConfiguration<T> where T : UserContent<T> {
+public abstract class UserContentConfiguration<T> : BaseContentConfiguration<T> where T : UserContent {
     public override void Configure(EntityTypeBuilder<T> builder) {
         base.Configure(builder);// Call BaseContentConfiguration
 

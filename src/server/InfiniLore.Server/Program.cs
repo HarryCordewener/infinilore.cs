@@ -121,7 +121,7 @@ public static class Program {
         #region API
         builder.Services
             .AddFastEndpoints(options => {
-                options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All;
+                // options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All;
                 options.Assemblies = [
                     typeof(API.IAssemblyEntry).Assembly
                 ];
@@ -184,11 +184,12 @@ public static class Program {
                 ;
             ctx.Errors.UseProblemDetails();
         });
-        app.UseSwaggerGen();
-        // app.UseSwaggerUI(ModernStyle.Dark, setupAction: ctx => {
-        //     ctx.SwaggerEndpoint("swagger/v1/swagger.json", "InfiniLore API v1");
-        //     ctx.RoutePrefix = "swagger";
-        // });
+        
+        app.UseOpenApi();
+        app.UseSwaggerUI(ModernStyle.Dark, setupAction: ctx => {
+            ctx.SwaggerEndpoint("v1/swagger.json", "InfiniLore API v1");
+            ctx.RoutePrefix = "swagger";
+        });
 
         await using AsyncServiceScope scope = app.Services.CreateAsyncScope();// CreateAsyncScope
         await Task.WhenAll(

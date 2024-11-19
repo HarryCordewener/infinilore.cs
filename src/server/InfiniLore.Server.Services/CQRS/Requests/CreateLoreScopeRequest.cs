@@ -11,4 +11,4 @@ namespace InfiniLore.Server.Services.CQRS.Requests;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public record CreateLoreScopeCommand(LoreScopeModel model) : IRequest<OneOf<Success<Guid>, Error<string>>>;
+public record CreateLoreScopeCommand(LoreScopeModel Model) : IRequest<OneOf<Success<Guid>, Error<string>>>;

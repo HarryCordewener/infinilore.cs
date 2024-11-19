@@ -8,7 +8,7 @@ namespace InfiniLore.Server.Data.Configurations.Base;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class BaseContentConfiguration<T> : IEntityTypeConfiguration<T> where T : BaseContent<T> {
+public abstract class BaseContentConfiguration<T> : IEntityTypeConfiguration<T> where T : BaseContent {
     public virtual void Configure(EntityTypeBuilder<T> builder) {
         HasSoftDeleteAsQueryFilter(builder);
         HasUniqueIdAsKey(builder);

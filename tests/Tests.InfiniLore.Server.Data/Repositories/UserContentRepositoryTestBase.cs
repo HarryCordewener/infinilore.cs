@@ -16,7 +16,7 @@ namespace Tests.InfiniLore.Server.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 public abstract class UserContentRepositoryTestBase<TRepository, TModel>(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>
     where TRepository : IUserContentRepository<TModel>
-    where TModel : UserContent<TModel> {
+    where TModel : UserContent {
 
     [UsedImplicitly] protected readonly TRepository Repository = fixture.ServiceProvider.GetRequiredService<TRepository>();
     [UsedImplicitly] protected readonly IDbUnitOfWork<InfiniLoreDbContext> UnitOfWork = fixture.ServiceProvider.GetRequiredService<IDbUnitOfWork<InfiniLoreDbContext>>();

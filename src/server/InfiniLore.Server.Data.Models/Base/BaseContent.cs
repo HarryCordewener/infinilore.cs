@@ -8,8 +8,8 @@ namespace InfiniLore.Server.Data.Models.Base;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class BaseContent<T> where T : BaseContent<T> {
-    [Key] public Guid Id { get; set; }
+public abstract class BaseContent {
+    [Key] public Guid Id { get; set; } = Guid.CreateVersion7();
     public DateTime CreatedDate { get; private set; } = DateTime.UtcNow;
 
     #region SoftDelete

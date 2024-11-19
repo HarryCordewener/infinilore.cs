@@ -19,14 +19,14 @@ public static class LoreScopeCommandTestData {
             Id = Guid.NewGuid(),
             Name = "Test Scope 1",
             Description = "Test Scope Description 1",
-            Owner = user1
+            OwnerId = user1.Id
         });
 
         data.Add(new LoreScopeModel {
             Id = Guid.NewGuid(),
             Name = "Test Scope 2",
             Description = "Test Scope Description 2",
-            Owner = user1
+            OwnerId = user1.Id
         });
 
         return data;
@@ -42,13 +42,13 @@ public static class LoreScopeCommandTestData {
                 Id = Guid.NewGuid(),
                 Name = "Test Scope 3",
                 Description = "Test Scope Description 3",
-                Owner = user1
+                OwnerId = user1.Id
             },
             new() {
                 Id = Guid.NewGuid(),
                 Name = "Test Scope 4",
                 Description = "Test Scope Description 4",
-                Owner = user1
+                OwnerId = user1.Id
             }
         });
 
@@ -56,12 +56,12 @@ public static class LoreScopeCommandTestData {
             new() {
                 Name = "Test Scope Without Server Side Id",
                 Description = "Test Scope Description 3",
-                Owner = user1
+                OwnerId = user1.Id
             },
             new() {
                 Name = "Test Scope Without Server Side Id 2",
                 Description = "Test Scope Description 4",
-                Owner = user1
+                OwnerId = user1.Id
             }
         });
 
@@ -78,7 +78,7 @@ public static class LoreScopeCommandTestData {
                 Id = Guid.NewGuid(),
                 Name = "Test Scope 5",
                 Description = "Test Scope Description 5",
-                Owner = user1
+                OwnerId = user1.Id
             },
             p2: async model => {
                 model.Description = "Updated Scope Description 5";
@@ -99,7 +99,7 @@ public static class LoreScopeCommandTestData {
             Id = Guid.NewGuid(),
             Name = "Test Scope 6",
             Description = "Will be deleted",
-            Owner = user1
+            OwnerId = user1.Id
         });
 
         return data;

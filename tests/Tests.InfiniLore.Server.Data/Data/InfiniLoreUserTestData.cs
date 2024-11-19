@@ -31,14 +31,14 @@ public static class InfiniLoreUserCommandTestData {
             Id = Guid.NewGuid(),
             Name = "Scope1",
             Description = "Description1",
-            Owner = user2
+            OwnerId = user2.Id
         });
 
         user2.LoreScopes.Add(new LoreScopeModel {
             Id = Guid.NewGuid(),
             Name = "Scope2",
             Description = "Description2",
-            Owner = user2
+            OwnerId = user2.Id
         });
 
         data.Add(user2);
@@ -53,7 +53,7 @@ public static class InfiniLoreUserCommandTestData {
             Id = Guid.NewGuid(),
             Name = "Scope1",
             Description = "Description1",
-            Owner = user3
+            OwnerId = user3.Id
         };
 
         var user3Multiverse = new MultiverseModel {
@@ -61,7 +61,7 @@ public static class InfiniLoreUserCommandTestData {
             Name = "Multiverse1",
             Description = "Description1",
             LoreScope = user3LoreScope,
-            Owner = user3
+            OwnerId = user3.Id
         };
 
         var user3Universe = new UniverseModel {
@@ -69,7 +69,7 @@ public static class InfiniLoreUserCommandTestData {
             Name = "Universe1",
             Description = "Description1",
             Multiverse = user3Multiverse,
-            Owner = user3
+            OwnerId = user3.Id
         };
 
         user3.LoreScopes.Add(user3LoreScope);

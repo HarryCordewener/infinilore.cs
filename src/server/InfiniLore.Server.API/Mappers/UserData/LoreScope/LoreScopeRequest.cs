@@ -1,15 +1,21 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Data.Models.Account;
+using InfiniLore.Server.API.Mappers.Base;
 
-namespace InfiniLore.Server.Data.Models.Base;
+namespace InfiniLore.Server.API.Mappers.UserData.LoreScope;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class UserContent : BaseContent, IHasOwner {
-    public bool IsPublic { get; set; }
-    public ICollection<UserContentAccess> UserAccess { get; set; } = [];
-    public virtual InfiniLoreUser Owner { get; set; } = null!;
-    public required string OwnerId { get; set; }
-}
+public record LoreScopeRequest(
+    Guid? Id,
+    string OwnerId,
+    
+    string Name,
+    string? Description
+    
+) : UserContentRequest(
+    Id,
+    OwnerId
+);
