@@ -12,11 +12,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCore.SwaggerUI.Themes" Version="1.0.0"/>
-        <PackageReference Include="FastEndpoints" Version="5.31.0.8-beta" />
-        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.8-beta" />
-        <PackageReference Include="FastEndpoints.Security" Version="5.31.0.8-beta" />
-        <PackageReference Include="FastEndpoints.Swagger" Version="5.31.0.8-beta" />
+        <PackageReference Include="AspNetCore.SwaggerUI.Themes" Version="2.0.0" />
+        <PackageReference Include="FastEndpoints" Version="5.31.0.9-beta" />
+        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.9-beta" />
+        <PackageReference Include="FastEndpoints.Security" Version="5.31.0.9-beta" />
+        <PackageReference Include="FastEndpoints.Swagger" Version="5.31.0.9-beta" />
         <PackageReference Include="JetBrains.Annotations" Version="2024.3.0"/>
         <PackageReference Include="MediatR" Version="12.4.1"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
