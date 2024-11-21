@@ -2,8 +2,8 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Types.Unions;
-using InfiniLore.Server.Data.Models.Account;
-using InfiniLore.Server.Data.Models.UserData;
+using InfiniLore.Server.Data.Models.Content.Account;
+using InfiniLore.Server.Data.Models.Content.UserData;
 using System.Linq.Expressions;
 
 namespace Tests.InfiniLore.Server.Data.Data;

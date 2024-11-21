@@ -2,7 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
-using InfiniLore.Server.Data;
+using InfiniLore.Server.Data.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.InfiniLore.Server.Data;

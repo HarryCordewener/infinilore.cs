@@ -8,8 +8,8 @@ using FastEndpoints.Security;
 using FastEndpoints.Swagger;
 using InfiniLore.Server.API;
 using InfiniLore.Server.Components;
-using InfiniLore.Server.Data;
-using InfiniLore.Server.Data.Models.Account;
+using InfiniLore.Server.Data.Models.Content.Account;
+using InfiniLore.Server.Data.SqlServer;
 using InfiniLore.Server.Services;
 using InfiniLore.Server.Services.CQRS;
 using MediatR;
@@ -142,7 +142,7 @@ public static class Program {
         builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
         #endregion
 
-        builder.Services.RegisterServicesFromInfiniLoreServerData();
+        builder.Services.RegisterServicesFromInfiniLoreServerDataSqlServer();
         builder.Services.RegisterServicesFromInfiniLoreServerServices();
 
         // -------------------------------------------------------------------------------------------------------------
@@ -177,7 +177,7 @@ public static class Program {
             ctx.Endpoints.RoutePrefix = "api";
             ctx.Binding.ReflectionCache
                 .AddFromInfiniLoreServerAPI()
-                .AddFromInfiniLoreServerData()
+                .AddFromInfiniLoreServerDataSqlServer()
                 .AddFromInfiniLoreServerServices()
                 ;
 

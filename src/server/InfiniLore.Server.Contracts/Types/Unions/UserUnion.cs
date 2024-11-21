@@ -2,7 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
-using InfiniLore.Server.Data.Models.Account;
+using InfiniLore.Server.Data.Models.Content.Account;
 
 namespace InfiniLore.Server.Contracts.Types.Unions;
 // ---------------------------------------------------------------------------------------------------------------------

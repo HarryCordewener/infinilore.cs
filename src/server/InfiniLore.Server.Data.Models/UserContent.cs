@@ -1,0 +1,17 @@
+// ---------------------------------------------------------------------------------------------------------------------
+// Imports
+// ---------------------------------------------------------------------------------------------------------------------
+using InfiniLore.Server.Data.Models.Content.Account;
+using System.ComponentModel.DataAnnotations;
+
+namespace InfiniLore.Server.Data.Models;
+// ---------------------------------------------------------------------------------------------------------------------
+// Code
+// ---------------------------------------------------------------------------------------------------------------------
+public abstract class UserContent : BaseContent, IHasOwner {
+    public bool IsPublic { get; set; }
+    public required virtual InfiniLoreUser Owner { get; set; } = null!;
+    [MaxLength(450)] public string OwnerId { get; set; } = null!;
+    
+    public ICollection<UserContentAccess> UserAccess { get; set; } = [];
+}

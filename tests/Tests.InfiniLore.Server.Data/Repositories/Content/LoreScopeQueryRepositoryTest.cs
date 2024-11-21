@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Unions;
-using InfiniLore.Server.Data.Models.UserData;
+using InfiniLore.Server.Data.Models.Content.UserData;
 using System.Linq.Expressions;
 using Tests.InfiniLore.Server.Data.Data;
 

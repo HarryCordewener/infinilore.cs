@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
-using InfiniLore.Server.Data.Models.Base;
+using InfiniLore.Server.Data.Models;
 
 namespace InfiniLore.Server.Contracts.Data;
 // ---------------------------------------------------------------------------------------------------------------------

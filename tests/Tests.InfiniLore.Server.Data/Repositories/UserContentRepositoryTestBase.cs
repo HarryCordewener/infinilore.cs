@@ -4,8 +4,8 @@
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
-using InfiniLore.Server.Data;
-using InfiniLore.Server.Data.Models.Base;
+using InfiniLore.Server.Data.Models;
+using InfiniLore.Server.Data.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 

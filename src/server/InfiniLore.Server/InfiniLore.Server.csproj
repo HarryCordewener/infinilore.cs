@@ -30,7 +30,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\client\InfiniLore.WasmClient\InfiniLore.WasmClient.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.API\InfiniLore.Server.API.csproj"/>
-        <ProjectReference Include="..\InfiniLore.Server.Data\InfiniLore.Server.Data.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Server.Data.SqlServer\InfiniLore.Server.Data.SqlServer.csproj" />
         <ProjectReference Include="..\InfiniLore.Server.Services\InfiniLore.Server.Services.csproj"/>
     </ItemGroup>
 

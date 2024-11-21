@@ -2,7 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Data.Models.Account;
+using InfiniLore.Server.Data.Models.Content.Account;
 
 namespace InfiniLore.Server.Contracts.Services;
 // ---------------------------------------------------------------------------------------------------------------------
