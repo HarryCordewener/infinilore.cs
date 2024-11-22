@@ -34,6 +34,7 @@
         <Folder Include="Controllers\Content\UserData\" />
         <Folder Include="Controllers\Data\Discovery\" />
         <Folder Include="Controllers\Data\System\" />
+        <Folder Include="Controllers\Data\User\LoreScopes\GetLoreScopesUser\" />
         <Folder Include="Mappers\Account\"/>
         <Folder Include="Mappers\UserData\"/>
     </ItemGroup>
