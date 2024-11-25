@@ -6,7 +6,6 @@ using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Services.Authorization;
 using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Data.Models;
 using InfiniLore.Server.Data.Models.Content.UserData;
 using InfiniLore.Server.Data.SqlServer;
 using InfiniLore.Server.Services.CQRS.Requests.Commands;

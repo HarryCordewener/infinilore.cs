@@ -53,9 +53,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniLore.Server.Services.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniLore.Server.Services.CQRS.Requests", "src\server\InfiniLore.Server.Services.CQRS.Requests\InfiniLore.Server.Services.CQRS.Requests.csproj", "{22F3C636-8628-46E5-B1A9-0C0C1919464E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Authorization", "Authorization", "{25326A39-74B3-48B9-B345-BFC1D1DB78DE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auth", "Auth", "{25326A39-74B3-48B9-B345-BFC1D1DB78DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniLore.Server.Services.Authorization", "src\server\InfiniLore.Server.Services.Authorization\InfiniLore.Server.Services.Authorization.csproj", "{F03AB56F-E8AB-4B70-A886-D5995CAD5274}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfiniLore.Server.Services.Authentication", "src\server\InfiniLore.Server.Services.Authentication\InfiniLore.Server.Services.Authentication.csproj", "{55850CFD-7B44-4649-BA61-525EA3EE7D78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +113,10 @@ Global
 		{F03AB56F-E8AB-4B70-A886-D5995CAD5274}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F03AB56F-E8AB-4B70-A886-D5995CAD5274}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F03AB56F-E8AB-4B70-A886-D5995CAD5274}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55850CFD-7B44-4649-BA61-525EA3EE7D78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55850CFD-7B44-4649-BA61-525EA3EE7D78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55850CFD-7B44-4649-BA61-525EA3EE7D78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55850CFD-7B44-4649-BA61-525EA3EE7D78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EB00BE10-6020-4E39-A00F-C202A0165920} = {7304F551-466C-4016-A729-CDA819CE9983}
@@ -135,5 +141,6 @@ Global
 		{22F3C636-8628-46E5-B1A9-0C0C1919464E} = {B7113FA8-3A74-424D-9B0B-F22906B59E0E}
 		{25326A39-74B3-48B9-B345-BFC1D1DB78DE} = {01C7445D-32FF-4602-AE4B-EE5336015F92}
 		{F03AB56F-E8AB-4B70-A886-D5995CAD5274} = {25326A39-74B3-48B9-B345-BFC1D1DB78DE}
+		{55850CFD-7B44-4649-BA61-525EA3EE7D78} = {25326A39-74B3-48B9-B345-BFC1D1DB78DE}
 	EndGlobalSection
 EndGlobal

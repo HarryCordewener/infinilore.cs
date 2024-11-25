@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Serilog;
 using System.Security.Claims;
 using Testcontainers.MsSql;
 
@@ -32,7 +31,7 @@ public static class Program {
         // Builder
         // -------------------------------------------------------------------------------------------------------------
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-        builder.OverrideLoggingAsSeriLog();
+        // builder.OverrideLoggingAsSeriLog();
 
         #region Database
         MsSqlContainer container = new MsSqlBuilder()
@@ -48,7 +47,7 @@ public static class Program {
 
         builder.Services.AddDbContextFactory<InfiniLoreDbContext>(options =>
             options.UseSqlServer(container.GetConnectionString())
-                .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
+                // .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
         );
         builder.Services.RegisterServicesFromInfiniLoreServerDataSqlServer();
         #endregion
