@@ -10,9 +10,7 @@ namespace InfiniLore.Server.Data.Models;
 // ---------------------------------------------------------------------------------------------------------------------
 public class UserContentAccessModel {
     [Key] public Guid Id { get; init; } = Guid.CreateVersion7(); // Not part of the BaseContent family
-
-    public virtual object? Content { get; init; }
-    public Guid ContentId { get; init; }
+    public required Guid ContentId { get; init; }
     
     public required InfiniLoreUser User { get; init; }
     [MaxLength(450)] public string UserId { get; init; } = null!;

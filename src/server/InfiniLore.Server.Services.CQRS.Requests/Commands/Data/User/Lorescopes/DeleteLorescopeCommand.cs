@@ -1,18 +1,17 @@
-﻿// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using AterraEngine.Unions;
-using InfiniLore.Server.Contracts.Types.Unions;
+using InfiniLore.Server.Contracts.Services.CQRS;
 using InfiniLore.Server.Data.Models.Content.UserData;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 
-namespace InfiniLore.Server.Services.CQRS.Requests.Queries;
+// ReSharper disable once CheckNamespace
+namespace InfiniLore.Server.Services.CQRS.Requests.Commands;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public record GetOneLorescopeQuery(
-    HttpContext HttpContext,
-    UserIdUnion UserIdUnion,
-    Guid LorescopeId) : IRequest<SuccessOrFailure<LoreScopeModel, string>>;
+public record DeleteLorescopeCommand(
+      HttpContext HttpContext,
+      Guid LorescopeId  
+) : ICqrsRequest<LoreScopeModel>;

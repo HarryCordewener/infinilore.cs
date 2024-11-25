@@ -91,13 +91,13 @@ namespace InfiniLore.Server.Data.SqlServer.Migrations
                         {
                             Id = "d957c0f8-e90e-4068-a968-4f4b49fc165c",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "62d874f8-176e-4b4c-91e5-eb6911be9327",
+                            ConcurrencyStamp = "bcb90b69-a743-4c2e-b9b6-6aadeaeaba38",
                             Email = "testuser@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TESTUSER@EXAMPLE.COM",
                             NormalizedUserName = "TESTUSER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGgvA/7Lip+LkdcmQj9FW4aYpnrw15pf69hC81Sv1k/ywPTd968x6eMNrNMXNNk33w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEF9DotKZHyyCk7hsoitWWz1XPso6L+kNOyu4PIZy8FNNF8usuG4EwuvcaLmHt5/Sow==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "d957c0f8-e90e-4068-a968-4f4b49fc165b",
                             TwoFactorEnabled = false,
@@ -335,6 +335,9 @@ namespace InfiniLore.Server.Data.SqlServer.Migrations
                     b.Property<Guid?>("MultiverseModelId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("UniverseModelId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -342,9 +345,14 @@ namespace InfiniLore.Server.Data.SqlServer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ContentId")
+                        .IsUnique();
+
                     b.HasIndex("LoreScopeModelId");
 
                     b.HasIndex("MultiverseModelId");
+
+                    b.HasIndex("UniverseModelId");
 
                     b.HasIndex("UserId");
 
@@ -383,13 +391,13 @@ namespace InfiniLore.Server.Data.SqlServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4f361a8d-9237-4393-a89f-f2c9edd97218",
+                            Id = "2995026b-5735-497a-91e5-503e0a5db3d9",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "fa4c7b7e-ada0-4dd0-838b-0cf33b7b912d",
+                            Id = "f41634bf-d6e8-4d25-9096-bfc99ed7bd82",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -563,12 +571,6 @@ namespace InfiniLore.Server.Data.SqlServer.Migrations
 
             modelBuilder.Entity("InfiniLore.Server.Data.Models.UserContentAccessModel", b =>
                 {
-                    b.HasOne("InfiniLore.Server.Data.Models.Content.UserData.UniverseModel", "Content")
-                        .WithMany("UserAccess")
-                        .HasForeignKey("ContentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("InfiniLore.Server.Data.Models.Content.UserData.LoreScopeModel", null)
                         .WithMany("UserAccess")
                         .HasForeignKey("LoreScopeModelId");
@@ -577,13 +579,15 @@ namespace InfiniLore.Server.Data.SqlServer.Migrations
                         .WithMany("UserAccess")
                         .HasForeignKey("MultiverseModelId");
 
+                    b.HasOne("InfiniLore.Server.Data.Models.Content.UserData.UniverseModel", null)
+                        .WithMany("UserAccess")
+                        .HasForeignKey("UniverseModelId");
+
                     b.HasOne("InfiniLore.Server.Data.Models.Content.Account.InfiniLoreUser", "User")
                         .WithMany("ContentAccesses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Content");
 
                     b.Navigation("User");
                 });

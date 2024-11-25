@@ -1,15 +1,17 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using Microsoft.AspNetCore.Mvc;
+using InfiniLore.Server.Contracts.Services.CQRS;
+using InfiniLore.Server.Data.Models.Content.UserData;
+using Microsoft.AspNetCore.Http;
 
-namespace InfiniLore.Server.API.Controllers.Account.Identity.GetSpecificUser;
+// ReSharper disable once CheckNamespace
+namespace InfiniLore.Server.Services.CQRS.Requests.Commands;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public record GetSpecificUserRequest(
-    [FromQuery] string? Username,
-    [FromQuery] Guid? UserId
-) {
-    public bool IsEmpty => Username is null && UserId is null;
-}
+public record CreateLorescopeCommand(
+      HttpContext HttpContext,
+      LoreScopeModel Lorescope  
+) : ICqrsRequest<LoreScopeModel>;

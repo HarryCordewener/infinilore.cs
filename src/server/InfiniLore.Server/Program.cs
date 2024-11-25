@@ -11,10 +11,7 @@ using InfiniLore.Server.Components;
 using InfiniLore.Server.Data.Models.Content.Account;
 using InfiniLore.Server.Data.Repositories;
 using InfiniLore.Server.Data.SqlServer;
-using InfiniLore.Server.Services;
 using InfiniLore.Server.Services.Authorization;
-using InfiniLore.Server.Services.CQRS;
-using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -47,12 +44,13 @@ public static class Program {
             .Build();
         await container.StartAsync();
         
-        Log.Debug("Database connection string {connection}", container.GetConnectionString());
+        Console.WriteLine($"Database connection string {container.GetConnectionString()}");
 
         builder.Services.AddDbContextFactory<InfiniLoreDbContext>(options =>
             options.UseSqlServer(container.GetConnectionString())
                 .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
         );
+        builder.Services.RegisterServicesFromInfiniLoreServerDataSqlServer();
         #endregion
 
         #region Authentication
@@ -143,13 +141,9 @@ public static class Program {
         builder.Services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssemblyContaining<Services.CQRS.Handlers.IAssemblyEntry>();
         });
-
-        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
         #endregion
 
         builder.Services.RegisterServicesFromInfiniLoreServerDataRepositories();
-        builder.Services.RegisterServicesFromInfiniLoreServerDataSqlServer();
-        builder.Services.RegisterServicesFromInfiniLoreServerServices();
         builder.Services.RegisterServicesFromInfiniLoreServerServicesAuthorization();
 
         // -------------------------------------------------------------------------------------------------------------
@@ -182,12 +176,8 @@ public static class Program {
         
         app.UseDefaultExceptionHandler()
             .UseFastEndpoints(ctx => {
-                ctx.Endpoints.RoutePrefix = "api";
-                ctx.Binding.ReflectionCache
-                    .AddFromInfiniLoreServerAPI()
-                    .AddFromInfiniLoreServerDataSqlServer()
-                    .AddFromInfiniLoreServerServices()
-                    ;
+                ctx.Endpoints.RoutePrefix = "api/v1";
+                ctx.Binding.ReflectionCache.AddFromInfiniLoreServerAPI();
 
                 ctx.Errors.UseProblemDetails();
             });

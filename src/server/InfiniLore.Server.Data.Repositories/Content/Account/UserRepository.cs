@@ -30,8 +30,6 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, UserM
         string id = userId.AsUserId;
 
         InfiniLoreUser? result = await dbContext.Users
-            // .Include(u => u.Roles)
-            // .Include(u => u.Permissions)
             .FirstOrDefaultAsync(u => u.Id == id, ct);
 
         if (result is null) return new None();
@@ -43,8 +41,6 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, UserM
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
 
         InfiniLoreUser? result = await dbContext.Users
-            // .Include(u => u.Roles)
-            // .Include(u => u.Permissions)
             .FirstOrDefaultAsync(u => u.Id == userName, ct);
 
         if (result is null) return new None();
@@ -56,8 +52,6 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, UserM
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
 
         InfiniLoreUser[] result = await dbContext.Users
-            // .Include(u => u.Roles)
-            // .Include(u => u.Permissions)
             .Where(predicate)
             .ToArrayAsync(ct);
 

@@ -15,10 +15,5 @@ public abstract class UserContentConfiguration<T> : BaseContentConfiguration<T> 
         // Index on IsPublic and OwnerId to allow for fast filtering of public content by user
         builder.HasIndex(x => new { x.Id, x.OwnerId,
             IsPublic = x.IsPubliclyReadable });
-
-        builder.HasMany(model => model.UserAccess)
-            .WithOne(nameof(UserContentAccessModel.Content))
-            .HasForeignKey(model => model.ContentId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

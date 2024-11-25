@@ -18,4 +18,11 @@
       <ProjectReference Include="..\InfiniLore.Server.Data.Models\InfiniLore.Server.Data.Models.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Commands\Data\Discovery\" />
+      <Folder Include="Commands\Data\System\" />
+      <Folder Include="Queries\Data\Discovery\" />
+      <Folder Include="Queries\Data\System\" />
+    </ItemGroup>
+
 </Project>

@@ -23,11 +23,15 @@ public class UserContentAuthorizationService(IUserRepository userRepository, IUs
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
+    public Task<bool> ValidateAsync<T>(HttpContext accessor, T model, AccessKind accessKind, CancellationToken ct = default) where T : UserContent 
+        => ValidateAsync(accessor, model.Id, accessKind, ct);
+    
     public async Task<bool> ValidateAsync(HttpContext accessor, Guid contentId, AccessKind accessKind, CancellationToken ct = default) {
         if (!(await GetUserFromClaimsPrincipalAsync(accessor, ct)).TryGetAsT0(out InfiniLoreUser accessorUser)) return false;
-
+        
         return await userContentAccessRepository.UserHasKindAsync(contentId, accessorUser.Id, accessKind, ct);
     }
+    
     public async Task<bool> ValidateIsOwnerAsync(HttpContext accessor, UserIdUnion ownerId, CancellationToken ct = default) {
         if (!(await GetUserFromClaimsPrincipalAsync(accessor, ct)).TryGetAsT0(out InfiniLoreUser accessorUser)) return false;
         
