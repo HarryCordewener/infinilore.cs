@@ -21,7 +21,7 @@ public class CreateLoreScopeHandler(ILoreScopeRepository repository, IDbUnitOfWo
         try {
             CommandResult<LoreScopeModel> result = await repository.TryAddWithResultAsync(request.Model, ct);
             if (!result.TryGetSuccessValue(out EntityEntry<LoreScopeModel>? loreScope)) {
-                return new Error<string>($"Could not add lore scope: {result.ErrorString}");
+                return new Error<string>($"Could not add lore scope: {result.FailureString}");
             }
 
             await unitOfWork.CommitAsync(ct);

@@ -8,7 +8,7 @@ using InfiniLore.Server.Data.Models.Content.UserData;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace InfiniLore.Server.API.Controllers.LoreScopes.GetSpecificLoreScope;
+namespace InfiniLore.Server.API.Controllers.Content.LoreScopes.GetSpecificLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ public class GetSpecificLoreScopeEndpoint(ILoreScopeRepository loreScopeQueries)
         return resultLoreScope.Match<Results<Ok<LoreScopeResponse>, NotFound>>(
             successCase: success => TypedResults.Ok(Map.FromEntity(success.Value)),
             noneCase: _ => TypedResults.NotFound(),
-            errorCase: _ => TypedResults.NotFound()
+            failureCase: _ => TypedResults.NotFound()
         );
     }
 }

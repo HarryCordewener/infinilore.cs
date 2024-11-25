@@ -5,20 +5,17 @@ using InfiniLore.Server.Data.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace InfiniLore.Server.Data.SqlServer.Configurations;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class UserContentConfiguration<T> : BaseContentConfiguration<T> where T : UserContent {
-    public override void Configure(EntityTypeBuilder<T> builder) {
-        base.Configure(builder);// Call BaseContentConfiguration
-
-        // Index on IsPublic and OwnerId to allow for fast filtering of public content by user
-        builder.HasIndex(x => new { x.Id, x.OwnerId,
-            IsPublic = x.IsPubliclyReadable });
-
-        builder.HasMany(model => model.UserAccess)
-            .WithOne(nameof(UserContentAccessModel.Content))
-            .HasForeignKey(model => model.ContentId)
-            .OnDelete(DeleteBehavior.Cascade);
-    }
+public class UserContentAccessConfiguration : IEntityTypeConfiguration<UserContentAccessModel> {
+    public void Configure(EntityTypeBuilder<UserContentAccessModel> builder) {
+        builder.HasQueryFilter(model => model.Content is BaseContent && ((BaseContent)model.Content).SoftDeleteDate == null);
+        
+        // Each user can only have one unique access level per content
+        // example : A user can have both read and write access rights, but not twice read access rights
+        builder.HasIndex(content => new { content.ContentId, content.UserId })
+            .IsUnique();
+    } 
 }

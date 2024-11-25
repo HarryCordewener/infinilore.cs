@@ -5,17 +5,20 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
+    
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-        
-      <PackageReference Include="AterraEngine.Unions" Version="1.2.0" />
-      <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
-    </ItemGroup>
 
+        <PackageReference Include="AterraEngine.Unions" Version="1.2.0"/>
+        <PackageReference Include="FastEndpoints" Version="5.31.0.10-beta"/>
+        <PackageReference Include="FastEndpoints.Generator" Version="5.31.0.10-beta">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+    
     <ItemGroup>
       <ProjectReference Include="..\InfiniLore.Server.Contracts\InfiniLore.Server.Contracts.csproj" />
-      <ProjectReference Include="..\InfiniLore.Server.Data.Models\InfiniLore.Server.Data.Models.csproj" />
     </ItemGroup>
 
 </Project>

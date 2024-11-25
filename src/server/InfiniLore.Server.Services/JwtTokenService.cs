@@ -65,7 +65,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         QueryResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
-            case Error<string>: return getResult.ErrorString;
+            case Error<string>: return getResult.FailureString;
         }
 
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
@@ -86,21 +86,21 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         QueryResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
-            case Error<string>: return getResult.ErrorString;
+            case Error<string>: return getResult.FailureString;
         }
 
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
         if (oldToken.Owner.Id != user.Id) return "Refresh token does not belong to user";
 
         CommandOutput deleteResult = await repository.TryPermanentDeleteAsync(oldToken, ct);
-        if (!deleteResult.IsSuccess) return deleteResult.ErrorString;
+        if (!deleteResult.IsSuccess) return deleteResult.FailureString;
 
         return true;
     }
 
     public async Task<TrueFalseOrError> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default) {
         CommandOutput deleteResult = await repository.TryPermanentDeleteAllForUserAsync(user, ct);
-        if (!deleteResult.IsSuccess) return deleteResult.ErrorString;
+        if (!deleteResult.IsSuccess) return deleteResult.FailureString;
 
         return true;
 

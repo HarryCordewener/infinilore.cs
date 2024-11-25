@@ -2,6 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.API.Controllers.Data.User.LoreScopes;
+using InfiniLore.Server.API.Controllers.LoreScopes.DeleteSpecificLoreScope;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
@@ -10,7 +11,7 @@ using InfiniLore.Server.Data.SqlServer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace InfiniLore.Server.API.Controllers.LoreScopes.DeleteSpecificLoreScope;
+namespace InfiniLore.Server.API.Controllers.Content.LoreScopes.DeleteSpecificLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ public class DeleteSpecificLoreScopeEndpoint(IDbUnitOfWork<InfiniLoreDbContext> 
         }
 
         CommandOutput resultDelete = await repository.TryDeleteAsync(loreScope, ct);
-        if (resultDelete.IsError) return TypedResults.NotFound();
+        if (resultDelete.IsFailure) return TypedResults.NotFound();
 
         await unitOfWork.CommitAsync(ct);
         return TypedResults.Ok();

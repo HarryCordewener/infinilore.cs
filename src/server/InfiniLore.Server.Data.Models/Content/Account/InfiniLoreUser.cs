@@ -14,6 +14,8 @@ public class InfiniLoreUser : IdentityUser {
     public ICollection<UniverseModel> Universes { get; init; } = [];
     public ICollection<JwtRefreshTokenModel> JwtRefreshTokens { get; init; } = [];
 
+    public ICollection<UserContentAccessModel> ContentAccesses { get; init; } = [];
+
     // -----------------------------------------------------------------------------------------------------------------
     // Constructors
     // -----------------------------------------------------------------------------------------------------------------

@@ -15,9 +15,9 @@ namespace InfiniLore.Server.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : Repository<T>(unitOfWork), IBaseContentRepository<T> where T : BaseContent {
+public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : InfiniLoreDbContextRepository<T>(unitOfWork), IBaseContentRepository<T> where T : BaseContent {
     #region Commands
-    public async ValueTask<CommandOutput> TryAddAsync(T model, CancellationToken ct = default) {
+    public async virtual ValueTask<CommandOutput> TryAddAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         if (await dbSet.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";
 
@@ -25,7 +25,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         return new Success();
     }
 
-    public async ValueTask<CommandResult<T>> TryAddWithResultAsync(T model, CancellationToken ct = default) {
+    public async virtual ValueTask<CommandResult<T>> TryAddWithResultAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         if (await dbSet.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";
 
@@ -33,25 +33,29 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         return result;
     }
 
-    public async ValueTask<CommandOutput> TryUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
-        DbSet<T> dbSet = await GetDbSetAsync();
-        T? existing = await dbSet.FindAsync([model.Id], ct);
-        if (existing == null) return "Model does not exist";
-
-        dbSet.Update(await update(existing));
-        return new Success();
-    }
-
-    public async ValueTask<CommandResult<T>> TryUpdateWithResultAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+    public async virtual ValueTask<CommandOutput> TryUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T? existing = await dbSet.FindAsync([model.Id], ct);
         if (existing == null) return "Model does not exist";
 
         EntityEntry<T> result = dbSet.Update(await update(existing));
+        result.Entity.UpdateLastModifiedDate();
+        
+        return new Success();
+    }
+
+    public async virtual ValueTask<CommandResult<T>> TryUpdateWithResultAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync();
+        T? existing = await dbSet.FindAsync([model.Id], ct);
+        if (existing == null) return "Model does not exist";
+
+        EntityEntry<T> result = dbSet.Update(await update(existing));
+        result.Entity.UpdateLastModifiedDate();
+        
         return result;
     }
 
-    public async ValueTask<CommandOutput> TryAddOrUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+    public async virtual ValueTask<CommandOutput> TryAddOrUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
         if (model.Id == Guid.Empty) return await TryAddAsync(model, ct);
 
         DbSet<T> dbSet = await GetDbSetAsync();
@@ -61,11 +65,13 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             return new Success();
         }
 
-        dbSet.Update(await update(existing));
+        EntityEntry<T> result = dbSet.Update(await update(existing));
+        result.Entity.UpdateLastModifiedDate();
+        
         return new Success();
     }
 
-    public async ValueTask<CommandOutput> TryAddOrUpdateRangeAsync(IEnumerable<T> models, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+    public async virtual ValueTask<CommandOutput> TryAddOrUpdateRangeAsync(IEnumerable<T> models, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
         var modelsToAdd = new List<T>();
         var modelsToUpdate = new List<T>();
 
@@ -84,7 +90,9 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             }
 
             if (existingModelDict.TryGetValue(model.Id, out T? existingModel)) {
-                modelsToUpdate.Add(await update(existingModel));
+                T updatedModel = await update(existingModel);
+                existingModel.UpdateLastModifiedDate();
+                modelsToUpdate.Add(updatedModel);
                 continue;
             }
 
@@ -97,7 +105,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         return new Success();
     }
 
-    public async ValueTask<CommandOutput> TryDeleteAsync(T model, CancellationToken ct = default) {
+    public async virtual ValueTask<CommandOutput> TryDeleteAsync(T model, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T? existing = await dbSet.FindAsync([model.Id], ct);
         if (existing == null) return "Model does not exist";
@@ -106,7 +114,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         return new Success();
     }
 
-    public async ValueTask<CommandOutput> TryAddRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
+    public async virtual ValueTask<CommandOutput> TryAddRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         IEnumerable<T> userContents = models as T[] ?? models.ToArray();
         List<Guid> modelIds = userContents.Select(m => m.Id).ToList();
@@ -121,7 +129,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         return new Success();
     }
 
-    public async ValueTask<CommandOutput> TryDeleteRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
+    public async virtual ValueTask<CommandOutput> TryDeleteRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         IEnumerable<Guid> ids = models.Select(model => model.Id);
 
@@ -155,7 +163,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
     }
 
     public async virtual ValueTask<QueryResultMany<T>> TryGetAllASync(PaginationInfo pageInfo, CancellationToken ct) {
-        if (pageInfo.IsNotValid(out Error<string> pageInfoError)) return pageInfoError;
+        if (pageInfo.IsNotValid(out Failure<string> pageInfoFailure)) return pageInfoFailure;
 
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
@@ -191,7 +199,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
     }
 
     public async virtual ValueTask<QueryResultMany<T>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct, Expression<Func<T, object>>? orderBy = null) {
-        if (pageInfo.IsNotValid(out Error<string> pageInfoError)) return pageInfoError;
+        if (pageInfo.IsNotValid(out Failure<string> pageInfoFailure)) return pageInfoFailure;
 
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
@@ -207,7 +215,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
     }
 
     public async virtual ValueTask<QueryResultMany<T>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct, Expression<Func<T, object>>? orderBy = null) {
-        if (pageInfo.IsNotValid(out Error<string> pageInfoError)) return pageInfoError;
+        if (pageInfo.IsNotValid(out Failure<string> pageInfoFailure)) return pageInfoFailure;
 
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet

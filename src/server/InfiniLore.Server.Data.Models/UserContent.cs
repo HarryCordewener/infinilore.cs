@@ -9,9 +9,10 @@ namespace InfiniLore.Server.Data.Models;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public abstract class UserContent : BaseContent, IHasOwner {
-    public bool IsPublic { get; set; }
     public required virtual InfiniLoreUser Owner { get; set; } = null!;
     [MaxLength(450)] public string OwnerId { get; set; } = null!;
     
-    public ICollection<UserContentAccess> UserAccess { get; set; } = [];
+    public ICollection<UserContentAccessModel> UserAccess { get; set; } = [];
+    public bool IsPubliclyReadable { get; set; } // When authorization validation happens, this should overwrite the user's access level to always allow for read access
+    public bool IsDiscoverable { get; set; } = true;
 }

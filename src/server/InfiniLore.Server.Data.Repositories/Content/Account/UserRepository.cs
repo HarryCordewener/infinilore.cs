@@ -9,15 +9,22 @@ using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models.Content.Account;
 using InfiniLore.Server.Data.SqlServer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Security.Claims;
 
 namespace InfiniLore.Server.Data.Repositories.Content.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [RegisterService<IUserRepository>(LifeTime.Scoped)]
-public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUserRepository {
+public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, UserManager<InfiniLoreUser> userManager) : IUserRepository {
+    public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByClaimsPrincipalAsync(ClaimsPrincipal principal, CancellationToken ct = default) {
+        if (await userManager.GetUserAsync(principal) is not { } user) return new None();
+        return user;
+    }
+    
     public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
         string id = userId.AsUserId;
@@ -25,7 +32,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
         InfiniLoreUser? result = await dbContext.Users
             // .Include(u => u.Roles)
             // .Include(u => u.Permissions)
-            .FirstOrDefaultAsync(predicate: u => u.Id == id, ct);
+            .FirstOrDefaultAsync(u => u.Id == id, ct);
 
         if (result is null) return new None();
 
@@ -38,7 +45,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IUs
         InfiniLoreUser? result = await dbContext.Users
             // .Include(u => u.Roles)
             // .Include(u => u.Permissions)
-            .FirstOrDefaultAsync(predicate: u => u.Id == userName, ct);
+            .FirstOrDefaultAsync(u => u.Id == userName, ct);
 
         if (result is null) return new None();
 

@@ -1,13 +1,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using InfiniLore.Server.API.Controllers.Account.Identity.GetSpecificUser;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models.Content.Account;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace InfiniLore.Server.API.Controllers.Account.Identity.GetSpecificUser;
+namespace InfiniLore.Server.API.Controllers.Content.Account.Identity.GetSpecificUser;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -75,8 +76,8 @@ public class GetSpecificUserEndpoint(ILogger logger, IUserRepository queries)
             noneCase: async _ => await SendAsync(TypedResults.BadRequest(problemDetails), cancellation: ct),
 
             // Error
-            errorCase: async _ => {
-                logger.Error("Unexpected error during retrieval of User, with {error}", result.ErrorString);
+            failureCase: async _ => {
+                logger.Error("Unexpected error during retrieval of User, with {error}", result.FailureString);
                 await SendAsync(TypedResults.BadRequest(problemDetails), cancellation: ct);
             }
         );

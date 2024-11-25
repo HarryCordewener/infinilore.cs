@@ -9,9 +9,9 @@ namespace InfiniLore.Server.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class Repository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) where T : class {
+public abstract class InfiniLoreDbContextRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IRepository<InfiniLoreDbContext> where T : class {
     #region Queryables
-    protected async ValueTask<InfiniLoreDbContext> GetDbContextAsync() => await unitOfWork.GetDbContextAsync();
+    public async ValueTask<InfiniLoreDbContext> GetDbContextAsync() => await unitOfWork.GetDbContextAsync();
     
     protected async ValueTask<DbSet<T>> GetDbSetAsync() {
         InfiniLoreDbContext dbContext = await GetDbContextAsync();

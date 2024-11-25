@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
         <PackageReference Include="AterraEngine.Unions" Version="1.2.0" />
         <PackageReference Include="AterraEngine.Unions.Generators" Version="1.2.0" />
         <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.10-beta"/>

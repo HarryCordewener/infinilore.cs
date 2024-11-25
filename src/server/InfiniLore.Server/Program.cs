@@ -9,8 +9,10 @@ using FastEndpoints.Swagger;
 using InfiniLore.Server.API;
 using InfiniLore.Server.Components;
 using InfiniLore.Server.Data.Models.Content.Account;
+using InfiniLore.Server.Data.Repositories;
 using InfiniLore.Server.Data.SqlServer;
 using InfiniLore.Server.Services;
+using InfiniLore.Server.Services.Authorization;
 using InfiniLore.Server.Services.CQRS;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -19,6 +21,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Serilog;
 using System.Security.Claims;
 using Testcontainers.MsSql;
 
@@ -43,6 +46,8 @@ public static class Program {
             .WithReuse(true)
             .Build();
         await container.StartAsync();
+        
+        Log.Debug("Database connection string {connection}", container.GetConnectionString());
 
         builder.Services.AddDbContextFactory<InfiniLoreDbContext>(options =>
             options.UseSqlServer(container.GetConnectionString())
@@ -136,14 +141,16 @@ public static class Program {
 
         #region MediatR
         builder.Services.AddMediatR(cfg => {
-            cfg.RegisterServicesFromAssemblyContaining<Services.IAssemblyEntry>();
+            cfg.RegisterServicesFromAssemblyContaining<Services.CQRS.Handlers.IAssemblyEntry>();
         });
 
         builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
         #endregion
 
+        builder.Services.RegisterServicesFromInfiniLoreServerDataRepositories();
         builder.Services.RegisterServicesFromInfiniLoreServerDataSqlServer();
         builder.Services.RegisterServicesFromInfiniLoreServerServices();
+        builder.Services.RegisterServicesFromInfiniLoreServerServicesAuthorization();
 
         // -------------------------------------------------------------------------------------------------------------
         // App
@@ -172,17 +179,18 @@ public static class Program {
             .AddInteractiveServerRenderMode()
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(WasmClient.IAssemblyEntry).Assembly);
+        
+        app.UseDefaultExceptionHandler()
+            .UseFastEndpoints(ctx => {
+                ctx.Endpoints.RoutePrefix = "api";
+                ctx.Binding.ReflectionCache
+                    .AddFromInfiniLoreServerAPI()
+                    .AddFromInfiniLoreServerDataSqlServer()
+                    .AddFromInfiniLoreServerServices()
+                    ;
 
-        app.UseFastEndpoints(ctx => {
-            ctx.Endpoints.RoutePrefix = "api";
-            ctx.Binding.ReflectionCache
-                .AddFromInfiniLoreServerAPI()
-                .AddFromInfiniLoreServerDataSqlServer()
-                .AddFromInfiniLoreServerServices()
-                ;
-
-            ctx.Errors.UseProblemDetails();
-        });
+                ctx.Errors.UseProblemDetails();
+            });
 
         app.UseOpenApi();
         app.UseSwaggerUI(ModernStyle.Dark, setupAction: ctx => {

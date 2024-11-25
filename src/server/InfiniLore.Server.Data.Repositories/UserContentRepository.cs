@@ -25,7 +25,7 @@ public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             : new None();
     }
 
-    public async ValueTask<QueryResultMany<T>> TryGetByUserAsync(UserUnion userUnion, PaginationInfo pageInfo, CancellationToken ct = default) {
+    public async virtual ValueTask<QueryResultMany<T>> TryGetByUserAsync(UserUnion userUnion, PaginationInfo pageInfo, CancellationToken ct = default) {
         DbSet<T> dbSet = await GetDbSetAsync();
         T[] result = await dbSet
             .Where(ls => ls.OwnerId == userUnion.AsUserId)
@@ -38,13 +38,13 @@ public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             : new None();
     }
 
-    public async ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, CancellationToken ct) {
+    public async virtual ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessKind level, CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
 
         T[] result = await dbSet
             .Where(
                 model => model.OwnerId == ownerUnion.AsUserId
-                    && model.UserAccess.Any(access => access.User.Id == accessorUnion.AsUserId && access.AccessLevel == level)
+                    && model.UserAccess.Any(access => access.User.Id == accessorUnion.AsUserId && access.AccessKind == level)
             )
             .ToArrayAsync(cancellationToken: ct);
 
@@ -53,13 +53,13 @@ public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             : new None();
     }
 
-    public async ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessLevel level, PaginationInfo pageInfo, CancellationToken ct) {
+    public async virtual ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserUnion ownerUnion, UserUnion accessorUnion, AccessKind level, PaginationInfo pageInfo, CancellationToken ct) {
         DbSet<T> dbSet = await GetDbSetAsync();
 
         T[] result = await dbSet
             .Where(
                 model => model.OwnerId == ownerUnion.AsUserId
-                    && model.UserAccess.Any(access => access.User.Id == accessorUnion.AsUserId && access.AccessLevel == level)
+                    && model.UserAccess.Any(access => access.User.Id == accessorUnion.AsUserId && access.AccessKind == level)
             )
             .Skip(pageInfo.SkipAmount)
             .Take(pageInfo.PageSize)

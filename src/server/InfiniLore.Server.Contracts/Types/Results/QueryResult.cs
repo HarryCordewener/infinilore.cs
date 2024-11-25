@@ -9,9 +9,9 @@ namespace InfiniLore.Server.Contracts.Types.Results;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[UnionAliases("Success", null, "Error")]
-public readonly partial struct QueryResult<T>() : IUnion<Success<T>, None, Error<string>> {
-    public string ErrorString => TryGetAsError(out Error<string> error) ? error.Value : string.Empty;
+[UnionAliases("Success", null, "Failure")]
+public readonly partial struct QueryResult<T>() : IUnion<Success<T>, None, Failure<string>> {
+    public string FailureString => TryGetAsFailure(out Failure<string> failure) ? failure.Value : string.Empty;
 
     public bool TryGetSuccessValue([NotNullWhen(true)] out T? value) {
         value = default;
@@ -21,6 +21,6 @@ public readonly partial struct QueryResult<T>() : IUnion<Success<T>, None, Error
         return value is not null;
     }
 
-    public static implicit operator QueryResult<T>(string input) => new Error<string>(input);
+    public static implicit operator QueryResult<T>(string input) => new Failure<string>(input);
     public static implicit operator QueryResult<T>(T item) => new Success<T>(item);
 }

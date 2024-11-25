@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
 using InfiniLore.Server.Data.Models.Content.UserData;
-using InfiniLore.Server.Services.CQRS.Requests;
+using InfiniLore.Server.Services.CQRS.Requests.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -27,7 +27,11 @@ public class GetLoreScopeEndpoint(IMediator mediator) : Endpoint<GetLorescopeReq
     // -----------------------------------------------------------------------------------------------------------------
     public async override Task<EndpointResult> ExecuteAsync(GetLorescopeRequest req, CancellationToken ct) {
         SuccessOrFailure<LoreScopeModel, string> data = await mediator.Send(
-            new GetOneLorescopeQuery(req.UserId, req.LoreScopeId),
+            new GetOneLorescopeQuery(
+                HttpContext,
+                req.UserId, 
+                req.LoreScopeId
+            ),
             ct
         );
 

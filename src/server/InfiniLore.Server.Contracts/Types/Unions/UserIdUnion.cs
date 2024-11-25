@@ -16,4 +16,10 @@ public readonly partial record struct UserIdUnion() : IUnion<Guid, string> {
             throw new ArgumentException("Union does not contain a value");
         }
     }
+    
+    public override string? ToString() {
+        if (IsGuid) return AsGuid.ToString();
+        if (IsString) return AsString;
+        return base.ToString();
+    }
 }

@@ -48,13 +48,13 @@ public class GetAllLoreScopesEndpoint(ILoreScopeRepository loreScopeQueries, Use
             return TypedResults.Ok(models.Select(ls => Map.FromEntity(ls)));
         }
 
-        resultLoreScopes = await loreScopeQueries.TryGetByUserWithUserAccessAsync(req.UserId, user, AccessLevel.Read, ct);
+        resultLoreScopes = await loreScopeQueries.TryGetByUserWithUserAccessAsync(req.UserId, user, AccessKind.Read, ct);
         if (!resultLoreScopes.TryGetSuccessValue(out models)) return TypedResults.NotFound();
 
         IEnumerable<LoreScopeModel> data = models
             .Where(model => model.UserAccess.Any(access =>
                     access.User.Id == req.UserId.ToString()
-                    && access.AccessLevel == AccessLevel.Read
+                    && access.AccessKind == AccessKind.Read
                 )
             );
 
