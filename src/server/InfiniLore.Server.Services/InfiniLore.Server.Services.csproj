@@ -7,17 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.10-beta"/>
+        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.17-beta" />
         <PackageReference Include="MediatR" Version="12.4.1"/>
         <PackageReference Include="MediatR.Contracts" Version="2.0.1"/>
         <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0"/>
-        <PackageReference Include="FastEndpoints" Version="5.31.0.10-beta"/>
-        <PackageReference Include="FastEndpoints.Generator" Version="5.31.0.10-beta">
+        <PackageReference Include="FastEndpoints" Version="5.31.0.17-beta" />
+        <PackageReference Include="FastEndpoints.Generator" Version="5.31.0.17-beta">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="FastEndpoints.Security" Version="5.31.0.10-beta"/>
+        <PackageReference Include="FastEndpoints.Security" Version="5.31.0.17-beta" />
         <PackageReference Include="Serilog" Version="4.1.0"/>
     </ItemGroup>
 
