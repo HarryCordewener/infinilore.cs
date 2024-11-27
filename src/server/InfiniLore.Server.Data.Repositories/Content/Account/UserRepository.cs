@@ -2,7 +2,6 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.DependencyInjection;
-using AterraEngine.Unions;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
@@ -21,44 +20,45 @@ namespace InfiniLore.Server.Data.Repositories.Content.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 [InjectableService<IUserRepository>(ServiceLifetime.Scoped)]
 public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, UserManager<InfiniLoreUser> userManager) : IUserRepository {
-    public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByClaimsPrincipalAsync(ClaimsPrincipal principal, CancellationToken ct = default) {
-        if (await userManager.GetUserAsync(principal) is not { } user) return new None();
+    public async ValueTask<RepoResult<InfiniLoreUser>> TryGetByClaimsPrincipalAsync(ClaimsPrincipal principal, CancellationToken ct = default) {
+        if (await userManager.GetUserAsync(principal) is not {} user) return "User not found.";
+
         return user;
     }
-    
-    public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default) {
+
+    public async ValueTask<RepoResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
         var id = userId.ToGuid();
 
         InfiniLoreUser? result = await dbContext.Users
-            .FirstOrDefaultAsync(u => u.Id == id, ct);
+            .FirstOrDefaultAsync(predicate: u => u.Id == id, ct);
 
-        if (result is null) return new None();
+        if (result is null) return "User not found.";
 
         return result;
     }
 
-    public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByUserNameAsync(string userName, CancellationToken ct = default) {
+    public async ValueTask<RepoResult<InfiniLoreUser>> TryGetByUserNameAsync(string userName, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
 
         InfiniLoreUser? result = await dbContext.Users
-            .FirstOrDefaultAsync(u => u.NormalizedUserName != null
+            .FirstOrDefaultAsync(predicate: u => u.NormalizedUserName != null
                 && u.NormalizedUserName.Equals(userName, StringComparison.InvariantCultureIgnoreCase
                 ), ct);
 
-        if (result is null) return new None();
+        if (result is null) return "User not found.";
 
         return result;
     }
 
-    public async ValueTask<QueryResultMany<InfiniLoreUser>> TryGetByQueryAsync(Expression<Func<InfiniLoreUser, bool>> predicate, CancellationToken ct = default) {
+    public async ValueTask<RepoResult<InfiniLoreUser[]>> TryGetByQueryAsync(Expression<Func<InfiniLoreUser, bool>> predicate, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
 
         InfiniLoreUser[] result = await dbContext.Users
             .Where(predicate)
             .ToArrayAsync(ct);
 
-        if (result.Length == 0) return new None();
+        if (result.Length == 0) return "User not found.";
 
         return result;
     }

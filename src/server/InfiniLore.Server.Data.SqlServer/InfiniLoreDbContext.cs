@@ -12,17 +12,17 @@ namespace InfiniLore.Server.Data.SqlServer;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public class InfiniLoreDbContext : IdentityDbContext<InfiniLoreUser, IdentityRole<Guid>, Guid> {
-    public DbSet<LoreScopeModel> LoreScopes { get; init; }
-    public DbSet<MultiverseModel> Multiverses { get; init; }
-    public DbSet<UniverseModel> Universes { get; init; }
-    public DbSet<JwtRefreshTokenModel> JwtRefreshTokens { get; init; }
-    public DbSet<UserContentAccessModel> UserContentAccesses { get; init; }
 
     // -----------------------------------------------------------------------------------------------------------------
     // Constructors
     // -----------------------------------------------------------------------------------------------------------------
     public InfiniLoreDbContext() {}
     public InfiniLoreDbContext(DbContextOptions<InfiniLoreDbContext> options) : base(options) {}
+    public DbSet<LoreScopeModel> LoreScopes { get; init; }
+    public DbSet<MultiverseModel> Multiverses { get; init; }
+    public DbSet<UniverseModel> Universes { get; init; }
+    public DbSet<JwtRefreshTokenModel> JwtRefreshTokens { get; init; }
+    public DbSet<UserContentAccessModel> UserContentAccesses { get; init; }
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods

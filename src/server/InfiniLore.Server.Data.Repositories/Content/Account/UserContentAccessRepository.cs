@@ -9,8 +9,7 @@ using InfiniLore.Server.Data.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace InfiniLore.Server.Data.Repositories;
-
+namespace InfiniLore.Server.Data.Repositories.Content.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -21,7 +20,8 @@ public class UserContentAccessRepository(IDbUnitOfWork<InfiniLoreDbContext> unit
         UserContentAccessModel[] potentialAccesses = await dbContext.UserContentAccesses.Where(
             access => access.ContentId == contentId
                 && access.UserId == accessorId.ToGuid()
-            ).ToArrayAsync(cancellationToken: ct);
+        ).ToArrayAsync(cancellationToken: ct);
+
         return potentialAccesses.Any(access => access.AccessKind.HasFlag(accessKind));
     }
 }

@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InfiniLore.Server.Services.Authorization;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -23,18 +22,18 @@ public class UserContentAuthorizationService(IUserRepository userRepository, IUs
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
-    public ValueTask<bool> ValidateAsync<T>(T model, AccessKind accessKind, CancellationToken ct = default) where T : UserContent 
+    public ValueTask<bool> ValidateAsync<T>(T model, AccessKind accessKind, CancellationToken ct = default) where T : UserContent
         => ValidateAsync(model.Id, accessKind, ct);
-    
+
     public async ValueTask<bool> ValidateAsync(Guid contentId, AccessKind accessKind, CancellationToken ct = default) {
-        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsT0(out InfiniLoreUser accessorUser)) return false;
-        
+        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsT0(out InfiniLoreUser? accessorUser) || accessorUser is null) return false;
+
         return await userContentAccessRepository.UserHasKindAsync(contentId, accessorUser.Id, accessKind, ct);
     }
-    
+
     public async ValueTask<bool> ValidateIsOwnerAsync(Guid ownerId, CancellationToken ct = default) {
-        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsT0(out InfiniLoreUser accessorUser)) return false;
-        
+        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsT0(out InfiniLoreUser? accessorUser) || accessorUser is null) return false;
+
         return accessorUser.Id == ownerId;
     }
 
@@ -43,11 +42,10 @@ public class UserContentAuthorizationService(IUserRepository userRepository, IUs
     // -----------------------------------------------------------------------------------------------------------------
     private async ValueTask<Union<InfiniLoreUser, None, Failure<string>>> GetUserFromClaimsPrincipalAsync(CancellationToken ct) {
         if (contextAccessor.HttpContext is not {} accessor) return new Failure<string>("No HttpContext found in IHttpContextAccessor");
-        
-        QueryResult<InfiniLoreUser> accessorResult = await userRepository.TryGetByClaimsPrincipalAsync(accessor.User, ct);
-        if (accessorResult.IsNone) return accessorResult.AsNone;
+
+        RepoResult<InfiniLoreUser> accessorResult = await userRepository.TryGetByClaimsPrincipalAsync(accessor.User, ct);
         if (accessorResult.IsFailure) return accessorResult.AsFailure;
-        
+
         InfiniLoreUser accessorUser = accessorResult.AsSuccess.Value;
         return accessorUser;
     }

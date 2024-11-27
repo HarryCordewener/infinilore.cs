@@ -11,6 +11,6 @@ namespace InfiniLore.Server.Contracts.Services.Auth.Authentication;
 public interface IJwtTokenService {
     ValueTask<JwtResult> GenerateTokensAsync(InfiniLoreUser user, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default);
     ValueTask<JwtResult> RefreshTokensAsync(Guid refreshToken, CancellationToken ct = default);
-    ValueTask<TrueFalseOrError> RevokeTokensAsync(InfiniLoreUser user, Guid refreshToken, CancellationToken ct = default);
-    ValueTask<TrueFalseOrError> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default);
+    ValueTask<BoolOrFailure> RevokeTokensAsync(InfiniLoreUser user, Guid refreshToken, CancellationToken ct = default);
+    ValueTask<BoolOrFailure> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default);
 }

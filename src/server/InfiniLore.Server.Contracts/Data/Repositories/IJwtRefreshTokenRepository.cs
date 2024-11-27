@@ -8,7 +8,7 @@ namespace InfiniLore.Server.Contracts.Data.Repositories;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public interface IJwtRefreshTokenRepository :
-    IQueryHasTryGetByIdAsync<JwtRefreshTokenModel>,
-    ICommandHasTryAddAsync<JwtRefreshTokenModel>,
-    ICommandHasTryPermanentDeleteAsync<JwtRefreshTokenModel>,
-    ICommandHasTryPermanentDeleteAllForUserAsync<JwtRefreshTokenModel>;
+    IHasTryGetByIdAsync<JwtRefreshTokenModel>,
+    IHasTryAddAsync<JwtRefreshTokenModel>,
+    IHasTryRemoveAsync<JwtRefreshTokenModel>,
+    IHasTryPermanentRemoveAllForUserAsync;

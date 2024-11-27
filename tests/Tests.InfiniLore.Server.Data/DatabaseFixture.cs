@@ -2,6 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Data;
+using InfiniLore.Server.Data.Repositories;
 using InfiniLore.Server.Data.SqlServer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,7 @@ public class DatabaseFixture : IAsyncLifetime {
         );
 
         services.RegisterServicesFromInfiniLoreServerDataSqlServer();
+        services.RegisterServicesFromInfiniLoreServerDataRepositories();
 
         ServiceProvider = services.BuildServiceProvider().CreateScope().ServiceProvider;
 

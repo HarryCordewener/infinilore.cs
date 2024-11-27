@@ -10,5 +10,5 @@ namespace InfiniLore.Server.Contracts.Data.Repositories;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public interface ILoreScopeRepository : IUserContentRepository<LoreScopeModel> {
-    ValueTask<QueryResultMany<LoreScopeModel>> TryGetByUserIdAndLorescopeId(UserIdUnion userId, Guid? lorescopeId, CancellationToken ct = default);
+    ValueTask<RepoResult<LoreScopeModel[]>> TryGetByUserIdAndLorescopeId(UserIdUnion userId, Guid? lorescopeId, CancellationToken ct = default);
 }

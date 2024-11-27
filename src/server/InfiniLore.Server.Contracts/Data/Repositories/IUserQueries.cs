@@ -12,8 +12,8 @@ namespace InfiniLore.Server.Contracts.Data.Repositories;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public interface IUserRepository {
-    ValueTask<QueryResult<InfiniLoreUser>> TryGetByClaimsPrincipalAsync(ClaimsPrincipal principal, CancellationToken ct = default);
-    ValueTask<QueryResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default);
-    ValueTask<QueryResult<InfiniLoreUser>> TryGetByUserNameAsync(string userName, CancellationToken ct = default);
-    ValueTask<QueryResultMany<InfiniLoreUser>> TryGetByQueryAsync(Expression<Func<InfiniLoreUser, bool>> predicate, CancellationToken ct = default);
+    ValueTask<RepoResult<InfiniLoreUser>> TryGetByClaimsPrincipalAsync(ClaimsPrincipal principal, CancellationToken ct = default);
+    ValueTask<RepoResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default);
+    ValueTask<RepoResult<InfiniLoreUser>> TryGetByUserNameAsync(string userName, CancellationToken ct = default);
+    ValueTask<RepoResult<InfiniLoreUser[]>> TryGetByQueryAsync(Expression<Func<InfiniLoreUser, bool>> predicate, CancellationToken ct = default);
 }

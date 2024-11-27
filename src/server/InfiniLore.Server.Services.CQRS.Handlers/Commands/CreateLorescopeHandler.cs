@@ -13,7 +13,6 @@ using MediatR;
 using Serilog;
 
 namespace InfiniLore.Server.Services.CQRS.Handlers.Commands;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -21,13 +20,13 @@ public class CreateLorescopeHandler(ILoreScopeRepository loreScopeRepository, IL
     public async Task<SuccessOrFailure<LoreScopeModel, string>> Handle(CreateLorescopeCommand request, CancellationToken ct) {
         try {
             if (!await authService.ValidateIsOwnerAsync(request.Lorescope.OwnerId, ct)) return "Access Denied";
-            
-            CommandResult<LoreScopeModel> result = await loreScopeRepository.TryAddWithResultAsync(request.Lorescope, ct);
+
+            RepoResult<LoreScopeModel> result = await loreScopeRepository.TryAddWithResultAsync(request.Lorescope, ct);
             await unitOfWork.CommitAsync(ct);
-            
+
             return result.Value switch {
                 Success<LoreScopeModel> success => success,
-                Failure<string> failure => failure, // Pass failure directly
+                Failure<string> failure => failure,// Pass failure directly
                 _ => throw new ArgumentException("Result union did not have a valid success or failure value")
             };
         }

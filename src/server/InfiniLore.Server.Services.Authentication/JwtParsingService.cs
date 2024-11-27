@@ -2,7 +2,6 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.DependencyInjection;
-using FastEndpoints;
 using InfiniLore.Server.Contracts.Services.Auth.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +32,7 @@ public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger log
         }
         private set => _jwt = value;
     }
-    
+
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
@@ -53,6 +52,8 @@ public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger log
     }
 
     public bool TryGetPermissions([NotNullWhen(true)] out string[]? permissions) => TryGetPayloadData("permissions", out permissions);
+
+    public bool TryGetRoles([NotNullWhen(true)] out string[]? permissions) => TryGetPayloadData("roles", out permissions);
 
     private bool TryGetPayloadData<T>(string key, [NotNullWhen(true)] out T? value) {
         value = default;
@@ -81,6 +82,4 @@ public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger log
             return false;
         }
     }
-    
-    public bool TryGetRoles([NotNullWhen(true)] out string[]? permissions) => TryGetPayloadData("roles", out permissions);
 }

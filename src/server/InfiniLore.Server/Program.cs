@@ -20,13 +20,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Testcontainers.MsSql;
+using IAssemblyEntry=InfiniLore.Server.API.IAssemblyEntry;
 
 namespace InfiniLore.Server;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public static class Program {
-    public static async Task Main(string[] args) {
+    public async static Task Main(string[] args) {
         // -------------------------------------------------------------------------------------------------------------
         // Builder
         // -------------------------------------------------------------------------------------------------------------
@@ -40,15 +41,17 @@ public static class Program {
             .WithName("infinilore-production-db")
             .WithReuse(true)
             .Build();
+
         await container.StartAsync();
-        
+
         Console.WriteLine($"Database connection string {container.GetConnectionString()}");
 
         builder.Services.AddDbContextFactory<InfiniLoreDbContext>(options =>
-            options.UseSqlServer(container.GetConnectionString())
-                // .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
+                options.UseSqlServer(container.GetConnectionString())
+            // .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
         );
-        builder.Services.RegisterServicesFromInfiniLoreServerDataSqlServer(); // Registers the IDbUnitOfWork<T>
+
+        builder.Services.RegisterServicesFromInfiniLoreServerDataSqlServer();// Registers the IDbUnitOfWork<T>
         #endregion
 
         #region Authentication
@@ -120,7 +123,7 @@ public static class Program {
         builder.Services
             .AddFastEndpoints(options => {
                 options.Assemblies = [
-                    typeof(API.IAssemblyEntry).Assembly
+                    typeof(IAssemblyEntry).Assembly
                 ];
             })
             .SwaggerDocument(options => {
@@ -171,7 +174,7 @@ public static class Program {
             .AddInteractiveServerRenderMode()
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(WasmClient.IAssemblyEntry).Assembly);
-        
+
         app.UseDefaultExceptionHandler()
             .UseFastEndpoints(ctx => {
                 ctx.Endpoints.RoutePrefix = "api/v1";
@@ -192,7 +195,7 @@ public static class Program {
         // Create a localised scope so we can get the DbContextFactory correctly.
         await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
         await using InfiniLoreDbContext db = await app.Services.GetRequiredService<IDbContextFactory<InfiniLoreDbContext>>().CreateDbContextAsync();
-        
+
         await db.Database.MigrateAsync();
         await db.SaveChangesAsync();
     }

@@ -12,23 +12,21 @@ using MediatR;
 using Serilog;
 
 namespace InfiniLore.Server.Services.CQRS.Handlers.Queries;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetOneLoreScopeHandler(ILoreScopeRepository loreScopeRepository, ILogger logger, IUserContentAuthorizationService authService ) : IRequestHandler<GetOneLorescopeQuery, SuccessOrFailure<LoreScopeModel, string>> {
+public class GetOneLoreScopeHandler(ILoreScopeRepository loreScopeRepository, ILogger logger, IUserContentAuthorizationService authService) : IRequestHandler<GetOneLorescopeQuery, SuccessOrFailure<LoreScopeModel, string>> {
 
     public async Task<SuccessOrFailure<LoreScopeModel, string>> Handle(GetOneLorescopeQuery request, CancellationToken ct) {
         try {
             if (!await authService.ValidateAsync(request.LorescopeId, AccessKind.Read, ct)) return "Access Denied";
-            
+
             // After everything is validated, we can finally store to the db
-            QueryResultMany<LoreScopeModel> result = await loreScopeRepository.TryGetByUserIdAndLorescopeId(request.UserIdUnion, request.LorescopeId, ct);
-            
+            RepoResult<LoreScopeModel[]> result = await loreScopeRepository.TryGetByUserIdAndLorescopeId(request.UserIdUnion, request.LorescopeId, ct);
+
             return result.Value switch {
                 Success<LoreScopeModel> success => success,
-                None => "No lore scopes were found for the provided user and lorescope id",
-                Failure<string> failure => failure, // Pass failure directly
+                Failure<string> failure => failure,// Pass failure directly
                 _ => "An unknown error occurred"
             };
         }

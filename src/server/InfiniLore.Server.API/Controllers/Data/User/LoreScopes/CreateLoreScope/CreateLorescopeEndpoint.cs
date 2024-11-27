@@ -25,16 +25,16 @@ public class CreateLorescopeEndpoint(IMediator mediator) : Endpoint<LoreScopeFor
         SuccessOrFailure<LoreScopeModel, string> result = await mediator.Send(
             new CreateLorescopeCommand(
                 HttpContext,
-                await Map.ToEntityAsync(req, ct)), 
+                await Map.ToEntityAsync(req, ct)),
             ct
         );
-        
+
         if (result.TryGetAsFailure(out Failure<string> failure)) {
             return TypedResults.BadRequest(new ProblemDetails {
                 Detail = failure.Value
             });
         }
-        
+
         return TypedResults.Ok(Map.FromEntity(result.AsSuccess.Value));
     }
 }

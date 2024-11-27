@@ -2,7 +2,6 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
-using CodeOfChaos.Extensions;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models;
@@ -17,96 +16,139 @@ namespace InfiniLore.Server.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : InfiniLoreDbContextRepository<T>(unitOfWork), IBaseContentRepository<T> where T : BaseContent {
     #region Commands
-    public async virtual ValueTask<CommandOutput> TryAddAsync(T model, CancellationToken ct = default) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult> TryAddAsync(T model, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         if (await dbSet.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";
 
         await dbSet.AddAsync(model, ct);
         return new Success();
     }
 
-    public async virtual ValueTask<CommandResult<T>> TryAddWithResultAsync(T model, CancellationToken ct = default) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult<T>> TryAddWithResultAsync(T model, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         if (await dbSet.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";
 
         EntityEntry<T> result = await dbSet.AddAsync(model, ct);
         return result;
     }
 
-    public async virtual ValueTask<CommandOutput> TryUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
-        DbSet<T> dbSet = await GetDbSetAsync();
-        T? existing = await dbSet.FindAsync([model.Id], ct);
+    public async virtual ValueTask<RepoResult> TryUpdateAsync(Guid id, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
+        T? existing = await dbSet.FindAsync([id], ct);
         if (existing == null) return "Model does not exist";
 
+        // Two calls are needed
         EntityEntry<T> result = dbSet.Update(await update(existing));
         result.Entity.UpdateLastModifiedDate();
-        
+
         return new Success();
     }
 
-    public async virtual ValueTask<CommandResult<T>> TryUpdateWithResultAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
-        DbSet<T> dbSet = await GetDbSetAsync();
-        T? existing = await dbSet.FindAsync([model.Id], ct);
+    public async virtual ValueTask<RepoResult<T>> TryUpdateWithResultAsync(Guid id, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
+        T? existing = await dbSet.FindAsync([id], ct);
         if (existing == null) return "Model does not exist";
 
+        // Two calls are needed
         EntityEntry<T> result = dbSet.Update(await update(existing));
         result.Entity.UpdateLastModifiedDate();
-        
+
         return result;
     }
 
-    public async virtual ValueTask<CommandOutput> TryAddOrUpdateAsync(T model, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
-        if (model.Id == Guid.Empty) return await TryAddAsync(model, ct);
-
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async ValueTask<RepoResult> TryUpdateAsync(T model, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T? existing = await dbSet.FindAsync([model.Id], ct);
-        if (existing is null) {
+        if (existing == null) return "Model does not exist";
+
+        // All is done in one call to the db
+        model.UpdateLastModifiedDate();
+        dbSet.Update(model);
+
+        return new Success();
+    }
+
+    public async ValueTask<RepoResult<T>> TryUpdateWithResultAsync(T model, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
+        T? existing = await dbSet.FindAsync([model.Id], ct);
+        if (existing == null) return "Model does not exist";
+
+        // All is done in one call to the db
+        model.UpdateLastModifiedDate();
+        EntityEntry<T> result = dbSet.Update(model);
+
+        return result;
+    }
+
+    public async ValueTask<RepoResult> TryUpdateAsync(IEnumerable<T> models, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
+        T[] modelArray = models as T[] ?? models.ToArray();
+        HashSet<Guid> idsToUpdate = modelArray.Select(m => m.Id).ToHashSet();
+        if (!await dbSet.AllAsync(predicate: model => idsToUpdate.Contains(model.Id), ct)) return "One or more Models do not exist";
+
+        dbSet.UpdateRange(modelArray);
+
+        return new Success();
+    }
+
+    public async ValueTask<RepoResult> TryAddOrUpdateAsync(Guid id, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
+        T? existing = await dbSet.FindAsync([id], ct);
+        if (existing == null) return "Model does not exist";
+
+        // Two calls are needed
+        EntityEntry<T> result = dbSet.Update(await update(existing));
+        result.Entity.UpdateLastModifiedDate();
+
+        return new Success();
+    }
+
+    public async virtual ValueTask<RepoResult> TryAddOrUpdateAsync(T model, CancellationToken ct = default) {
+        if (model.Id == Guid.Empty) return await TryAddAsync(model, ct);// model wasn't assigned an id yet, so can always be added (normally)
+
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
+        if (await dbSet.FindAsync([model.Id], ct) is null) {
             await dbSet.AddAsync(model, ct);
             return new Success();
         }
 
-        EntityEntry<T> result = dbSet.Update(await update(existing));
+        EntityEntry<T> result = dbSet.Update(model);
         result.Entity.UpdateLastModifiedDate();
-        
+
         return new Success();
     }
 
-    public async virtual ValueTask<CommandOutput> TryAddOrUpdateRangeAsync(IEnumerable<T> models, Func<T, ValueTask<T>> update, CancellationToken ct = default) {
-        var modelsToAdd = new List<T>();
-        var modelsToUpdate = new List<T>();
+    public async virtual ValueTask<RepoResult> TryAddOrUpdateRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
 
-        IEnumerable<T> userContents = models as T[] ?? models.ToArray();
-        List<Guid> modelIds = userContents.Select(m => m.Id).Where(id => id != Guid.Empty).ToList();
+        T[] userContents = models as T[] ?? models.ToArray();
+        HashSet<Guid> modelIds = userContents
+            .Select(c => c.Id)
+            .ToHashSet();
 
-        DbSet<T> dbSet = await GetDbSetAsync();
-        List<T> existingModels = await dbSet.Where(m => modelIds.Contains(m.Id)).ToListAsync(ct);
+        T[] existingModels = await dbSet
+            .Where(m => modelIds.Contains(m.Id))
+            .ToArrayAsync(ct);
 
-        Dictionary<Guid, T> existingModelDict = existingModels.ToDictionary(keySelector: m => m.Id, elementSelector: m => m);
+        HashSet<Guid> existingModelIds = existingModels
+            .Select(m => m.Id)
+            .ToHashSet();
 
-        foreach (T model in userContents) {
-            if (model.Id == Guid.Empty) {
-                modelsToAdd.Add(model);
-                continue;
-            }
+        IEnumerable<T> modelsNotInDb = userContents
+            .Where(model => !existingModelIds.Contains(model.Id));
 
-            if (existingModelDict.TryGetValue(model.Id, out T? existingModel)) {
-                T updatedModel = await update(existingModel);
-                existingModel.UpdateLastModifiedDate();
-                modelsToUpdate.Add(updatedModel);
-                continue;
-            }
-
-            modelsToAdd.Add(model);
+        foreach (T existingModel in existingModels) {
+            existingModel.UpdateLastModifiedDate();
         }
 
-        if (modelsToAdd.Count != 0) await dbSet.AddRangeAsync(modelsToAdd, ct);
-        if (modelsToUpdate.Count != 0) dbSet.UpdateRange(modelsToUpdate);
+        await dbSet.AddRangeAsync(modelsNotInDb, ct);
+        dbSet.UpdateRange(existingModels);
 
         return new Success();
     }
 
-    public async virtual ValueTask<CommandOutput> TryDeleteAsync(T model, CancellationToken ct = default) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult> TryDeleteAsync(T model, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T? existing = await dbSet.FindAsync([model.Id], ct);
         if (existing == null) return "Model does not exist";
 
@@ -114,10 +156,10 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         return new Success();
     }
 
-    public async virtual ValueTask<CommandOutput> TryAddRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult> TryAddRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         IEnumerable<T> userContents = models as T[] ?? models.ToArray();
-        List<Guid> modelIds = userContents.Select(m => m.Id).ToList();
+        HashSet<Guid> modelIds = userContents.Select(m => m.Id).ToHashSet();
 
         // Get all models in the db that match any Ids of the passed-in models
         List<T> existingModels = await dbSet.Where(m => modelIds.Contains(m.Id)).ToListAsync(ct);
@@ -129,105 +171,114 @@ public class BaseContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
         return new Success();
     }
 
-    public async virtual ValueTask<CommandOutput> TryDeleteRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
-        DbSet<T> dbSet = await GetDbSetAsync();
-        IEnumerable<Guid> ids = models.Select(model => model.Id);
+    public async virtual ValueTask<RepoResult> TryDeleteRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
+        HashSet<Guid> ids = models.Select(model => model.Id).ToHashSet();
 
         await dbSet
             .Where(model => ids.Contains(model.Id))
-            .ForEachAsync(action: model => model.SoftDelete(), ct);
+            .ExecuteUpdateAsync(setPropertyCalls: s => BaseContent.SoftDeleteWithPropertyCalls(s), ct);
+
+        return new Success();
+    }
+    public async ValueTask<RepoResult> TryPermanentRemoveAsync(T model, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
+        T? existing = await dbSet.FindAsync([model.Id], ct);
+        if (existing == null) return "Model does not exist";
+
+        dbSet.Remove(existing);
+        return new Success();
+    }
+
+    public async ValueTask<RepoResult> TryPermanentRemoveRangeAsync(IEnumerable<T> models, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
+        HashSet<Guid> ids = models.Select(model => model.Id).ToHashSet();
+
+        int recordsAffected = await dbSet
+            .Where(model => ids.Contains(model.Id))
+            .ExecuteDeleteAsync(ct);
+
+        if (recordsAffected <= 0 && ids.Count != 0) return "No models were deleted";
 
         return new Success();
     }
     #endregion
 
     #region Queries
-    public async virtual ValueTask<QueryResult<T>> TryGetByIdAsync(Guid id, CancellationToken ct) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult<T>> TryGetByIdAsync(Guid id, CancellationToken ct) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T? result = await dbSet
             .FirstOrDefaultAsync(predicate: ls => ls.Id == id, ct);
 
-        if (result is null) return new None();
+        if (result is null) return "Content not found.";
 
         return new Success<T>(result);
     }
 
-    public async virtual ValueTask<QueryResultMany<T>> TryGetAllAsync(CancellationToken ct) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult<T[]>> TryGetAllAsync(CancellationToken ct) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T[] result = await dbSet
             .ToArrayAsync(cancellationToken: ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
 
-    public async virtual ValueTask<QueryResultMany<T>> TryGetAllASync(PaginationInfo pageInfo, CancellationToken ct) {
+    public async virtual ValueTask<RepoResult<T[]>> TryGetAllASync(PaginationInfo pageInfo, CancellationToken ct) {
         if (pageInfo.IsNotValid(out Failure<string> pageInfoFailure)) return pageInfoFailure;
 
-        DbSet<T> dbSet = await GetDbSetAsync();
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T[] result = await dbSet
             .Skip(pageInfo.SkipAmount)
             .Take(pageInfo.PageSize)
             .ToArrayAsync(ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
 
-    public async virtual ValueTask<QueryResultMany<T>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, CancellationToken ct) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult<T[]>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, CancellationToken ct) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T[] result = await dbSet
             .Where(predicate)
             .ToArrayAsync(cancellationToken: ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
 
-    public async virtual ValueTask<QueryResultMany<T>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, CancellationToken ct) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult<T[]>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, CancellationToken ct) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T[] result = await dbSet
             .Where(predicate)
             .ToArrayAsync(cancellationToken: ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
 
-    public async virtual ValueTask<QueryResultMany<T>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct, Expression<Func<T, object>>? orderBy = null) {
+    public async virtual ValueTask<RepoResult<T[]>> TryGetByCriteriaAsync(Expression<Func<T, bool>> predicate, Expression<Func<T, object>> orderBy, PaginationInfo pageInfo, CancellationToken ct) {
         if (pageInfo.IsNotValid(out Failure<string> pageInfoFailure)) return pageInfoFailure;
 
-        DbSet<T> dbSet = await GetDbSetAsync();
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T[] result = await dbSet
             .Where(predicate)
-            .ConditionalOrderByNotNull(orderBy)// Checks for not null and then orders by it, else skips the order by
+            .OrderBy(orderBy)
             .Skip(pageInfo.SkipAmount)
             .Take(pageInfo.PageSize)
             .ToArrayAsync(cancellationToken: ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
 
-    public async virtual ValueTask<QueryResultMany<T>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, PaginationInfo pageInfo, CancellationToken ct, Expression<Func<T, object>>? orderBy = null) {
+    public async virtual ValueTask<RepoResult<T[]>> TryGetByCriteriaAsync(Expression<Func<T, int, bool>> predicate, Expression<Func<T, object>> orderBy, PaginationInfo pageInfo, CancellationToken ct) {
         if (pageInfo.IsNotValid(out Failure<string> pageInfoFailure)) return pageInfoFailure;
 
-        DbSet<T> dbSet = await GetDbSetAsync();
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T[] result = await dbSet
             .Where(predicate)
-            .ConditionalOrderByNotNull(orderBy)// Checks for not null and then orders by it, else skips the order by
+            .OrderBy(orderBy)
             .Skip(pageInfo.SkipAmount)
             .Take(pageInfo.PageSize)
             .ToArrayAsync(cancellationToken: ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
     #endregion
 }

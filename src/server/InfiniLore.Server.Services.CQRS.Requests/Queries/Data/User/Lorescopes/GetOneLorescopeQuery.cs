@@ -7,7 +7,6 @@ using InfiniLore.Server.Data.Models.Content.UserData;
 
 // ReSharper disable once CheckNamespace
 namespace InfiniLore.Server.Services.CQRS.Requests.Queries;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------

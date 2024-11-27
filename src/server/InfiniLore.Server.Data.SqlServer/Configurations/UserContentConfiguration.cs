@@ -13,7 +13,9 @@ public abstract class UserContentConfiguration<T> : BaseContentConfiguration<T> 
         base.Configure(builder);// Call BaseContentConfiguration
 
         // Index on IsPublic and OwnerId to allow for fast filtering of public content by user
-        builder.HasIndex(x => new { x.Id, x.OwnerId,
-            IsPublic = x.IsPubliclyReadable });
+        builder.HasIndex(x => new {
+            x.Id, x.OwnerId,
+            IsPublic = x.IsPubliclyReadable
+        });
     }
 }

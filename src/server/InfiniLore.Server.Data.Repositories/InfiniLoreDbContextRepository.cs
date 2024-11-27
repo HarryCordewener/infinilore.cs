@@ -11,10 +11,10 @@ namespace InfiniLore.Server.Data.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 public abstract class InfiniLoreDbContextRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IRepository<InfiniLoreDbContext> where T : class {
     #region Queryables
-    public async ValueTask<InfiniLoreDbContext> GetDbContextAsync() => await unitOfWork.GetDbContextAsync();
-    
-    protected async ValueTask<DbSet<T>> GetDbSetAsync() {
-        InfiniLoreDbContext dbContext = await GetDbContextAsync();
+    public async ValueTask<InfiniLoreDbContext> GetDbContextAsync(CancellationToken ct = default) => await unitOfWork.GetDbContextAsync(ct);
+
+    protected async ValueTask<DbSet<T>> GetDbSetAsync(CancellationToken ct = default) {
+        InfiniLoreDbContext dbContext = await GetDbContextAsync(ct);
         return dbContext.Set<T>();
     }
     #endregion

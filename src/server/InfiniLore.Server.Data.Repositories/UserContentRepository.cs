@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using AterraEngine.Unions;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
@@ -14,32 +13,28 @@ namespace InfiniLore.Server.Data.Repositories;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : BaseContentRepository<T>(unitOfWork), IUserContentRepository<T> where T : UserContent {
-    public async virtual ValueTask<QueryResultMany<T>> TryGetByUserAsync(UserIdUnion userUnion, CancellationToken ct) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult<T[]>> TryGetByUserAsync(UserIdUnion userUnion, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T[] result = await dbSet
             .Where(ls => ls.OwnerId == userUnion.ToGuid())
             .ToArrayAsync(cancellationToken: ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
 
-    public async virtual ValueTask<QueryResultMany<T>> TryGetByUserAsync(UserIdUnion userUnion, PaginationInfo pageInfo, CancellationToken ct = default) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult<T[]>> TryGetByUserAsync(UserIdUnion userUnion, PaginationInfo pageInfo, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
         T[] result = await dbSet
             .Where(ls => ls.OwnerId == userUnion.ToGuid())
             .Skip(pageInfo.SkipAmount)
             .Take(pageInfo.PageSize)
             .ToArrayAsync(cancellationToken: ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
 
-    public async virtual ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserIdUnion ownerUnion, UserIdUnion accessorUnion, AccessKind level, CancellationToken ct) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult<T[]>> TryGetByUserWithUserAccessAsync(UserIdUnion ownerUnion, UserIdUnion accessorUnion, AccessKind level, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
 
         T[] result = await dbSet
             .Where(
@@ -48,13 +43,11 @@ public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             )
             .ToArrayAsync(cancellationToken: ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
 
-    public async virtual ValueTask<QueryResultMany<T>> TryGetByUserWithUserAccessAsync(UserIdUnion ownerUnion, UserIdUnion accessorUnion, AccessKind level, PaginationInfo pageInfo, CancellationToken ct) {
-        DbSet<T> dbSet = await GetDbSetAsync();
+    public async virtual ValueTask<RepoResult<T[]>> TryGetByUserWithUserAccessAsync(UserIdUnion ownerUnion, UserIdUnion accessorUnion, AccessKind level, PaginationInfo pageInfo, CancellationToken ct = default) {
+        DbSet<T> dbSet = await GetDbSetAsync(ct);
 
         T[] result = await dbSet
             .Where(
@@ -65,8 +58,6 @@ public class UserContentRepository<T>(IDbUnitOfWork<InfiniLoreDbContext> unitOfW
             .Take(pageInfo.PageSize)
             .ToArrayAsync(cancellationToken: ct);
 
-        return result.Length > 0
-            ? result
-            : new None();
+        return result;
     }
 }

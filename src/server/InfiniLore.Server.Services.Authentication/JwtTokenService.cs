@@ -1,10 +1,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-
 using AterraEngine.DependencyInjection;
 using AterraEngine.Unions;
-using FastEndpoints;
 using FastEndpoints.Security;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
@@ -63,7 +61,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
     }
 
     public async ValueTask<JwtResult> RefreshTokensAsync(Guid refreshToken, CancellationToken ct = default) {
-        QueryResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
+        RepoResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
             case Error<string>: return getResult.FailureString;
@@ -72,7 +70,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
         if (oldToken.ExpiresAt < DateTime.UtcNow) return "Refresh token has expired";
 
-        await repository.TryPermanentDeleteAsync(oldToken, ct);
+        await repository.TryPermanentRemoveAsync(oldToken, ct);
 
         return await GenerateTokensAsync(
             oldToken.Owner,
@@ -83,29 +81,26 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         );
     }
 
-    public async ValueTask<TrueFalseOrError> RevokeTokensAsync(InfiniLoreUser user, Guid refreshToken, CancellationToken ct = default) {
-        QueryResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
-        switch (getResult.Value) {
-            case None: return "Refresh token not found";
-            case Error<string>: return getResult.FailureString;
-        }
+    public async ValueTask<BoolOrFailure> RevokeTokensAsync(InfiniLoreUser user, Guid refreshToken, CancellationToken ct = default) {
+        RepoResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
+        if (getResult.IsFailure) return getResult.AsFailure;
 
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
         if (oldToken.Owner.Id != user.Id) return "Refresh token does not belong to user";
 
-        CommandOutput deleteResult = await repository.TryPermanentDeleteAsync(oldToken, ct);
+        RepoResult deleteResult = await repository.TryPermanentRemoveAsync(oldToken, ct);
         if (!deleteResult.IsSuccess) return deleteResult.FailureString;
 
         return true;
     }
 
-    public async ValueTask<TrueFalseOrError> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default) {
-        CommandOutput deleteResult = await repository.TryPermanentDeleteAllForUserAsync(user, ct);
-        if (!deleteResult.IsSuccess) return deleteResult.FailureString;
+    public async ValueTask<BoolOrFailure> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default) {
+        RepoResult deleteResult = await repository.TryPermanentRemoveAllForUserAsync(user, ct);
+        if (!deleteResult.IsSuccess) return deleteResult.AsFailure;
 
         return true;
     }
-    
+
     private static string HashToken(Guid token) {
         byte[] tokenBytes = Encoding.UTF8.GetBytes(token.ToString());
         byte[] hashBytes = SHA256.HashData(tokenBytes);
@@ -138,7 +133,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
             Permissions = permissions
         };
 
-        CommandOutput resultAddition = await repository.TryAddAsync(refreshToken, ct);
+        RepoResult resultAddition = await repository.TryAddAsync(refreshToken, ct);
         switch (resultAddition.Value) {
             case Success:
                 try {

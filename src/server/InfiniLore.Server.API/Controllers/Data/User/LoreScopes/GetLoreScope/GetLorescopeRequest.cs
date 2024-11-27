@@ -4,11 +4,10 @@
 using Microsoft.AspNetCore.Mvc;
 
 namespace InfiniLore.Server.API.Controllers.Data.User.LoreScopes.GetLoreScope;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public record GetLorescopeRequest(
-    [FromRoute] Guid UserId, 
+    [FromRoute] Guid UserId,
     [FromRoute] Guid LoreScopeId
 );

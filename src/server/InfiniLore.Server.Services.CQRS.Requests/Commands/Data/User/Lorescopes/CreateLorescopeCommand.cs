@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.Http;
 
 // ReSharper disable once CheckNamespace
 namespace InfiniLore.Server.Services.CQRS.Requests.Commands;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public record CreateLorescopeCommand(
-      HttpContext HttpContext,
-      LoreScopeModel Lorescope  
+    HttpContext HttpContext,
+    LoreScopeModel Lorescope
 ) : ICqrsRequest<LoreScopeModel>;

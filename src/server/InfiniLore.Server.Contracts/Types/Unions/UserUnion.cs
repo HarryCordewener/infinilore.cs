@@ -13,6 +13,7 @@ public readonly partial struct UserIdUnion() : IUnion<InfiniLoreUser, Guid, stri
         if (IsInfiniLoreUser) return AsInfiniLoreUser.Id;
         if (IsGuid) return AsGuid;
         if (IsString) return Guid.Parse(AsString);
+
         throw new ArgumentException("Union does not contain a value");
     }
 }

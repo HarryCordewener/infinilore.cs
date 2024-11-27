@@ -36,7 +36,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
     #region Commands
     protected async Task CanCreateSingleModel(TModel model) {
         // Act
-        CommandOutput commandResult = await _repository.TryAddAsync(model);
+        RepoResult commandResult = await _repository.TryAddAsync(model);
         bool commitResult = await _unitOfWork.TryCommitAsync();
 
         // Assert
@@ -44,7 +44,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         Assert.True(commandResult.IsSuccess);
 
         // Verify
-        QueryResult<TModel> addedModel = await _repository.TryGetByIdAsync(model.Id);
+        RepoResult<TModel> addedModel = await _repository.TryGetByIdAsync(model.Id);
         Assert.True(addedModel.IsSuccess);
         Assert.True(addedModel.TryGetSuccessValue(out TModel? addedModelValue));
         Assert.Equal(model.Id, addedModelValue.Id);
@@ -53,7 +53,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
     protected async Task CanCreateMultipleModels(IEnumerable<TModel> models) {
         // Act
         IEnumerable<TModel> userContents = models as TModel[] ?? models.ToArray();
-        CommandOutput commandResult = await _repository.TryAddRangeAsync(userContents);
+        RepoResult commandResult = await _repository.TryAddRangeAsync(userContents);
         bool commitResult = await _unitOfWork.TryCommitAsync();
 
         // Assert
@@ -62,7 +62,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
 
         // Verify
         foreach (TModel model in userContents) {
-            QueryResult<TModel> addedModel = await _repository.TryGetByIdAsync(model.Id);
+            RepoResult<TModel> addedModel = await _repository.TryGetByIdAsync(model.Id);
             Assert.True(addedModel.IsSuccess);
             Assert.True(addedModel.TryGetSuccessValue(out TModel? addedModelValue));
             Assert.Equal(model.Id, addedModelValue.Id);
@@ -74,7 +74,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         bool commitResult = await _unitOfWork.TryCommitAsync();
 
         // Act
-        CommandOutput commandResult = await _repository.TryUpdateAsync(model, updateFunc);
+        RepoResult commandResult = await _repository.TryUpdateAsync(model.Id, updateFunc);
         bool commitResult2 = await _unitOfWork.TryCommitAsync();
 
         // Assert
@@ -83,7 +83,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         Assert.True(commandResult.IsSuccess);
 
         // Verify
-        QueryResult<TModel> updatedModel = await _repository.TryGetByIdAsync(model.Id);
+        RepoResult<TModel> updatedModel = await _repository.TryGetByIdAsync(model.Id);
         Assert.True(updatedModel.IsSuccess);
         Assert.True(updatedModel.TryGetSuccessValue(out TModel? value));
         Assert.True(validateFunc(value));
@@ -95,7 +95,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         bool commitResult = await _unitOfWork.TryCommitAsync();
 
         // Act
-        CommandOutput commandResult = await _repository.TryDeleteAsync(model);
+        RepoResult commandResult = await _repository.TryDeleteAsync(model);
         bool commitResult2 = await _unitOfWork.TryCommitAsync();
 
         // Assert
@@ -104,8 +104,9 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         Assert.True(commandResult.IsSuccess);
 
         // Verify
-        QueryResult<TModel> deletedModel = await _repository.TryGetByIdAsync(model.Id);
-        Assert.True(deletedModel.IsNone);
+        RepoResult<TModel> deletedModel = await _repository.TryGetByIdAsync(model.Id);
+        Assert.True(deletedModel.IsFailure);// should be deleted
+        Assert.Equal("Content not found.", deletedModel.FailureString);
     }
     #endregion
 
@@ -115,7 +116,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         await AddModelToDatabaseAsync(model);
 
         // Act
-        QueryResult<TModel> result = await _repository.TryGetByIdAsync(model.Id);
+        RepoResult<TModel> result = await _repository.TryGetByIdAsync(model.Id);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -128,7 +129,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         await AddModelToDatabaseAsync(model);
 
         // Act
-        QueryResultMany<TModel> result = await _repository.TryGetByUserAsync(userUnion);
+        RepoResult<TModel[]> result = await _repository.TryGetByUserAsync(userUnion);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -138,7 +139,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
 
     protected async Task CanGetAllAsync(IEnumerable<TModel> models) {
         // Arrange
-        QueryResultMany<TModel> originalAmountResult = await _repository.TryGetAllAsync();
+        RepoResult<TModel[]> originalAmountResult = await _repository.TryGetAllAsync();
         Assert.True(originalAmountResult.TryGetSuccessValue(out TModel[]? originalModels));
         int originalAmount = originalModels.Length;// We need to do this because we are using the same database for all tests
 
@@ -148,7 +149,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         }
 
         // Act
-        QueryResultMany<TModel> result = await _repository.TryGetAllAsync();
+        RepoResult<TModel[]> result = await _repository.TryGetAllAsync();
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -161,7 +162,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         await AddModelToDatabaseAsync(model);
 
         // Act
-        QueryResultMany<TModel> result = await _repository.TryGetByCriteriaAsync(predicate);
+        RepoResult<TModel[]> result = await _repository.TryGetByCriteriaAsync(predicate);
 
         // Assert
         Assert.True(result.IsSuccess);
