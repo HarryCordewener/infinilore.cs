@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using AterraEngine.DependencyInjection;
 using AterraEngine.Unions;
-using FastEndpoints;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
@@ -11,6 +11,7 @@ using InfiniLore.Server.Data.Models.Content.Account;
 using InfiniLore.Server.Data.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using System.Security.Claims;
 
@@ -18,7 +19,7 @@ namespace InfiniLore.Server.Data.Repositories.Content.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[RegisterService<IUserRepository>(LifeTime.Scoped)]
+[InjectableService<IUserRepository>(ServiceLifetime.Scoped)]
 public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, UserManager<InfiniLoreUser> userManager) : IUserRepository {
     public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByClaimsPrincipalAsync(ClaimsPrincipal principal, CancellationToken ct = default) {
         if (await userManager.GetUserAsync(principal) is not { } user) return new None();
@@ -27,7 +28,7 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, UserM
     
     public async ValueTask<QueryResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
-        string id = userId.AsUserId;
+        var id = userId.ToGuid();
 
         InfiniLoreUser? result = await dbContext.Users
             .FirstOrDefaultAsync(u => u.Id == id, ct);
@@ -41,7 +42,9 @@ public class UserRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, UserM
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
 
         InfiniLoreUser? result = await dbContext.Users
-            .FirstOrDefaultAsync(u => u.Id == userName, ct);
+            .FirstOrDefaultAsync(u => u.NormalizedUserName != null
+                && u.NormalizedUserName.Equals(userName, StringComparison.InvariantCultureIgnoreCase
+                ), ct);
 
         if (result is null) return new None();
 

@@ -8,11 +8,12 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.18-beta" />
-        <PackageReference Include="FastEndpoints.Generator" Version="5.31.0.18-beta">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="AterraEngine.DependencyInjection" Version="1.1.0" />
+        <PackageReference Include="AterraEngine.DependencyInjection.Generators" Version="1.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.18-beta" />
         <PackageReference Include="FastEndpoints.Security" Version="5.31.0.18-beta" />
         
         <PackageReference Include="Serilog" Version="4.1.0" />

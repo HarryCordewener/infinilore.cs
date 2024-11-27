@@ -1,8 +1,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using AterraEngine.DependencyInjection;
 using InfiniLore.Server.Contracts.Data;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace InfiniLore.Server.Data.SqlServer;
@@ -11,7 +13,7 @@ namespace InfiniLore.Server.Data.SqlServer;
 // ---------------------------------------------------------------------------------------------------------------------
 
 /// <inheritdoc cref="InfiniLore.Server.Contracts.Data.IDbUnitOfWork{T}" />
-[RegisterService<IDbUnitOfWork<InfiniLoreDbContext>>(LifeTime.Scoped)]
+[InjectableService<IDbUnitOfWork<InfiniLoreDbContext>>(ServiceLifetime.Scoped)]
 public class InfiniLoreDbUnitOfWork(IDbContextFactory<InfiniLoreDbContext> dbContextFactory, ILogger logger) : IDbUnitOfWork<InfiniLoreDbContext> {
     private InfiniLoreDbContext? _db;
     private IDbContextTransaction? _transaction;

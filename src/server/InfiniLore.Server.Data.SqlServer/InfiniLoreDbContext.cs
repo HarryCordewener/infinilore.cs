@@ -11,7 +11,7 @@ namespace InfiniLore.Server.Data.SqlServer;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class InfiniLoreDbContext : IdentityDbContext<InfiniLoreUser, IdentityRole, string> {
+public class InfiniLoreDbContext : IdentityDbContext<InfiniLoreUser, IdentityRole<Guid>, Guid> {
     public DbSet<LoreScopeModel> LoreScopes { get; init; }
     public DbSet<MultiverseModel> Multiverses { get; init; }
     public DbSet<UniverseModel> Universes { get; init; }
@@ -40,7 +40,7 @@ public class InfiniLoreDbContext : IdentityDbContext<InfiniLoreUser, IdentityRol
         );
 
         var testUser = new InfiniLoreUser {
-            Id = "d957c0f8-e90e-4068-a968-4f4b49fc165c",
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
             UserName = "testuser",
             NormalizedUserName = "TESTUSER",
             Email = "testuser@example.com",

@@ -9,5 +9,5 @@ namespace InfiniLore.Server.Data.Models;
 // ---------------------------------------------------------------------------------------------------------------------
 public interface IHasOwner {
     public InfiniLoreUser Owner { get; set; }
-    public string OwnerId { get; set; }
+    public Guid OwnerId { get; set; }
 }

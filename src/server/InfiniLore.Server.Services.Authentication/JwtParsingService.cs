@@ -1,9 +1,11 @@
 ﻿// ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using AterraEngine.DependencyInjection;
 using FastEndpoints;
 using InfiniLore.Server.Contracts.Services.Auth.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
@@ -14,7 +16,7 @@ namespace InfiniLore.Server.Services.Authentication;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[RegisterService<IJwtParsingService>(LifeTime.Scoped)]
+[InjectableService<IJwtParsingService>(ServiceLifetime.Scoped)]
 public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger logger) : IJwtParsingService {
 
     private readonly JwtSecurityTokenHandler _handler = new();

@@ -1,23 +1,23 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using AterraEngine.DependencyInjection;
 using AterraEngine.Unions;
-using FastEndpoints;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Services.Auth.Authorization;
 using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models;
 using InfiniLore.Server.Data.Models.Content.Account;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace InfiniLore.Server.Services.Authorization;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[RegisterService<IUserContentAuthorizationService>(LifeTime.Scoped)]
+[InjectableService<IUserContentAuthorizationService>(ServiceLifetime.Scoped)]
 public class UserContentAuthorizationService(IUserRepository userRepository, IUserContentAccessRepository userContentAccessRepository, IHttpContextAccessor contextAccessor) : IUserContentAuthorizationService {
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -32,10 +32,10 @@ public class UserContentAuthorizationService(IUserRepository userRepository, IUs
         return await userContentAccessRepository.UserHasKindAsync(contentId, accessorUser.Id, accessKind, ct);
     }
     
-    public async ValueTask<bool> ValidateIsOwnerAsync(UserIdUnion ownerId, CancellationToken ct = default) {
+    public async ValueTask<bool> ValidateIsOwnerAsync(Guid ownerId, CancellationToken ct = default) {
         if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsT0(out InfiniLoreUser accessorUser)) return false;
         
-        return accessorUser.Id == ownerId.AsUserId;
+        return accessorUser.Id == ownerId;
     }
 
     // -----------------------------------------------------------------------------------------------------------------

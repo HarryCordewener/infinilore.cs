@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Server.Data.Models.Content.Account;
 using System.ComponentModel.DataAnnotations;
 
 namespace InfiniLore.Server.Data.Models;
@@ -11,9 +10,7 @@ namespace InfiniLore.Server.Data.Models;
 public class UserContentAccessModel {
     [Key] public Guid Id { get; init; } = Guid.CreateVersion7(); // Not part of the BaseContent family
     public required Guid ContentId { get; init; }
-    
-    public required InfiniLoreUser User { get; init; }
-    [MaxLength(450)] public string UserId { get; init; } = null!;
+    public required Guid UserId { get; init; }
     
     public required AccessKind AccessKind { get; init; }
 }

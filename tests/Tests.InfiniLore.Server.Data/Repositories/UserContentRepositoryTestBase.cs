@@ -29,7 +29,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
     public abstract Task TestCanDeleteModel(TModel model);
 
     public abstract Task TestCanGetByIdAsync(TModel model);
-    public abstract Task TestCanGetByUserAsync(UserUnion userUnion, TModel model);
+    public abstract Task TestCanGetByUserAsync(UserIdUnion userUnion, TModel model);
     public abstract Task TestCanGetAllAsync(IEnumerable<TModel> models);
     public abstract Task TestCanGetByCriteriaAsync(Expression<Func<TModel, bool>> predicate, TModel model);
 
@@ -123,7 +123,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         Assert.Equal(model.Id, value.Id);
     }
 
-    protected async Task CanGetByUserAsync(UserUnion userUnion, TModel model) {
+    protected async Task CanGetByUserAsync(UserIdUnion userUnion, TModel model) {
         // Arrange
         await AddModelToDatabaseAsync(model);
 

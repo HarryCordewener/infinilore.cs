@@ -12,9 +12,6 @@ namespace InfiniLore.Server.Data.SqlServer.Configurations;
 public class UserContentAccessConfiguration : IEntityTypeConfiguration<UserContentAccessModel> {
     public void Configure(EntityTypeBuilder<UserContentAccessModel> builder) {
         
-        builder.HasIndex(content => content.ContentId)
-            .IsUnique();
-        
         // Each user can only have one unique access level per content
         // example : A user can have both read and write access rights, but not twice read access rights
         builder.HasIndex(content => new { content.ContentId, content.UserId })

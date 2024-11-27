@@ -2,6 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 
+using AterraEngine.DependencyInjection;
 using AterraEngine.Unions;
 using FastEndpoints;
 using FastEndpoints.Security;
@@ -14,6 +15,7 @@ using InfiniLore.Server.Data.Models.Content.Account;
 using InfiniLore.Server.Data.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -23,7 +25,7 @@ namespace InfiniLore.Server.Services.Authentication;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[RegisterService<IJwtTokenService>(LifeTime.Scoped)]
+[InjectableService<IJwtTokenService>(ServiceLifetime.Scoped)]
 public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, IConfiguration configuration, IJwtRefreshTokenRepository repository, ILogger logger, UserManager<InfiniLoreUser> userManager) : IJwtTokenService {
     public async ValueTask<JwtResult> GenerateTokensAsync(InfiniLoreUser user, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
         try {
@@ -102,8 +104,8 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         if (!deleteResult.IsSuccess) return deleteResult.FailureString;
 
         return true;
-
     }
+    
     private static string HashToken(Guid token) {
         byte[] tokenBytes = Encoding.UTF8.GetBytes(token.ToString());
         byte[] hashBytes = SHA256.HashData(tokenBytes);
@@ -120,7 +122,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
 
                 o.User.Roles.Add(roles);
                 o.User.Permissions.Add(permissions);
-                o.User[ClaimTypes.NameIdentifier] = user.Id;
+                o.User[ClaimTypes.NameIdentifier] = user.Id.ToString();
             });
 
         return jwtToken;

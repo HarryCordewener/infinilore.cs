@@ -50,7 +50,7 @@ public interface ICommandHasTryPermanentDeleteAsync<in T> where T : BaseContent 
 }
 
 public interface ICommandHasTryPermanentDeleteAllForUserAsync<in T> where T : BaseContent, IHasOwner {
-    ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(UserUnion userUnion, CancellationToken ct = default);
+    ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(UserIdUnion userUnion, CancellationToken ct = default);
 }
 #endregion
 #endregion

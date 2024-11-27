@@ -8,14 +8,11 @@ namespace InfiniLore.Server.Contracts.Types.Unions;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public readonly partial struct UserUnion() : IUnion<InfiniLoreUser, Guid, string> {
-    public string AsUserId {
-        get {
-            if (IsInfiniLoreUser) return AsInfiniLoreUser.Id;
-            if (IsGuid) return AsGuid.ToString();
-            if (IsString) return AsString;
-
-            throw new ArgumentException("Union does not contain a value");
-        }
+public readonly partial struct UserIdUnion() : IUnion<InfiniLoreUser, Guid, string> {
+    public Guid ToGuid() {
+        if (IsInfiniLoreUser) return AsInfiniLoreUser.Id;
+        if (IsGuid) return AsGuid;
+        if (IsString) return Guid.Parse(AsString);
+        throw new ArgumentException("Union does not contain a value");
     }
 }

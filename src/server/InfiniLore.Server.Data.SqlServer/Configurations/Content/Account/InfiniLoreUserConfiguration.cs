@@ -28,7 +28,7 @@ public class InfiniLoreUserConfiguration : IEntityTypeConfiguration<InfiniLoreUs
             .HasForeignKey(token => token.OwnerId);
 
         builder.HasMany(user => user.ContentAccesses)
-            .WithOne(access => access.User)
+            .WithOne()
             .HasForeignKey(access => access.UserId);
     }
 }

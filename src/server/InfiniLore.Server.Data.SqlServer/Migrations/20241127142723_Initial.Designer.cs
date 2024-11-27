@@ -4,6 +4,7 @@ using InfiniLore.Server.Data.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InfiniLore.Server.Data.SqlServer.Migrations
 {
     [DbContext(typeof(InfiniLoreDbContext))]
-    partial class InfiniLoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241127142723_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,13 +95,13 @@ namespace InfiniLore.Server.Data.SqlServer.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7612850e-8c21-47b3-bb00-9ac8ff819675",
+                            ConcurrencyStamp = "15743b7e-cc0b-4a22-a48d-bc163433bc58",
                             Email = "testuser@example.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TESTUSER@EXAMPLE.COM",
                             NormalizedUserName = "TESTUSER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOFvgjGb2UE6tZmwyjNuowOSntKvI0gbeelY4Pkq6u5wm3NF7ceEOc2moP2R5lIC2w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEO56MotVjoAxBm3AmnPHgFADjTihjYTVngLnj+OoNqDON/ev6G2dxPi8iVbi5rsfFw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "d957c0f8-e90e-4068-a968-4f4b49fc165b",
                             TwoFactorEnabled = false,
@@ -371,13 +374,13 @@ namespace InfiniLore.Server.Data.SqlServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0c3bc5e0-4c80-4d26-8bef-f3bf7a357751",
+                            Id = "80946331-3c7d-4181-b7fa-18381cf48693",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "12981bf7-16b7-4441-8754-42c0a5bf8df2",
+                            Id = "1c82784a-88b6-4344-9a08-a0acf2662696",
                             Name = "user",
                             NormalizedName = "USER"
                         });

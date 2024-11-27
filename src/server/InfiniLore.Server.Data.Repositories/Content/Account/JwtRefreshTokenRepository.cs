@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using AterraEngine.DependencyInjection;
 using AterraEngine.Unions;
-using FastEndpoints;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
@@ -11,6 +11,7 @@ using InfiniLore.Server.Data.Models.Content.Account;
 using InfiniLore.Server.Data.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.DependencyInjection;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -18,7 +19,7 @@ namespace InfiniLore.Server.Data.Repositories.Content.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[RegisterService<IJwtRefreshTokenRepository>(LifeTime.Scoped)]
+[InjectableService<IJwtRefreshTokenRepository>(ServiceLifetime.Scoped)]
 public class JwtRefreshTokenRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork) : IJwtRefreshTokenRepository {
 
     #region Commands
@@ -65,11 +66,11 @@ public class JwtRefreshTokenRepository(IDbUnitOfWork<InfiniLoreDbContext> unitOf
         return new Success();
     }
 
-    public async ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(UserUnion userUnion, CancellationToken ct = default) {
+    public async ValueTask<CommandOutput> TryPermanentDeleteAllForUserAsync(UserIdUnion userUnion, CancellationToken ct = default) {
         InfiniLoreDbContext dbContext = await unitOfWork.GetDbContextAsync(ct);
 
         int recordsAffected = await dbContext.JwtRefreshTokens
-            .Where(m => m.OwnerId == userUnion.AsUserId)
+            .Where(m => m.OwnerId == userUnion.ToGuid())
             .ExecuteDeleteAsync(cancellationToken: ct);
 
         if (recordsAffected <= 0) return "No models were deleted";

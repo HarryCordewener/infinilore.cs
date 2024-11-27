@@ -34,8 +34,8 @@ public static class LoreScopeQueryTestData {
         return data;
     }
 
-    public static TheoryData<UserUnion, LoreScopeModel> GetUserModels() {
-        var data = new TheoryData<UserUnion, LoreScopeModel>();
+    public static TheoryData<UserIdUnion, LoreScopeModel> GetUserModels() {
+        var data = new TheoryData<UserIdUnion, LoreScopeModel>();
 
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 

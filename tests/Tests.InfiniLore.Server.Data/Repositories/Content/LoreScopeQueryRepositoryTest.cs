@@ -40,7 +40,7 @@ public class LoreScopeQueryRepositoryTest(DatabaseFixture fixture) : UserContent
 
     [Theory]
     [MemberData(nameof(LoreScopeQueryTestData.GetUserModels), MemberType = typeof(LoreScopeQueryTestData))]
-    public override Task TestCanGetByUserAsync(UserUnion userUnion, LoreScopeModel model) => CanGetByUserAsync(userUnion, model);
+    public override Task TestCanGetByUserAsync(UserIdUnion userUnion, LoreScopeModel model) => CanGetByUserAsync(userUnion, model);
 
     [Theory]
     [MemberData(nameof(LoreScopeQueryTestData.GetMultipleModels), MemberType = typeof(LoreScopeQueryTestData))]
