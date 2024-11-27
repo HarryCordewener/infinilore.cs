@@ -5,7 +5,7 @@ using AterraEngine.Unions;
 using FastEndpoints;
 using InfiniLore.Server.Contracts.Data;
 using InfiniLore.Server.Contracts.Data.Repositories;
-using InfiniLore.Server.Contracts.Services.Authorization;
+using InfiniLore.Server.Contracts.Services.Auth.Authorization;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models;
@@ -18,22 +18,22 @@ namespace InfiniLore.Server.Services.Authorization;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [RegisterService<IUserContentAuthorizationService>(LifeTime.Scoped)]
-public class UserContentAuthorizationService(IUserRepository userRepository, IUserContentAccessRepository userContentAccessRepository) : IUserContentAuthorizationService {
+public class UserContentAuthorizationService(IUserRepository userRepository, IUserContentAccessRepository userContentAccessRepository, IHttpContextAccessor contextAccessor) : IUserContentAuthorizationService {
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
-    public Task<bool> ValidateAsync<T>(HttpContext accessor, T model, AccessKind accessKind, CancellationToken ct = default) where T : UserContent 
-        => ValidateAsync(accessor, model.Id, accessKind, ct);
+    public ValueTask<bool> ValidateAsync<T>(T model, AccessKind accessKind, CancellationToken ct = default) where T : UserContent 
+        => ValidateAsync(model.Id, accessKind, ct);
     
-    public async Task<bool> ValidateAsync(HttpContext accessor, Guid contentId, AccessKind accessKind, CancellationToken ct = default) {
-        if (!(await GetUserFromClaimsPrincipalAsync(accessor, ct)).TryGetAsT0(out InfiniLoreUser accessorUser)) return false;
+    public async ValueTask<bool> ValidateAsync(Guid contentId, AccessKind accessKind, CancellationToken ct = default) {
+        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsT0(out InfiniLoreUser accessorUser)) return false;
         
         return await userContentAccessRepository.UserHasKindAsync(contentId, accessorUser.Id, accessKind, ct);
     }
     
-    public async Task<bool> ValidateIsOwnerAsync(HttpContext accessor, UserIdUnion ownerId, CancellationToken ct = default) {
-        if (!(await GetUserFromClaimsPrincipalAsync(accessor, ct)).TryGetAsT0(out InfiniLoreUser accessorUser)) return false;
+    public async ValueTask<bool> ValidateIsOwnerAsync(UserIdUnion ownerId, CancellationToken ct = default) {
+        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsT0(out InfiniLoreUser accessorUser)) return false;
         
         return accessorUser.Id == ownerId.AsUserId;
     }
@@ -41,7 +41,9 @@ public class UserContentAuthorizationService(IUserRepository userRepository, IUs
     // -----------------------------------------------------------------------------------------------------------------
     // Helper Methods
     // -----------------------------------------------------------------------------------------------------------------
-    private async Task<Union<InfiniLoreUser, None, Failure<string>>> GetUserFromClaimsPrincipalAsync(HttpContext accessor, CancellationToken ct) {
+    private async ValueTask<Union<InfiniLoreUser, None, Failure<string>>> GetUserFromClaimsPrincipalAsync(CancellationToken ct) {
+        if (contextAccessor.HttpContext is not {} accessor) return new Failure<string>("No HttpContext found in IHttpContextAccessor");
+        
         QueryResult<InfiniLoreUser> accessorResult = await userRepository.TryGetByClaimsPrincipalAsync(accessor.User, ct);
         if (accessorResult.IsNone) return accessorResult.AsNone;
         if (accessorResult.IsFailure) return accessorResult.AsFailure;

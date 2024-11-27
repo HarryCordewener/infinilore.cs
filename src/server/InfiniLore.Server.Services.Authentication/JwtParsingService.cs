@@ -79,5 +79,6 @@ public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger log
             return false;
         }
     }
+    
     public bool TryGetRoles([NotNullWhen(true)] out string[]? permissions) => TryGetPayloadData("roles", out permissions);
 }

@@ -2,7 +2,6 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AspNetCore.Swagger.Themes;
-using CodeOfChaos.Extensions.AspNetCore;
 using FastEndpoints;
 using FastEndpoints.Security;
 using FastEndpoints.Swagger;
@@ -17,7 +16,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Security.Claims;
 using Testcontainers.MsSql;
 
@@ -120,7 +118,6 @@ public static class Program {
         #region API
         builder.Services
             .AddFastEndpoints(options => {
-                // options.SourceGeneratorDiscoveredTypes = DiscoveredTypes.All;
                 options.Assemblies = [
                     typeof(API.IAssemblyEntry).Assembly
                 ];
@@ -176,8 +173,11 @@ public static class Program {
         app.UseDefaultExceptionHandler()
             .UseFastEndpoints(ctx => {
                 ctx.Endpoints.RoutePrefix = "api/v1";
-                ctx.Binding.ReflectionCache.AddFromInfiniLoreServerAPI();
-
+                ctx.Binding.ReflectionCache
+                    .AddFromInfiniLoreServerAPI()
+                    .AddFromInfiniLoreServerDataRepositories()
+                    .AddFromInfiniLoreServerDataSqlServer()
+                    .AddFromInfiniLoreServerServicesAuthorization();
                 ctx.Errors.UseProblemDetails();
             });
 

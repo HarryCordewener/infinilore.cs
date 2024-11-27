@@ -10,8 +10,8 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
 
         <PackageReference Include="AterraEngine.Unions" Version="1.2.0"/>
-        <PackageReference Include="FastEndpoints" Version="5.31.0.17-beta" />
-        <PackageReference Include="FastEndpoints.Generator" Version="5.31.0.17-beta">
+        <PackageReference Include="FastEndpoints" Version="5.31.0.18-beta" />
+        <PackageReference Include="FastEndpoints.Generator" Version="5.31.0.18-beta">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

@@ -3,15 +3,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Server.Contracts.Types.Unions;
 using InfiniLore.Server.Data.Models;
-using Microsoft.AspNetCore.Http;
 
-namespace InfiniLore.Server.Contracts.Services.Authorization;
+namespace InfiniLore.Server.Contracts.Services.Auth.Authorization;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public interface IUserContentAuthorizationService {
-    Task<bool> ValidateAsync<T>(HttpContext accessor, T model, AccessKind accessKind, CancellationToken ct = default) where T : UserContent ;
-    Task<bool> ValidateAsync(HttpContext accessor, Guid contentId, AccessKind accessKind, CancellationToken ct = default);
-    Task<bool> ValidateIsOwnerAsync(HttpContext accessor, UserIdUnion ownerId, CancellationToken ct = default);
+    ValueTask<bool> ValidateAsync<T>(T model, AccessKind accessKind, CancellationToken ct = default) where T : UserContent ;
+    ValueTask<bool> ValidateAsync(Guid contentId, AccessKind accessKind, CancellationToken ct = default);
+    ValueTask<bool> ValidateIsOwnerAsync(UserIdUnion ownerId, CancellationToken ct = default);
 }

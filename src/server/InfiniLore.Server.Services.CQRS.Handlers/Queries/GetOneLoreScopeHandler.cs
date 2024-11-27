@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
 using InfiniLore.Server.Contracts.Data.Repositories;
-using InfiniLore.Server.Contracts.Services.Authorization;
+using InfiniLore.Server.Contracts.Services.Auth.Authorization;
 using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Data.Models;
 using InfiniLore.Server.Data.Models.Content.UserData;
@@ -20,7 +20,7 @@ public class GetOneLoreScopeHandler(ILoreScopeRepository loreScopeRepository, IL
 
     public async Task<SuccessOrFailure<LoreScopeModel, string>> Handle(GetOneLorescopeQuery request, CancellationToken ct) {
         try {
-            if (!await authService.ValidateAsync(request.HttpContext, request.LorescopeId, AccessKind.Read, ct)) return "Access Denied";
+            if (!await authService.ValidateAsync(request.LorescopeId, AccessKind.Read, ct)) return "Access Denied";
             
             // After everything is validated, we can finally store to the db
             QueryResultMany<LoreScopeModel> result = await loreScopeRepository.TryGetByUserIdAndLorescopeId(request.UserIdUnion, request.LorescopeId, ct);

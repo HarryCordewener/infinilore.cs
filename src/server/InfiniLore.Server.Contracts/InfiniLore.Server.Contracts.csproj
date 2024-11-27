@@ -10,7 +10,7 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
         <PackageReference Include="AterraEngine.Unions" Version="1.2.0" />
         <PackageReference Include="AterraEngine.Unions.Generators" Version="1.2.0" />
-        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.17-beta" />
+        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.18-beta" />
         <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1"/>
