@@ -8,41 +8,58 @@ using FastEndpoints.Security;
 using FastEndpoints.Swagger;
 using InfiniLore.Server.API;
 using InfiniLore.Server.Components;
-using InfiniLore.Server.Contracts.Repositories;
-using InfiniLore.Server.Data;
-using InfiniLore.Server.Data.Models.Account;
-using InfiniLore.Server.Data.Repositories.UserData;
-using InfiniLore.Server.Services;
+using InfiniLore.Server.Data.Models.Content.Account;
+using InfiniLore.Server.Data.Repositories;
+using InfiniLore.Server.Data.SqlServer;
+using InfiniLore.Server.Services.Authentication;
+using InfiniLore.Server.Services.Authorization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Testcontainers.MsSql;
+using IAssemblyEntry=InfiniLore.Server.API.IAssemblyEntry;
 
 namespace InfiniLore.Server;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public static class Program {
-    public static async Task Main(string[] args) {
+    public async static Task Main(string[] args) {
         // -------------------------------------------------------------------------------------------------------------
         // Builder
         // -------------------------------------------------------------------------------------------------------------
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         builder.OverrideLoggingAsSeriLog();
 
-        // TODO: Add Kestrel SLL
-        //  This will take some tweaking to get working
-
         #region Database
-        builder.Services.AddDbContextFactory<InfiniLoreDbContext>();
+        MsSqlContainer container = new MsSqlBuilder()
+            .WithImage("mcr.microsoft.com/mssql/server:2022-CU10-ubuntu-22.04")
+            .WithPassword("AnnaIsTrans4Ever!")
+            .WithName("infinilore-production-db")
+            .WithReuse(true)
+            .Build();
+
+        await container.StartAsync();
+
+        Console.WriteLine($"Database connection string {container.GetConnectionString()}");
+
+        builder.Services.AddDbContextFactory<InfiniLoreDbContext>(options =>
+                options.UseSqlServer(container.GetConnectionString())
+            // .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning))
+        );
+
+        builder.Services.RegisterServicesFromInfiniLoreServerDataSqlServer();// Registers the IDbUnitOfWork<T>
         #endregion
 
         #region Authentication
-        // Register JWT Authentication
-        builder.Services.AddAuthenticationJwtBearer(signingOptions: options => {
+        builder.Services.AddAuthenticationJwtBearer(
+            signingOptions: options => {
                 options.SigningKey = builder.Configuration["JWT:Key"];
-            }
-            , bearerOptions: bearerOptions => {
+            },
+            bearerOptions: bearerOptions => {
                 bearerOptions.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
                 bearerOptions.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
 
@@ -53,35 +70,38 @@ public static class Program {
             });
 
         builder.Services.AddAuthentication(o => {
-                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }
-        );
+            o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        });
 
-        // TODO Add google oauth login
-
-        // Register Identity
         builder.Services.AddIdentityCore<InfiniLoreUser>(options => {
                 options.SignIn.RequireConfirmedAccount = false;
             })
-            .AddRoles<IdentityRole>()// Resolves an issue, thanks to : https://stackoverflow.com/a/68603582/9133374
+            .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<InfiniLoreDbContext>()
             .AddSignInManager();
 
-        // Override cookie auth scheme to return 401/403 instead of redirecting on API calls
         builder.Services.ConfigureApplicationCookie(
             cookieOptions => {
-                cookieOptions.Events.OnRedirectToLogin = context => {
-                    if (context is { Request.Path.Value: "/api", Response.StatusCode: 200 }) {
+                // ReSharper disable once RedundantLambdaParameterType
+                cookieOptions.Events.OnRedirectToLogin = (RedirectContext<CookieAuthenticationOptions> context) => {
+                    if (IsApiRequest(context)) {
                         context.Response.StatusCode = 401;
+                    }
+                    else {
+                        context.Response.Redirect(context.RedirectUri);
                     }
 
                     return Task.CompletedTask;
                 };
 
-                cookieOptions.Events.OnRedirectToAccessDenied = context => {
-                    if (context is { Request.Path.Value: "/api", Response.StatusCode: 200 }) {
+                // ReSharper disable once RedundantLambdaParameterType
+                cookieOptions.Events.OnRedirectToAccessDenied = (RedirectContext<CookieAuthenticationOptions> context) => {
+                    if (IsApiRequest(context)) {
                         context.Response.StatusCode = 403;
+                    }
+                    else {
+                        context.Response.Redirect(context.RedirectUri);
                     }
 
                     return Task.CompletedTask;
@@ -103,13 +123,13 @@ public static class Program {
         builder.Services
             .AddFastEndpoints(options => {
                 options.Assemblies = [
-                    typeof(API.IAssemblyEntry).Assembly
+                    typeof(IAssemblyEntry).Assembly
                 ];
             })
             .SwaggerDocument(options => {
                 options.DocumentSettings = settings => {
                     settings.Version = "v1";
-                    settings.Title = "InfiniLore API v1";
+                    settings.Title = "InfiniLore API";
                     settings.Description = "An ASP.NET Core Web API for managing InfiniLore";
                 };
             });
@@ -117,15 +137,21 @@ public static class Program {
         builder.Services.AddIdentityApiEndpoints<InfiniLoreUser>();
         #endregion
 
-        builder.Services.RegisterServicesFromInfiniLoreServerAPI();
-        builder.Services.RegisterServicesFromInfiniLoreServerData();
-        builder.Services.AddScoped(typeof(IAuditLogRepository<>), typeof(AuditLogRepository<>));
-        builder.Services.RegisterServicesFromInfiniLoreServerServices();
+        #region MediatR
+        builder.Services.AddMediatR(cfg => {
+            cfg.RegisterServicesFromAssemblyContaining<Services.CQRS.Handlers.IAssemblyEntry>();
+        });
+        #endregion
+
+        builder.Services.RegisterServicesFromInfiniLoreServerDataRepositories();
+        builder.Services.RegisterServicesFromInfiniLoreServerServicesAuthorization();
+        builder.Services.RegisterServicesFromInfiniLoreServerServicesAuthentication();
 
         // -------------------------------------------------------------------------------------------------------------
         // App
         // -------------------------------------------------------------------------------------------------------------
         WebApplication app = builder.Build();
+        await MigrateDatabaseAsync(app);
 
         if (app.Environment.IsDevelopment()) {
             app.UseWebAssemblyDebugging();
@@ -137,6 +163,7 @@ public static class Program {
 
         app.UseHttpsRedirection();
 
+        app.MapStaticAssets();
         app.UseStaticFiles();
         app.UseAntiforgery();
 
@@ -148,35 +175,30 @@ public static class Program {
             .AddInteractiveWebAssemblyRenderMode()
             .AddAdditionalAssemblies(typeof(WasmClient.IAssemblyEntry).Assembly);
 
-        app.UseFastEndpoints(ctx => {
-            ctx.Endpoints.RoutePrefix = "api";
-        });
+        app.UseDefaultExceptionHandler()
+            .UseFastEndpoints(ctx => {
+                ctx.Endpoints.RoutePrefix = "api/v1";
+                ctx.Binding.ReflectionCache.AddFromInfiniLoreServerAPI();
+                ctx.Errors.UseProblemDetails();
+            });
 
         app.UseOpenApi();
         app.UseSwaggerUI(ModernStyle.Dark, setupAction: ctx => {
-            ctx.SwaggerEndpoint("/swagger/v1/swagger.json", "InfiniLore API v1");
+            ctx.SwaggerEndpoint("v1/swagger.json", "InfiniLore API v1");
             ctx.RoutePrefix = "swagger";
         });
 
-        // TODO Check if applying the migrations is actually correct here
-        await using (InfiniLoreDbContext db = await app.Services.GetRequiredService<IDbContextFactory<InfiniLoreDbContext>>().CreateDbContextAsync()) {
-            await db.Database.MigrateAsync();
-            await db.SaveChangesAsync();
-        }
-        
-        // using (IServiceScope scope = app.Services.CreateScope()) {
-        //     IServiceProvider services = scope.ServiceProvider;
-        //     
-        //     using var userManager = services.GetRequiredService<UserManager<InfiniLoreUser>>();
-        //     using var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-        //
-        //     InfiniLoreUser? user = await userManager.FindByIdAsync("9d6bda72-43d3-40cd-a101-e535dcb4104a");
-        //     if (user is null) return;
-        //
-        //     IdentityResult result = await userManager.AddToRoleAsync(user, "admin");
-        //     if (!result.Succeeded) return;
-        // }
-
         await app.RunAsync();
     }
+
+    private async static ValueTask MigrateDatabaseAsync(WebApplication app) {
+        // Create a localised scope so we can get the DbContextFactory correctly.
+        await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
+        await using InfiniLoreDbContext db = await app.Services.GetRequiredService<IDbContextFactory<InfiniLoreDbContext>>().CreateDbContextAsync();
+
+        await db.Database.MigrateAsync();
+        await db.SaveChangesAsync();
+    }
+
+    private static bool IsApiRequest(RedirectContext<CookieAuthenticationOptions> context) => context is { Request.Path.Value: "/api", Response.StatusCode: 200 };
 }

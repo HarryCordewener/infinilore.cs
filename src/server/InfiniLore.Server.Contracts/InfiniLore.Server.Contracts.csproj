@@ -1,18 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEndpoints.Attributes" Version="5.30.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8"/>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="AterraEngine.Unions" Version="2.1.0"/>
+        <PackageReference Include="AterraEngine.Unions.Generators" Version="2.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.18-beta"/>
+        <PackageReference Include="MediatR.Contracts" Version="2.0.1"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\lib\InfiniLoreLib\InfiniLoreLib.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.Data.Models\InfiniLore.Server.Data.Models.csproj"/>
     </ItemGroup>
 

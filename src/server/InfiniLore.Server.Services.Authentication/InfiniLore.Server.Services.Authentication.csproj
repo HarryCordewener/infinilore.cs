@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="AterraEngine.DependencyInjection" Version="1.1.0"/>
+        <PackageReference Include="AterraEngine.DependencyInjection.Generators" Version="1.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="FastEndpoints.Attributes" Version="5.31.0.18-beta"/>
+        <PackageReference Include="FastEndpoints.Security" Version="5.31.0.18-beta"/>
+
+        <PackageReference Include="Serilog" Version="4.1.0"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\InfiniLore.Server.Contracts\InfiniLore.Server.Contracts.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Server.Data.SqlServer\InfiniLore.Server.Data.SqlServer.csproj"/>
+    </ItemGroup>
+
+</Project>

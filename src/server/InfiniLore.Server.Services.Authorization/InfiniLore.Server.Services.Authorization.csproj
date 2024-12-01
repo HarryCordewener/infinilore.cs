@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="AterraEngine.DependencyInjection" Version="1.1.0"/>
+        <PackageReference Include="AterraEngine.DependencyInjection.Generators" Version="1.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="AterraEngine.Unions" Version="2.1.0"/>
+
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\InfiniLore.Server.Contracts\InfiniLore.Server.Contracts.csproj"/>
+    </ItemGroup>
+
+</Project>

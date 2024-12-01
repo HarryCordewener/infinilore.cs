@@ -8,67 +8,78 @@ namespace InfiniLore.Server.Contracts.Data;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 /// <summary>
-/// Implementation of the unit of work pattern specific to InfiniLore database context.
+///     Implementation of the unit of work pattern specific to InfiniLore database context.
 /// </summary>
-public interface IDbUnitOfWork<out T> : IDisposable where T : DbContext {
-    /// <summary>
-    /// Provides access to the underlying database context in the InfiniLore system.
-    /// This context is primarily used to interact with database models such as LoreScopes, Multiverses, and Universes.
-    /// </summary>
-    T Db { get; }
-
+public interface IDbUnitOfWork<T> : IAsyncDisposable, IDisposable where T : DbContext {
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // ----------------------------------------------------------------------------------------------------------------
 
     /// <summary>
-    /// Asynchronously saves all changes made in this context to the database.
+    ///     When a transaction is started, will commit the transaction, else will save directly to the database.
     /// </summary>
     /// <param name="ct">A CancellationToken to observe while waiting for the task to complete.</param>
-    /// <returns>A task that represents the asynchronous save operation. The task result contains the number of state entries written to the database.</returns>
-    Task<int> SaveChangesAsync(CancellationToken ct = default);
+    /// <returns>
+    ///     A task that represents the asynchronous save operation. The task result contains the number of state entries
+    ///     written to the database.
+    /// </returns>
+    Task CommitAsync(CancellationToken ct = default);
 
     /// <summary>
-    /// Begins a new database transaction asynchronously.
+    ///     Attempts to save all changes made in this context to the database.
+    /// </summary>
+    /// <param name="ct">A CancellationToken to observe while waiting for the task to complete.</param>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains a boolean value indicating whether
+    ///     the commit was successful.
+    /// </returns>
+    Task<bool> TryCommitAsync(CancellationToken ct = default);
+
+    /// <summary>
+    ///     Begins a new database transaction asynchronously.
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task BeginTransactionAsync(CancellationToken ct = default);
 
     /// <summary>
-    /// Asynchronously commits all changes made in the current transaction.
-    /// Silently fails if no transactions has been started yet.
+    ///     Asynchronously rolls back all changes made in the current transaction.
+    ///     Silently fails if no transactions has been started yet.
     /// </summary>
     /// <param name="ct">A CancellationToken to observe while waiting for the task to complete.</param>
-    Task CommitTransactionAsync(CancellationToken ct = default);
-
+    Task RollbackAsync(CancellationToken ct = default);
 
     /// <summary>
-    /// Attempts to commit the current database transaction asynchronously.
+    ///     Attempts to rollback the current database transaction. If no transaction is active, returns false.
     /// </summary>
     /// <returns>
-    /// A task that represents the asynchronous operation. The task result is a boolean indicating whether the transaction was successfully committed.
+    ///     Returns a boolean indicating whether the rollback was successful.
+    ///     Returns true if the rollback occurred, otherwise returns false.
     /// </returns>
-    Task<bool> TryCommitTransactionAsync(CancellationToken ct = default);
+    Task<bool> TryRollbackAsync(CancellationToken ct = default);
 
     /// <summary>
-    /// Asynchronously rolls back all changes made in the current transaction.
-    /// Silently fails if no transactions has been started yet.
+    ///     Asynchronously attempts to roll back the transaction to a specified savepoint.
     /// </summary>
+    /// <param name="name">The name of the savepoint to roll back to.</param>
     /// <param name="ct">A CancellationToken to observe while waiting for the task to complete.</param>
-    Task RollbackTransactionAsync(CancellationToken ct = default);
-
-    /// <summary>
-    /// Attempts to rollback the current database transaction. If no transaction is active, returns false.
-    /// </summary>
     /// <returns>
-    /// Returns a boolean indicating whether the rollback was successful.
-    /// Returns true if the rollback occurred, otherwise returns false.
+    ///     A task that represents the asynchronous rollback operation. The task result contains a boolean value
+    ///     indicating whether the rollback to the savepoint was successful.
     /// </returns>
-    Task<bool> TryRollbackTransactionAsync(CancellationToken ct = default);
+    Task<bool> TryRollbackToSavepointAsync(string name, CancellationToken ct = default);
 
     /// <summary>
-    /// Retrieves the current InfiniLoreDbContext instance.
+    ///     Asynchronously creates a savepoint in the current database transaction.
     /// </summary>
-    /// <returns>The InfiniLoreDbContext instance.</returns>
-    T GetDbContext();
+    /// <param name="name">The name to assign to the savepoint.</param>
+    /// <param name="ct">A CancellationToken to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    Task CreateSavepointAsync(string name, CancellationToken ct = default);
+
+    /// <summary>
+    ///     Asynchronously retrieves the current InfiniLoreDbContext instance.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the InfiniLoreDbContext instance.</returns>
+    /// <remarks>Not using a getter property to ensure proper usage of CancellationToken</remarks>
+    Task<T> GetDbContextAsync(CancellationToken ct = default);
 }
