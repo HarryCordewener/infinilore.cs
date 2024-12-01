@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+using InfiniLore.Database.Models.Content.UserData;
 using InfiniLore.Server.Contracts.Services.CQRS;
-using InfiniLore.Server.Data.Models.Content.UserData;
 using Microsoft.AspNetCore.Http;
 
 // ReSharper disable once CheckNamespace

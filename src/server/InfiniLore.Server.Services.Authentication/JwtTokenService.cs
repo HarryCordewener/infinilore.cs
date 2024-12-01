@@ -4,13 +4,13 @@
 using AterraEngine.DependencyInjection;
 using AterraEngine.Unions;
 using FastEndpoints.Security;
-using InfiniLore.Server.Contracts.Data;
-using InfiniLore.Server.Contracts.Data.Repositories;
+using InfiniLore.Database.Models.Content.Account;
+using InfiniLore.Database.MsSqlServer;
+using InfiniLore.Server.Contracts.Database;
+using InfiniLore.Server.Contracts.Database.Repositories.Content.Account;
 using InfiniLore.Server.Contracts.Services.Auth.Authentication;
 using InfiniLore.Server.Contracts.Types;
 using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Data.Models.Content.Account;
-using InfiniLore.Server.Data.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +24,7 @@ namespace InfiniLore.Server.Services.Authentication;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [InjectableService<IJwtTokenService>(ServiceLifetime.Scoped)]
-public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, IConfiguration configuration, IJwtRefreshTokenRepository repository, ILogger logger, UserManager<InfiniLoreUser> userManager) : IJwtTokenService {
+public class JwtTokenService(IDbUnitOfWork<MsSqlDbContext> unitOfWork, IConfiguration configuration, IJwtRefreshTokenRepository repository, ILogger logger, UserManager<InfiniLoreUser> userManager) : IJwtTokenService {
     public async ValueTask<JwtResult> GenerateTokensAsync(InfiniLoreUser user, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
         try {
             string? key = configuration["Jwt:Key"];
@@ -70,7 +70,7 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
         if (oldToken.ExpiresAt < DateTime.UtcNow) return "Refresh token has expired";
 
-        await repository.TryPermanentRemoveAsync(oldToken, ct);
+        await repository.TryRemoveAsync(oldToken, ct);
 
         return await GenerateTokensAsync(
             oldToken.Owner,
@@ -81,24 +81,22 @@ public class JwtTokenService(IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, ICon
         );
     }
 
-    public async ValueTask<BoolOrFailure> RevokeTokensAsync(InfiniLoreUser user, Guid refreshToken, CancellationToken ct = default) {
+    public async ValueTask<bool> RevokeTokensAsync(InfiniLoreUser user, Guid refreshToken, CancellationToken ct = default) {
         RepoResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
-        if (getResult.IsFailure) return getResult.AsFailure;
+        if (getResult.IsFailure) return false;
 
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
-        if (oldToken.Owner.Id != user.Id) return "Refresh token does not belong to user";
+        if (oldToken.Owner.Id != user.Id) return false;
 
-        RepoResult deleteResult = await repository.TryPermanentRemoveAsync(oldToken, ct);
-        if (!deleteResult.IsSuccess) return deleteResult.FailureString;
+        RepoResult deleteResult = await repository.TryRemoveAsync(oldToken, ct);
+        return deleteResult.IsSuccess;
 
-        return true;
     }
 
-    public async ValueTask<BoolOrFailure> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default) {
+    public async ValueTask<bool> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default) {
         RepoResult deleteResult = await repository.TryPermanentRemoveAllForUserAsync(user, ct);
-        if (!deleteResult.IsSuccess) return deleteResult.AsFailure;
+        return deleteResult.IsSuccess;
 
-        return true;
     }
 
     private static string HashToken(Guid token) {

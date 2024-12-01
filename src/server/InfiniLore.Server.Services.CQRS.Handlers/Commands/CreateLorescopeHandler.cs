@@ -2,12 +2,12 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
-using InfiniLore.Server.Contracts.Data;
-using InfiniLore.Server.Contracts.Data.Repositories;
+using InfiniLore.Database.Models.Content.UserData;
+using InfiniLore.Database.MsSqlServer;
+using InfiniLore.Server.Contracts.Database;
+using InfiniLore.Server.Contracts.Database.Repositories.Content.Data.User;
 using InfiniLore.Server.Contracts.Services.Auth.Authorization;
 using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Data.Models.Content.UserData;
-using InfiniLore.Server.Data.SqlServer;
 using InfiniLore.Server.Services.CQRS.Requests.Commands;
 using MediatR;
 using Serilog;
@@ -16,7 +16,7 @@ namespace InfiniLore.Server.Services.CQRS.Handlers.Commands;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class CreateLorescopeHandler(ILoreScopeRepository loreScopeRepository, ILogger logger, IDbUnitOfWork<InfiniLoreDbContext> unitOfWork, IUserContentAuthorizationService authService) : IRequestHandler<CreateLorescopeCommand, SuccessOrFailure<LoreScopeModel, string>> {
+public class CreateLorescopeHandler(ILoreScopeRepository loreScopeRepository, ILogger logger, IDbUnitOfWork<MsSqlDbContext> unitOfWork, IUserContentAuthorizationService authService) : IRequestHandler<CreateLorescopeCommand, SuccessOrFailure<LoreScopeModel, string>> {
     public async Task<SuccessOrFailure<LoreScopeModel, string>> Handle(CreateLorescopeCommand request, CancellationToken ct) {
         try {
             if (!await authService.ValidateIsOwnerAsync(request.Lorescope.OwnerId, ct)) return "Access Denied";

@@ -2,7 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
-using InfiniLore.Server.Data.Models.Content.Account;
+using InfiniLore.Database.Models.Content.Account;
 
 namespace InfiniLore.Server.Contracts.Types.Unions;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -10,10 +10,11 @@ namespace InfiniLore.Server.Contracts.Types.Unions;
 // ---------------------------------------------------------------------------------------------------------------------
 public readonly partial struct UserIdUnion() : IUnion<InfiniLoreUser, Guid, string> {
     public Guid ToGuid() {
-        if (IsInfiniLoreUser) return AsInfiniLoreUser.Id;
-        if (IsGuid) return AsGuid;
-        if (IsString) return Guid.Parse(AsString);
-
-        throw new ArgumentException("Union does not contain a value");
+        switch (this) {
+            case { IsInfiniLoreUser: true, AsInfiniLoreUser.Id: var guid }: return guid;
+            case { IsGuid: true, AsGuid: var guid }: return guid;
+            case { IsString : true, AsString: var stringValue }: return Guid.Parse(stringValue);
+            default: throw new ArgumentException("Union does not contain a value");
+        }
     }
 }

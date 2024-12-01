@@ -31,8 +31,8 @@
     <ItemGroup>
         <ProjectReference Include="..\..\client\InfiniLore.WasmClient\InfiniLore.WasmClient.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.API\InfiniLore.Server.API.csproj"/>
-        <ProjectReference Include="..\InfiniLore.Server.Data.Repositories\InfiniLore.Server.Data.Repositories.csproj"/>
-        <ProjectReference Include="..\InfiniLore.Server.Data.SqlServer\InfiniLore.Server.Data.SqlServer.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Database.Repositories\InfiniLore.Database.Repositories.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Database.MsSqlServer\InfiniLore.Database.MsSqlServer.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.Services.Authentication\InfiniLore.Server.Services.Authentication.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.Services.Authorization\InfiniLore.Server.Services.Authorization.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.Services.CQRS.Handlers\InfiniLore.Server.Services.CQRS.Handlers.csproj"/>

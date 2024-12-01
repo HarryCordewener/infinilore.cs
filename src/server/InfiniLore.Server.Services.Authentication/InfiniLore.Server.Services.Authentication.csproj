@@ -22,7 +22,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\InfiniLore.Server.Contracts\InfiniLore.Server.Contracts.csproj"/>
-        <ProjectReference Include="..\InfiniLore.Server.Data.SqlServer\InfiniLore.Server.Data.SqlServer.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Database.MsSqlServer\InfiniLore.Database.MsSqlServer.csproj"/>
     </ItemGroup>
 
 </Project>

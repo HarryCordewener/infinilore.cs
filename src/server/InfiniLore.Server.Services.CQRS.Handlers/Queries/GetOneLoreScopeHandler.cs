@@ -2,11 +2,11 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
-using InfiniLore.Server.Contracts.Data.Repositories;
+using InfiniLore.Database.Models;
+using InfiniLore.Database.Models.Content.UserData;
+using InfiniLore.Server.Contracts.Database.Repositories.Content.Data.User;
 using InfiniLore.Server.Contracts.Services.Auth.Authorization;
 using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Data.Models;
-using InfiniLore.Server.Data.Models.Content.UserData;
 using InfiniLore.Server.Services.CQRS.Requests.Queries;
 using MediatR;
 using Serilog;

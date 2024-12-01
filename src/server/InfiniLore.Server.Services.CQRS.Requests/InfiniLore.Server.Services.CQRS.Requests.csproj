@@ -15,7 +15,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\InfiniLore.Server.Contracts\InfiniLore.Server.Contracts.csproj"/>
-        <ProjectReference Include="..\InfiniLore.Server.Data.Models\InfiniLore.Server.Data.Models.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Database.Models\InfiniLore.Database.Models.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -24,11 +24,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\InfiniLore.Server.Data.SqlServer\InfiniLore.Server.Data.SqlServer.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Database.MsSqlServer\InfiniLore.Database.MsSqlServer.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.Services.CQRS.Requests\InfiniLore.Server.Services.CQRS.Requests.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Controllers\Account\"/>
         <Folder Include="Controllers\Admin\"/>
         <Folder Include="Controllers\Data\Discovery\"/>
         <Folder Include="Controllers\Data\System\"/>

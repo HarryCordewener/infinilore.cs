@@ -20,7 +20,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\InfiniLore.Server.Data.Models\InfiniLore.Server.Data.Models.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Database.Models\InfiniLore.Database.Models.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Database\Repositories\Content\Data\System\"/>
     </ItemGroup>
 
 </Project>

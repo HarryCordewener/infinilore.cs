@@ -3,12 +3,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.DependencyInjection;
 using AterraEngine.Unions;
-using InfiniLore.Server.Contracts.Data;
-using InfiniLore.Server.Contracts.Data.Repositories;
+using InfiniLore.Database.Models;
+using InfiniLore.Database.Models.Content.Account;
+using InfiniLore.Server.Contracts.Database.Repositories;
+using InfiniLore.Server.Contracts.Database.Repositories.Content.Account;
 using InfiniLore.Server.Contracts.Services.Auth.Authorization;
 using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Data.Models;
-using InfiniLore.Server.Data.Models.Content.Account;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
