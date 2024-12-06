@@ -36,6 +36,7 @@
         <ProjectReference Include="..\InfiniLore.Server.Services.Authentication\InfiniLore.Server.Services.Authentication.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.Services.Authorization\InfiniLore.Server.Services.Authorization.csproj"/>
         <ProjectReference Include="..\InfiniLore.Server.Services.CQRS.Handlers\InfiniLore.Server.Services.CQRS.Handlers.csproj"/>
+        <ProjectReference Include="..\InfiniLore.Server.Services\InfiniLore.Server.Services.csproj" />
     </ItemGroup>
 
 </Project>

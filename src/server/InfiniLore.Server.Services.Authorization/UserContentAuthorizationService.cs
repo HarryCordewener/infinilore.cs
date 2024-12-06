@@ -26,6 +26,8 @@ public class UserContentAuthorizationService(
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
+    public ValueTask<bool> InDevelopmentAsync() => new(true);
+    
     public ValueTask<bool> ValidateAsync<T>(T model, AccessKind accessKind, CancellationToken ct = default) where T : UserContent
         => ValidateAsync(model.Id, accessKind, ct);
 

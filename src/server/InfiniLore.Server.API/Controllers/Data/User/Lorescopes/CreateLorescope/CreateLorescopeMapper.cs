@@ -3,15 +3,16 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Database.Models.Content.Account;
 using InfiniLore.Database.Models.Content.UserData;
+using InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope;
 using InfiniLore.Server.Contracts.Database.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 
-namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLoreScope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [UsedImplicitly]
-public class LorescopeResponseMapper : Mapper<LorescopeForm, LorescopeResponse, LorescopeModel> {
+public class CreateLorescopeMapper : Mapper<CreateLorescopeRequest, LorescopeResponse, LorescopeModel> {
     public override LorescopeResponse FromEntity(LorescopeModel ls) => new(
         ls.Id,
         ls.OwnerId,
@@ -20,7 +21,8 @@ public class LorescopeResponseMapper : Mapper<LorescopeForm, LorescopeResponse, 
         ls.Multiverses.Select(selector: m => m.Id).ToArray()
     );
 
-    public async override Task<LorescopeModel> ToEntityAsync(LorescopeForm request, CancellationToken ct = new()) {
+    public async override Task<LorescopeModel> ToEntityAsync(CreateLorescopeRequest request, CancellationToken ct = new()) {
+        // TODO Find a way to fit this into CQRS pattern
         var userRepository = Resolve<IUserRepository>();
         RepoResult<InfiniLoreUser> result = await userRepository.TryGetByIdAsync(request.UserId, ct);
 
@@ -31,7 +33,7 @@ public class LorescopeResponseMapper : Mapper<LorescopeForm, LorescopeResponse, 
         return new LorescopeModel {
             Owner = user,
             Name = request.Name,
-            Description = request.Description
+            Description = request.Description 
         };
     }
 }

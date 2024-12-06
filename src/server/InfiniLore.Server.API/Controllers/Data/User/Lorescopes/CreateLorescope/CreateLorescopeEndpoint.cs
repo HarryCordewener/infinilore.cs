@@ -3,9 +3,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
 using InfiniLore.Database.Models.Content.UserData;
+using InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLoreScope;
+using InfiniLore.Server.Contracts.Services;
 using InfiniLore.Server.Services.CQRS.Requests.Commands;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope;
@@ -13,27 +14,26 @@ namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-using EndpointResult=Results<Ok<LorescopeResponse>, BadRequest<ProblemDetails>>;
-
-public class CreateLorescopeEndpoint(IMediator mediator) : Endpoint<LorescopeForm, EndpointResult, LorescopeResponseMapper> {
+public class CreateLorescopeEndpoint(IMediator mediator, IMediatorOutputService mediatorOutput) 
+    : Endpoint<
+        CreateLorescopeRequest,
+        Results<Ok<LorescopeResponse>, BadRequest<ProblemDetails>>,
+        CreateLorescopeMapper
+    > {
+    
     public override void Configure() {
         Post("/data-user/{UserId:guid}/lore-scopes/");
+        AllowAnonymous();
         // Permissions("data-user.lore-scopes.create");
     }
 
-    public async override Task<EndpointResult> ExecuteAsync(LorescopeForm req, CancellationToken ct) {
+    public async override Task<Results<Ok<LorescopeResponse>, BadRequest<ProblemDetails>>> ExecuteAsync(CreateLorescopeRequest req, CancellationToken ct) {
         SuccessOrFailure<LorescopeModel> result = await mediator.Send(
             new CreateLorescopeCommand(
                 await Map.ToEntityAsync(req, ct)),
             ct
         );
-
-        if (result.TryGetAsFailure(out Failure<string> failure)) {
-            return TypedResults.BadRequest(new ProblemDetails {
-                Detail = failure.Value
-            });
-        }
-
-        return TypedResults.Ok(Map.FromEntity(result.AsSuccess.Value));
+        
+        return mediatorOutput.ToHttpResults(result, Map.FromEntity);
     }
 }

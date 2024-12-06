@@ -11,6 +11,7 @@ using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Database.Repositories;
 using InfiniLore.Server.API;
 using InfiniLore.Server.Components;
+using InfiniLore.Server.Services;
 using InfiniLore.Server.Services.Authentication;
 using InfiniLore.Server.Services.Authorization;
 using Microsoft.AspNetCore.Authentication;
@@ -146,6 +147,7 @@ public static class Program {
         builder.Services.RegisterServicesFromInfiniLoreDatabaseRepositories();
         builder.Services.RegisterServicesFromInfiniLoreServerServicesAuthorization();
         builder.Services.RegisterServicesFromInfiniLoreServerServicesAuthentication();
+        builder.Services.RegisterServicesFromInfiniLoreServerServices();
 
         // -------------------------------------------------------------------------------------------------------------
         // App

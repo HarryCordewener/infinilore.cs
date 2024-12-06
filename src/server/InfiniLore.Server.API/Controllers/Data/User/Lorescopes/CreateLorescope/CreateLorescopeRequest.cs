@@ -10,7 +10,6 @@ namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope
 // ---------------------------------------------------------------------------------------------------------------------
 public record CreateLorescopeRequest(
     [FromRoute] UserIdUnion UserId,
-    Guid LorescopeId,
     string Name,
-    string? Description
+    string Description
 );

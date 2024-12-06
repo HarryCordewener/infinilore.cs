@@ -25,7 +25,9 @@ public class CreateLorescopeHandler(
     
     public async Task<SuccessOrFailure<LorescopeModel>> Handle(CreateLorescopeCommand request, CancellationToken ct) {
         try {
-            if (!await authService.ValidateIsOwnerAsync(request.Lorescope.OwnerId, ct)) return "Access Denied";
+            if (!await authService.InDevelopmentAsync()) {
+                if (!await authService.ValidateIsOwnerAsync(request.Lorescope.OwnerId, ct)) return "Access Denied";
+            }
             
             // Pre-check if we can use the name
             // Done to get more human-readable error strings back

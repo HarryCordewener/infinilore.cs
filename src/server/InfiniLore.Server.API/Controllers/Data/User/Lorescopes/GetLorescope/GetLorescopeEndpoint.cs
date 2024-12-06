@@ -15,7 +15,7 @@ namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.GetLorescope;
 // ---------------------------------------------------------------------------------------------------------------------
 using EndpointResult=Results<Ok<LorescopeResponse>, BadRequest<ProblemDetails>>;
 
-public class GetLorescopeEndpoint(IMediator mediator) : Endpoint<GetLorescopeRequest, EndpointResult, LorescopeResponseMapper> {
+public class GetLorescopeEndpoint(IMediator mediator) : Endpoint<GetLorescopeRequest, EndpointResult, GetLorescopeMapper> {
 
     public override void Configure() {
         Get("/data-user/{UserId:guid}/lore-scopes/{LorescopeId:guid}");
