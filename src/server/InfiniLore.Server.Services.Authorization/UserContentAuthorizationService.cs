@@ -26,13 +26,13 @@ public class UserContentAuthorizationService(IUserRepository userRepository, IUs
         => ValidateAsync(model.Id, accessKind, ct);
 
     public async ValueTask<bool> ValidateAsync(Guid contentId, AccessKind accessKind, CancellationToken ct = default) {
-        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsT0(out InfiniLoreUser? accessorUser) || accessorUser is null) return false;
+        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsSuccessValue(out InfiniLoreUser? accessorUser)) return false;
 
         return await userContentAccessRepository.UserHasKindAsync(contentId, accessorUser.Id, accessKind, ct);
     }
 
     public async ValueTask<bool> ValidateIsOwnerAsync(Guid ownerId, CancellationToken ct = default) {
-        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsT0(out InfiniLoreUser? accessorUser) || accessorUser is null) return false;
+        if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsSuccessValue(out InfiniLoreUser? accessorUser)) return false;
 
         return accessorUser.Id == ownerId;
     }
@@ -40,7 +40,7 @@ public class UserContentAuthorizationService(IUserRepository userRepository, IUs
     // -----------------------------------------------------------------------------------------------------------------
     // Helper Methods
     // -----------------------------------------------------------------------------------------------------------------
-    private async ValueTask<Union<InfiniLoreUser, None, Failure<string>>> GetUserFromClaimsPrincipalAsync(CancellationToken ct) {
+    private async ValueTask<SuccessOrFailure<InfiniLoreUser,string>> GetUserFromClaimsPrincipalAsync(CancellationToken ct) {
         if (contextAccessor.HttpContext is not {} accessor) return new Failure<string>("No HttpContext found in IHttpContextAccessor");
 
         RepoResult<InfiniLoreUser> accessorResult = await userRepository.TryGetByClaimsPrincipalAsync(accessor.User, ct);
