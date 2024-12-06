@@ -5,7 +5,7 @@ using AterraEngine.Unions;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Diagnostics.CodeAnalysis;
 
-namespace InfiniLore.Server.Contracts.Types.Results;
+namespace InfiniLore.Server.Contracts.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -33,6 +33,7 @@ public readonly partial struct RepoResult<T>() : IUnion<Success<T>, Failure<stri
 
     public SuccessOrFailure<T> ToSuccessOrFailure() {
         if (IsSuccess) return AsSuccess;
+
         return AsFailure;
     }
 }

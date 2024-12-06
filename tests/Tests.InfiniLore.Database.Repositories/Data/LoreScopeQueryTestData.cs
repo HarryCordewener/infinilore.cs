@@ -3,8 +3,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Database.Models.Content.Account;
 using InfiniLore.Database.Models.Content.UserData;
-using InfiniLore.Server.Contracts.Types.Unions;
 using System.Linq.Expressions;
+using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
 namespace Tests.InfiniLore.Database.Repositories.Data;
 // ---------------------------------------------------------------------------------------------------------------------

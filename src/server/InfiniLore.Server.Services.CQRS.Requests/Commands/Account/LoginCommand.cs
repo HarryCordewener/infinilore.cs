@@ -1,13 +1,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Database.Models;
-using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
+using InfiniLore.Database.Models.Content.Account;
+using InfiniLore.Server.Contracts.Services.CQRS;
 
-namespace InfiniLore.Server.Contracts.Database.Repositories.Content.Account;
+namespace InfiniLore.Server.Services.CQRS.Requests.Commands.Account;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface IUserContentAccessRepository {
-    public ValueTask<bool> UserHasKindAsync(Guid contentId, UserIdUnion accessorId, AccessKind accessKind, CancellationToken ct = default);
-}
+public record LoginCommand(
+    string Username,
+    string Password
+) : ICqrsRequest<InfiniLoreUser>;

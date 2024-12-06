@@ -5,11 +5,11 @@ using InfiniLore.Database.Models;
 using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Server.Contracts.Database;
 using InfiniLore.Server.Contracts.Database.Repositories;
-using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Contracts.Types.Unions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using Tests.InfiniLore.Database.Repositories.Fixtures;
+using RepoResult=InfiniLore.Server.Contracts.Database.Repositories.RepoResult;
+using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
 namespace Tests.InfiniLore.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------

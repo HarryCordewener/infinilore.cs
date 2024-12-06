@@ -3,11 +3,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Database.Models.Content.Account;
 using InfiniLore.Database.Models.Content.UserData;
-using InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope;
 using InfiniLore.Server.Contracts.Database.Repositories;
-using InfiniLore.Server.Contracts.Types.Results;
 
-namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLoreScope;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -33,7 +31,7 @@ public class CreateLorescopeMapper : Mapper<CreateLorescopeRequest, LorescopeRes
         return new LorescopeModel {
             Owner = user,
             Name = request.Name,
-            Description = request.Description 
+            Description = request.Description
         };
     }
 }

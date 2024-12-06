@@ -20,20 +20,20 @@ public abstract class UserContent : BaseContent, IHasOwner {
     ///     the access permissions granted to users for a specific content item.
     /// </summary>
     public ICollection<UserContentAccessModel> UserAccess { get; set; } = [];
-    
+
     /// <summary>
     ///     Gets or sets a value indicating whether the content is publicly readable.
     ///     When authorization validation is performed, this property overrides the user's access level
     ///     to always allow for read access if set to true.
     /// </summary>
     public bool IsPubliclyReadable { get; set; } = false;
-    
+
     /// <summary>
     ///     Gets or sets a value indicating whether the content is discoverable through search features.
     ///     When set to false, you should only be able to find this resource by direct references.
     /// </summary>
     public bool IsDiscoverable { get; set; } = true;
-    
+
     /// <summary>
     ///     Determines whether the content should be included in discoverability search results.
     /// </summary>

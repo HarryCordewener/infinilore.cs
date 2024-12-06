@@ -3,9 +3,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
 using InfiniLore.Database.Models.Content.UserData;
+using InfiniLore.Server.Contracts.Database.Repositories;
 using InfiniLore.Server.Contracts.Database.Repositories.Content.Data.User;
 using InfiniLore.Server.Contracts.Services.Auth.Authorization;
-using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Services.CQRS.Requests.Queries;
 using MediatR;
 using Serilog;
@@ -15,8 +15,8 @@ namespace InfiniLore.Server.Services.CQRS.Handlers.Queries;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public class GetOneLorescopeHandler(
-    ILorescopeRepository lorescopeRepository, 
-    ILogger logger, 
+    ILorescopeRepository lorescopeRepository,
+    ILogger logger,
     IUserContentAuthorizationService authService
 ) : IRequestHandler<GetOneLorescopeQuery, SuccessOrFailure<LorescopeModel>> {
 

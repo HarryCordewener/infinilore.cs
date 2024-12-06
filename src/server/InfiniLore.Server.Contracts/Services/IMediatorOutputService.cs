@@ -6,7 +6,6 @@ using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace InfiniLore.Server.Contracts.Services;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -15,4 +14,6 @@ public interface IMediatorOutputService {
         SuccessOrFailure<TModel> successOrFailure,
         Func<TModel, TResponse> mapper
     );
+
+    public Results<Ok<TResponse>, BadRequest<ProblemDetails>> ToBadRequest<TResponse>(string? failure = null);
 }

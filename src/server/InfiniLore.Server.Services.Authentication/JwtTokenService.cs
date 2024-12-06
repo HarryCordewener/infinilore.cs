@@ -5,12 +5,10 @@ using AterraEngine.DependencyInjection;
 using AterraEngine.Unions;
 using FastEndpoints.Security;
 using InfiniLore.Database.Models.Content.Account;
-using InfiniLore.Database.MsSqlServer;
-using InfiniLore.Server.Contracts.Database;
+using InfiniLore.Server.Contracts.Database.Repositories;
 using InfiniLore.Server.Contracts.Database.Repositories.Content.Account;
 using InfiniLore.Server.Contracts.Services.Auth.Authentication;
 using InfiniLore.Server.Contracts.Types;
-using InfiniLore.Server.Contracts.Types.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,35 +22,43 @@ namespace InfiniLore.Server.Services.Authentication;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [InjectableService<IJwtTokenService>(ServiceLifetime.Scoped)]
-public class JwtTokenService(IDbUnitOfWork<MsSqlDbContext> unitOfWork, IConfiguration configuration, IJwtRefreshTokenRepository repository, ILogger logger, UserManager<InfiniLoreUser> userManager) : IJwtTokenService {
-    public async ValueTask<JwtResult> GenerateTokensAsync(InfiniLoreUser user, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
-        try {
-            string? key = configuration["Jwt:Key"];
-            if (key == null) {
-                logger.Error("Jwt:Key not found in configuration");
-                return "Jwt:Key not found in configuration";
-            }
+public class JwtTokenService(
+    IConfiguration configuration,
+    IJwtRefreshTokenRepository repository,
+    ILogger logger,
+    UserManager<InfiniLoreUser> userManager
+) : IJwtTokenService {
+    private readonly string _jwtKey = configuration["Jwt:Key"]!;
+    private readonly int _jwtAccessExpiresInMinutes = int.Parse(configuration["Jwt:AccessExpiresInMinutes"]!);
+    private readonly int _jwtRefreshExpiresInDays = int.Parse(configuration["Jwt:RefreshExpiresInDays"]!);
+    private readonly string _jwtIssuer = configuration["Jwt:Issuer"]!;
+    private readonly string _jwtAudience = configuration["Jwt:Audience"]!;
 
+    // -----------------------------------------------------------------------------------------------------------------
+    // Methods
+    // -----------------------------------------------------------------------------------------------------------------
+    public async ValueTask<SuccessOrFailure<JwtTokenData>> GenerateTokensAsync(InfiniLoreUser user, string[] roles, string[] permissions, int? expiresInDays, CancellationToken ct = default) {
+        try {
             // Check if all provided roles exist in the user's roles
+            // TODO move to IUserRepository usage
             IList<string> userRoles = await userManager.GetRolesAsync(user);
             if (!roles.All(role => userRoles.Contains(role))) {
                 logger.Warning("User {UserId} does not have all specified roles", user.Id);
                 return "User does not have the required roles";
             }
 
-            DateTime accessTokenExpiryUtc = DateTime.UtcNow.AddMinutes(int.Parse(configuration["Jwt:AccessExpiresInMinutes"]!));
-            DateTime refreshTokenExpiryUtc = DateTime.UtcNow.AddDays(expiresInDays ?? int.Parse(configuration["Jwt:RefreshExpiresInDays"]!));
+            DateTime accessTokenExpiryUtc = DateTime.UtcNow.AddMinutes(_jwtAccessExpiresInMinutes);
+            DateTime refreshTokenExpiryUtc = DateTime.UtcNow.AddDays(_jwtRefreshExpiresInDays);
 
             string accessToken = GenerateAccessToken(user, roles, permissions, accessTokenExpiryUtc);
-            Union<Guid, False> resultGenerate = await GenerateRefreshTokenAsync(user, roles, permissions, refreshTokenExpiryUtc, ct);
-            if (resultGenerate.IsT1) return "Refresh token could not be generated";
+            SuccessOrFailure<Guid> resultGenerate = await GenerateRefreshTokenAsync(user, roles, permissions, refreshTokenExpiryUtc, ct);
+            if (!resultGenerate.TryGetAsSuccessValue(out Guid refreshToken)) return "Refresh token could not be generated";
 
             return new JwtTokenData(
                 accessToken,
                 accessTokenExpiryUtc,
-                resultGenerate.AsT0,
+                refreshToken,
                 refreshTokenExpiryUtc);
-
         }
         catch (Exception ex) {
             logger.Error(ex, "Error generating tokens");
@@ -60,18 +66,12 @@ public class JwtTokenService(IDbUnitOfWork<MsSqlDbContext> unitOfWork, IConfigur
         }
     }
 
-    public async ValueTask<JwtResult> RefreshTokensAsync(Guid refreshToken, CancellationToken ct = default) {
+    public async ValueTask<SuccessOrFailure<JwtTokenData>> RefreshTokensAsync(Guid refreshToken, CancellationToken ct = default) {
         RepoResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
-        switch (getResult.Value) {
-            case None: return "Refresh token not found";
-            case Error<string>: return getResult.AsFailure;
-        }
-
-        JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;
+        if (!getResult.TryGetSuccessValue(out JwtRefreshTokenModel? oldToken)) return "Refresh token not found";
         if (oldToken.ExpiresAt < DateTime.UtcNow) return "Refresh token has expired";
 
         await repository.TryRemoveAsync(oldToken, ct);
-
         return await GenerateTokensAsync(
             oldToken.Owner,
             oldToken.Roles,
@@ -90,13 +90,11 @@ public class JwtTokenService(IDbUnitOfWork<MsSqlDbContext> unitOfWork, IConfigur
 
         RepoResult deleteResult = await repository.TryRemoveAsync(oldToken, ct);
         return deleteResult.IsSuccess;
-
     }
 
     public async ValueTask<bool> RevokeAllTokensFromUserAsync(InfiniLoreUser user, CancellationToken ct = default) {
         RepoResult deleteResult = await repository.TryPermanentRemoveAllForUserAsync(user, ct);
         return deleteResult.IsSuccess;
-
     }
 
     private static string HashToken(Guid token) {
@@ -108,10 +106,10 @@ public class JwtTokenService(IDbUnitOfWork<MsSqlDbContext> unitOfWork, IConfigur
     private string GenerateAccessToken(InfiniLoreUser user, string[] roles, string[] permissions, DateTime expiresAt) {
         string jwtToken = JwtBearer.CreateToken(
             o => {
-                o.SigningKey = configuration["Jwt:Key"]!;
+                o.SigningKey = _jwtKey;
                 o.ExpireAt = expiresAt;
-                o.Audience = configuration["JWT:Audience"];
-                o.Issuer = configuration["JWT:Issuer"];
+                o.Audience = _jwtAudience;
+                o.Issuer = _jwtIssuer;
 
                 o.User.Roles.Add(roles);
                 o.User.Permissions.Add(permissions);
@@ -121,33 +119,19 @@ public class JwtTokenService(IDbUnitOfWork<MsSqlDbContext> unitOfWork, IConfigur
         return jwtToken;
     }
 
-    private async ValueTask<Union<Guid, False>> GenerateRefreshTokenAsync(InfiniLoreUser user, string[] roles, string[] permissions, DateTime expiresAt, CancellationToken ct = default) {
+    private async ValueTask<SuccessOrFailure<Guid>> GenerateRefreshTokenAsync(InfiniLoreUser user, string[] roles, string[] permissions, DateTime expiresAt, CancellationToken ct = default) {
         var token = Guid.NewGuid();
         var refreshToken = new JwtRefreshTokenModel {
-            Owner = user,
+            OwnerId = user.Id,// Use the user's ID instead of the user object
             ExpiresAt = expiresAt,
             TokenHash = HashToken(token),
             Roles = roles,
             Permissions = permissions
         };
 
-        RepoResult resultAddition = await repository.TryAddAsync(refreshToken, ct);
-        switch (resultAddition.Value) {
-            case Success:
-                try {
-                    logger.Information("Attempting to commit transaction for user {UserId}", user.Id);
-                    await unitOfWork.CommitAsync(ct);
-                    logger.Information("Transaction committed successfully for user {UserId}", user.Id);
-                    return token;
-                }
-                catch (Exception ex) {
-                    logger.Error(ex, "Error during commit for user {UserId}", user.Id);
-                    return new False();
-                }
+        RepoResult result = await repository.TryAddAsync(refreshToken, ct);
+        if (result.IsSuccess) return token;
 
-            default:
-                logger.Error("Error adding refresh token for user {UserId}", user.Id);
-                return new False();
-        }
+        return new Failure<string>("Failed to save refresh token.");
     }
 }

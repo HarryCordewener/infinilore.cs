@@ -6,11 +6,11 @@ using InfiniLore.Database.Models;
 using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Server.Contracts.Database;
 using InfiniLore.Server.Contracts.Database.Repositories;
-using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Contracts.Types.Unions;
+using InfiniLore.Server.Contracts.Types;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
+using RepoResult=InfiniLore.Server.Contracts.Database.Repositories.RepoResult;
 
 namespace InfiniLore.Database.Repositories.Content;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<MsSqlDbContext> unitOfWork) 
         }
 
         dbSet.UpdateRange(modelArray);
-        
+
         // // Update the last modified date for all models that were updated
         // // Do this through property calls for performance reasons
         // await dbSet

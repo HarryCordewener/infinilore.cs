@@ -38,8 +38,8 @@ public class MsSqlDbContext : IdentityDbContext<InfiniLoreUser, IdentityRole<Gui
         // TODO Long term: Change Seeding Data approach
         // this doesn't feel like the correct approach to seed data for the server in the long term.
         builder.Entity<IdentityRole>().HasData(
-            new IdentityRole("admin") { NormalizedName = "ADMIN", Id = "0b3715f5-d1d2-4ffb-b869-0ab2462ad504"},
-            new IdentityRole("user") { NormalizedName = "USER", Id = "b693ab6e-5a2c-4093-947d-e1e1f3797294"}
+            new IdentityRole("admin") { NormalizedName = "ADMIN", Id = "0b3715f5-d1d2-4ffb-b869-0ab2462ad504" },
+            new IdentityRole("user") { NormalizedName = "USER", Id = "b693ab6e-5a2c-4093-947d-e1e1f3797294" }
         );
 
         builder.Entity<InfiniLoreUser>().HasData(new InfiniLoreUser {
@@ -51,7 +51,7 @@ public class MsSqlDbContext : IdentityDbContext<InfiniLoreUser, IdentityRole<Gui
             NormalizedEmail = "TESTUSER@EXAMPLE.COM",
             EmailConfirmed = true,
             SecurityStamp = "d957c0f8-e90e-4068-a968-4f4b49fc165b",
-            PasswordHash = "AQAAAAIAAYagAAAAEPcntIx4Y071oyt5g84a1kLZSkEA3/WG4dB8VJiyGcbZD2XUFHSqpWL9PqF+LL6aeQ==" // Test@1234
+            PasswordHash = "AQAAAAIAAYagAAAAEPcntIx4Y071oyt5g84a1kLZSkEA3/WG4dB8VJiyGcbZD2XUFHSqpWL9PqF+LL6aeQ=="// Test@1234
         });
     }
 }

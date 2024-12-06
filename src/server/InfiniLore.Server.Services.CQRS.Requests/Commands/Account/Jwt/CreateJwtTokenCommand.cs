@@ -1,13 +1,17 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Database.Models;
-using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
+using InfiniLore.Database.Models.Content.Account;
+using InfiniLore.Server.Contracts.Services.CQRS;
+using InfiniLore.Server.Contracts.Types;
 
-namespace InfiniLore.Server.Contracts.Database.Repositories.Content.Account;
+namespace InfiniLore.Server.Services.CQRS.Requests.Commands.Account.Jwt;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface IUserContentAccessRepository {
-    public ValueTask<bool> UserHasKindAsync(Guid contentId, UserIdUnion accessorId, AccessKind accessKind, CancellationToken ct = default);
-}
+public record CreateJwtTokenCommand(
+    InfiniLoreUser User,
+    string[] Roles,
+    string[] Permissions,
+    int? RefreshExpiresInDays = null
+) : ICqrsRequest<JwtTokenData>;
