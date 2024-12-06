@@ -64,7 +64,7 @@ public class JwtTokenService(IDbUnitOfWork<MsSqlDbContext> unitOfWork, IConfigur
         RepoResult<JwtRefreshTokenModel> getResult = await repository.TryGetByIdAsync(refreshToken, ct);
         switch (getResult.Value) {
             case None: return "Refresh token not found";
-            case Error<string>: return getResult.FailureString;
+            case Error<string>: return getResult.AsFailure;
         }
 
         JwtRefreshTokenModel oldToken = getResult.AsSuccess.Value;

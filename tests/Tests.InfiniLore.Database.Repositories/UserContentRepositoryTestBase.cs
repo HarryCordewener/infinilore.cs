@@ -109,7 +109,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         // Verify
         RepoResult<TModel> deletedModel = await _repository.TryGetByIdAsync(model.Id);
         Assert.True(deletedModel.IsFailure);// should be deleted
-        Assert.Equal("Content not found.", deletedModel.FailureString);
+        Assert.Equal("Content not found.", deletedModel.AsFailure.Value);
     }
     #endregion
 

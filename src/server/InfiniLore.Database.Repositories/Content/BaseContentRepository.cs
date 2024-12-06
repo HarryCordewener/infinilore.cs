@@ -21,6 +21,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<MsSqlDbContext> unitOfWork) 
         DbSet<T> dbSet = await GetDbSetAsync(ct);
         if (await dbSet.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";
 
+        model.UpdateLastModifiedDate();
         await dbSet.AddAsync(model, ct);
         return new Success();
     }
@@ -29,6 +30,7 @@ public class BaseContentRepository<T>(IDbUnitOfWork<MsSqlDbContext> unitOfWork) 
         DbSet<T> dbSet = await GetDbSetAsync(ct);
         if (await dbSet.AnyAsync(predicate: m => m.Id == model.Id, ct)) return "Model already exists";
 
+        model.UpdateLastModifiedDate();
         EntityEntry<T> result = await dbSet.AddAsync(model, ct);
         return result;
     }
@@ -65,7 +67,17 @@ public class BaseContentRepository<T>(IDbUnitOfWork<MsSqlDbContext> unitOfWork) 
         HashSet<Guid> idsToUpdate = modelArray.Select(m => m.Id).ToHashSet();
         if (!await dbSet.AllAsync(predicate: model => idsToUpdate.Contains(model.Id), ct)) return "One or more Models do not exist";
 
+        foreach (T model in modelArray) {
+            model.UpdateLastModifiedDate();
+        }
+
         dbSet.UpdateRange(modelArray);
+        
+        // // Update the last modified date for all models that were updated
+        // // Do this through property calls for performance reasons
+        // await dbSet
+        //     .Where(model => idsToUpdate.Contains(model.Id))
+        //     .ExecuteUpdateAsync(setPropertyCalls: s => BaseContent.UpdateLastModifiedDateWithPropertyCalls(s), ct);
 
         return new Success();
     }
@@ -80,8 +92,8 @@ public class BaseContentRepository<T>(IDbUnitOfWork<MsSqlDbContext> unitOfWork) 
             return new Success();
         }
 
-        EntityEntry<T> result = dbSet.Update(model);
-        result.Entity.UpdateLastModifiedDate();
+        model.UpdateLastModifiedDate();
+        dbSet.Update(model);
 
         return new Success();
     }
