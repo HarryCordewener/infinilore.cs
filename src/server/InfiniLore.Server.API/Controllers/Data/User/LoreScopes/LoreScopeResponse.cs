@@ -1,12 +1,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-namespace InfiniLore.Server.API.Controllers.Data.User.LoreScopes;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 // ReSharper disable NotAccessedPositionalProperty.Global
-public record LoreScopeResponse(
+public record LorescopeResponse(
     Guid Id,
     Guid UserId,
     string Name,

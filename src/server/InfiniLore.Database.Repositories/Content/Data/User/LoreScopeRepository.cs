@@ -16,22 +16,23 @@ namespace InfiniLore.Database.Repositories.Content.Data.User;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[InjectableService<ILoreScopeRepository>(ServiceLifetime.Scoped)]
-public class LoreScopeRepository(IDbUnitOfWork<MsSqlDbContext> unitOfWork) : UserContentRepository<LoreScopeModel>(unitOfWork), ILoreScopeRepository {
-    public async ValueTask<RepoResult<LoreScopeModel[]>> TryGetByUserIdAndLorescopeIdAsync(UserIdUnion userId, Guid lorescopeId, CancellationToken ct = default) {
-        DbSet<LoreScopeModel> dbSet = await GetDbSetAsync(ct);
+[InjectableService<ILorescopeRepository>(ServiceLifetime.Scoped)]
+public class LorescopeRepository(IDbUnitOfWork<MsSqlDbContext> unitOfWork) : UserContentRepository<LorescopeModel>(unitOfWork), ILorescopeRepository {
+    public async ValueTask<RepoResult<LorescopeModel[]>> TryGetByUserIdAndLorescopeIdAsync(UserIdUnion userId, Guid lorescopeId, CancellationToken ct = default) {
+        DbSet<LorescopeModel> dbSet = await GetDbSetAsync(ct);
 
-        LoreScopeModel[] result = await dbSet
+        LorescopeModel[] result = await dbSet
             .Include(model => model.Multiverses)// Include the multiverses so we can collect the Ids
             .Where(model => model.OwnerId == userId.ToGuid() && model.Id == lorescopeId)
             .ToArrayAsync(cancellationToken: ct);
 
         return result;
     }
-    public async ValueTask<RepoResult> CanUseAsNewLorescopeNameAsync(UserIdUnion userId, string name, CancellationToken ct = default) {
-        DbSet<LoreScopeModel> dbSet = await GetDbSetAsync(ct);
+    
+    public async ValueTask<RepoResult> IsValidNewNameAsync(UserIdUnion userId, string name, CancellationToken ct = default) {
+        DbSet<LorescopeModel> dbSet = await GetDbSetAsync(ct);
         
-        LoreScopeModel? existing = await dbSet
+        LorescopeModel? existing = await dbSet
             .FirstOrDefaultAsync(predicate: model => model.OwnerId == userId.ToGuid() && model.Name == name, ct);
         
         if (existing != null) return "A lore scope with that name already exists";

@@ -9,7 +9,6 @@ namespace InfiniLore.Server.Contracts.Database.Repositories.Content.Data.User;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface ILoreScopeRepository : IUserContentRepository<LoreScopeModel> {
-    ValueTask<RepoResult<LoreScopeModel[]>> TryGetByUserIdAndLorescopeIdAsync(UserIdUnion userId, Guid lorescopeId, CancellationToken ct = default);
-    ValueTask<RepoResult> CanUseAsNewLorescopeNameAsync(UserIdUnion userId, string name, CancellationToken ct = default);
+public interface ILorescopeRepository : IUserContentRepository<LorescopeModel> {
+    ValueTask<RepoResult> IsValidNewNameAsync(UserIdUnion userId, string name, CancellationToken ct = default);
 }

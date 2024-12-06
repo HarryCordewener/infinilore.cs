@@ -6,13 +6,13 @@ using InfiniLore.Database.Models.Content.UserData;
 using InfiniLore.Server.Contracts.Database.Repositories;
 using InfiniLore.Server.Contracts.Types.Results;
 
-namespace InfiniLore.Server.API.Controllers.Data.User.LoreScopes;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [UsedImplicitly]
-public class LoreScopeResponseMapper : Mapper<LoreScopeForm, LoreScopeResponse, LoreScopeModel> {
-    public override LoreScopeResponse FromEntity(LoreScopeModel ls) => new(
+public class LorescopeResponseMapper : Mapper<LorescopeForm, LorescopeResponse, LorescopeModel> {
+    public override LorescopeResponse FromEntity(LorescopeModel ls) => new(
         ls.Id,
         ls.OwnerId,
         ls.Name,
@@ -20,7 +20,7 @@ public class LoreScopeResponseMapper : Mapper<LoreScopeForm, LoreScopeResponse, 
         ls.Multiverses.Select(selector: m => m.Id).ToArray()
     );
 
-    public async override Task<LoreScopeModel> ToEntityAsync(LoreScopeForm request, CancellationToken ct = new()) {
+    public async override Task<LorescopeModel> ToEntityAsync(LorescopeForm request, CancellationToken ct = new()) {
         var userRepository = Resolve<IUserRepository>();
         RepoResult<InfiniLoreUser> result = await userRepository.TryGetByIdAsync(request.UserId, ct);
 
@@ -28,7 +28,7 @@ public class LoreScopeResponseMapper : Mapper<LoreScopeForm, LoreScopeResponse, 
             throw new ArgumentException($"User not found with id {request.UserId}");
         }
 
-        return new LoreScopeModel {
+        return new LorescopeModel {
             Owner = user,
             Name = request.Name,
             Description = request.Description

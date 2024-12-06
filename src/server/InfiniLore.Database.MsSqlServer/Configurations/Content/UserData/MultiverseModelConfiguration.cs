@@ -15,7 +15,7 @@ public class MultiverseModelConfiguration : UserContentConfiguration<MultiverseM
 
         builder.HasQueryFilter(model => model.SoftDeleteDate == null);
 
-        builder.HasIndex(model => new { model.Name, model.LoreScopeId }).IsUnique();
+        builder.HasIndex(model => new { model.Name, model.LorescopeId }).IsUnique();
 
         builder.HasMany(model => model.Universes)
             .WithOne(universe => universe.Multiverse)

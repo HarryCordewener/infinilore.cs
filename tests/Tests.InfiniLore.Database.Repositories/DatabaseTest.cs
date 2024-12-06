@@ -10,7 +10,7 @@ namespace Tests.InfiniLore.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class LoreScopeCommandRepositoryTest(DatabaseFixture fixture) : IClassFixture<DatabaseFixture> {
+public class LorescopeCommandRepositoryTest(DatabaseFixture fixture) : IClassFixture<DatabaseFixture> {
     private readonly IDbUnitOfWork<MsSqlDbContext> _unitOfWork = fixture.ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
 
     [Fact]

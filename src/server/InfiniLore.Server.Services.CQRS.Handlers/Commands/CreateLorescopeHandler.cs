@@ -16,22 +16,29 @@ namespace InfiniLore.Server.Services.CQRS.Handlers.Commands;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class CreateLorescopeHandler(ILoreScopeRepository loreScopeRepository, ILogger logger, IDbUnitOfWork<MsSqlDbContext> unitOfWork, IUserContentAuthorizationService authService) : IRequestHandler<CreateLorescopeCommand, SuccessOrFailure<LoreScopeModel>> {
-    public async Task<SuccessOrFailure<LoreScopeModel>> Handle(CreateLorescopeCommand request, CancellationToken ct) {
+public class CreateLorescopeHandler(
+    ILorescopeRepository lorescopeRepository,
+    ILogger logger,
+    IDbUnitOfWork<MsSqlDbContext> unitOfWork,
+    IUserContentAuthorizationService authService
+) : IRequestHandler<CreateLorescopeCommand, SuccessOrFailure<LorescopeModel>> {
+    
+    public async Task<SuccessOrFailure<LorescopeModel>> Handle(CreateLorescopeCommand request, CancellationToken ct) {
         try {
             if (!await authService.ValidateIsOwnerAsync(request.Lorescope.OwnerId, ct)) return "Access Denied";
             
-            RepoResult resultCanUseName = await loreScopeRepository.CanUseAsNewLorescopeNameAsync(request.Lorescope.OwnerId, request.Lorescope.Name, ct);
+            // Pre-check if we can use the name
+            // Done to get more human-readable error strings back
+            RepoResult resultCanUseName = await lorescopeRepository.IsValidNewNameAsync(request.Lorescope.OwnerId, request.Lorescope.Name, ct);
             if (resultCanUseName.IsFailure) return resultCanUseName.AsFailure;
 
-            RepoResult<LoreScopeModel> result = await loreScopeRepository.TryAddWithResultAsync(request.Lorescope, ct);
+            // Actually add the lore scope to the db
+            RepoResult<LorescopeModel> resultAddition = await lorescopeRepository.TryAddWithResultAsync(request.Lorescope, ct);
+            if (resultAddition.IsFailure) return resultAddition.AsFailure;
             await unitOfWork.CommitAsync(ct);
 
-            return result.Value switch {
-                Success<LoreScopeModel> success => success,
-                Failure<string> failure => failure, // Pass failure directly
-                _ => throw new ArgumentException("Result union did not have a valid success or failure value")
-            };
+            // Because we already checked for IsFailure above, we know that the result is a Success
+            return resultAddition.AsSuccess;
         }
         catch (Exception e) {
             logger.Error(e, "An error occurred while trying to create a lore scope");

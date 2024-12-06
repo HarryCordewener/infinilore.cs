@@ -18,7 +18,7 @@ public class MsSqlDbContext : IdentityDbContext<InfiniLoreUser, IdentityRole<Gui
     // -----------------------------------------------------------------------------------------------------------------
     public MsSqlDbContext() {}
     public MsSqlDbContext(DbContextOptions<MsSqlDbContext> options) : base(options) {}
-    public DbSet<LoreScopeModel> LoreScopes { get; init; }
+    public DbSet<LorescopeModel> Lorescopes { get; init; }
     public DbSet<MultiverseModel> Multiverses { get; init; }
     public DbSet<UniverseModel> Universes { get; init; }
     public DbSet<JwtRefreshTokenModel> JwtRefreshTokens { get; init; }

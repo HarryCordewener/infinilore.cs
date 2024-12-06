@@ -10,21 +10,21 @@ namespace Tests.InfiniLore.Database.Repositories.Data;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public static class LoreScopeQueryTestData {
+public static class LorescopeQueryTestData {
 
-    public static TheoryData<LoreScopeModel> GetSingleModels() {
-        var data = new TheoryData<LoreScopeModel>();
+    public static TheoryData<LorescopeModel> GetSingleModels() {
+        var data = new TheoryData<LorescopeModel>();
 
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 
-        data.Add(new LoreScopeModel {
+        data.Add(new LorescopeModel {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope 1",
             Description = "Test Query Scope Description 1",
             Owner = user1
         });
 
-        data.Add(new LoreScopeModel {
+        data.Add(new LorescopeModel {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope 2",
             Description = "Test Query Scope Description 2",
@@ -34,12 +34,12 @@ public static class LoreScopeQueryTestData {
         return data;
     }
 
-    public static TheoryData<UserIdUnion, LoreScopeModel> GetUserModels() {
-        var data = new TheoryData<UserIdUnion, LoreScopeModel>();
+    public static TheoryData<UserIdUnion, LorescopeModel> GetUserModels() {
+        var data = new TheoryData<UserIdUnion, LorescopeModel>();
 
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 
-        data.Add(user1, new LoreScopeModel {
+        data.Add(user1, new LorescopeModel {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope for User 1",
             Description = "Test Query Scope Description for User 1",
@@ -49,12 +49,12 @@ public static class LoreScopeQueryTestData {
         return data;
     }
 
-    public static TheoryData<IEnumerable<LoreScopeModel>> GetMultipleModels() {
-        var data = new TheoryData<IEnumerable<LoreScopeModel>>();
+    public static TheoryData<IEnumerable<LorescopeModel>> GetMultipleModels() {
+        var data = new TheoryData<IEnumerable<LorescopeModel>>();
 
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 
-        data.Add(new List<LoreScopeModel> {
+        data.Add(new List<LorescopeModel> {
             new() {
                 Id = Guid.NewGuid(),
                 Name = "Test Query Scope 3",
@@ -72,12 +72,12 @@ public static class LoreScopeQueryTestData {
         return data;
     }
 
-    public static TheoryData<Expression<Func<LoreScopeModel, bool>>, LoreScopeModel> GetCriteriaModels() {
-        var data = new TheoryData<Expression<Func<LoreScopeModel, bool>>, LoreScopeModel>();
+    public static TheoryData<Expression<Func<LorescopeModel, bool>>, LorescopeModel> GetCriteriaModels() {
+        var data = new TheoryData<Expression<Func<LorescopeModel, bool>>, LorescopeModel>();
 
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 
-        var model = new LoreScopeModel {
+        var model = new LorescopeModel {
             Id = Guid.NewGuid(),
             Name = "Test Query Scope with Criteria",
             Description = "Test Query Scope Description with Criteria",

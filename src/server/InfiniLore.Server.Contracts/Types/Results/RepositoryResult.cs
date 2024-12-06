@@ -33,4 +33,9 @@ public readonly partial struct RepoResult<T>() : IUnion<Success<T>, Failure<stri
     public static implicit operator RepoResult<T>(string input) => new Failure<string>(input);
     public static implicit operator RepoResult<T>(T value) => new Success<T>(value);
     public static implicit operator RepoResult<T>(EntityEntry<T> value) => new Success<T>(value.Entity);
+
+    public SuccessOrFailure<T> ToSuccessOrFailure() {
+        if (IsSuccess) return AsSuccess;
+        return AsFailure;
+    }
 }

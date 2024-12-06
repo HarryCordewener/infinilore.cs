@@ -4,13 +4,13 @@
 using InfiniLore.Server.Contracts.Types.Unions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace InfiniLore.Server.API.Controllers.Data.User.LoreScopes.CreateLoreScope;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public record CreateLorescopeRequest(
     [FromRoute] UserIdUnion UserId,
-    Guid LoreScopeId,
+    Guid LorescopeId,
     string Name,
     string? Description
 );

@@ -3,11 +3,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using Microsoft.AspNetCore.Mvc;
 
-namespace InfiniLore.Server.API.Controllers.Data.User.LoreScopes.GetLoreScope;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.GetLorescope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public record GetLorescopeRequest(
     [FromRoute] Guid UserId,
-    [FromRoute] Guid LoreScopeId
+    [FromRoute] Guid LorescopeId
 );

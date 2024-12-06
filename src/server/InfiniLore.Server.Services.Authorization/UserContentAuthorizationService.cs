@@ -17,7 +17,11 @@ namespace InfiniLore.Server.Services.Authorization;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [InjectableService<IUserContentAuthorizationService>(ServiceLifetime.Scoped)]
-public class UserContentAuthorizationService(IUserRepository userRepository, IUserContentAccessRepository userContentAccessRepository, IHttpContextAccessor contextAccessor) : IUserContentAuthorizationService {
+public class UserContentAuthorizationService(
+    IUserRepository userRepository,
+    IUserContentAccessRepository userContentAccessRepository,
+    IHttpContextAccessor contextAccessor
+) : IUserContentAuthorizationService {
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
@@ -35,6 +39,17 @@ public class UserContentAuthorizationService(IUserRepository userRepository, IUs
         if (!(await GetUserFromClaimsPrincipalAsync(ct)).TryGetAsSuccessValue(out InfiniLoreUser? accessorUser)) return false;
 
         return accessorUser.Id == ownerId;
+    }
+
+    public ValueTask<bool> HasAccessRead(Guid contentId, CancellationToken ct = default) {
+        return ValidateAsync(contentId, AccessKind.Read, ct);
+    }
+    
+    public ValueTask<bool> HasAccessWrite(Guid contentId, CancellationToken ct = default) {
+        return ValidateAsync(contentId, AccessKind.Write, ct);
+    }
+    public ValueTask<bool> HasAccessDelete(Guid contentId, CancellationToken ct = default) {
+        return ValidateAsync(contentId, AccessKind.Delete, ct);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

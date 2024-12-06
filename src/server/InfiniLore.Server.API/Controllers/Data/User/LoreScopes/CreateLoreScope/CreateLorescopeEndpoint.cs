@@ -8,23 +8,22 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace InfiniLore.Server.API.Controllers.Data.User.LoreScopes.CreateLoreScope;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-using EndpointResult=Results<Ok<LoreScopeResponse>, BadRequest<ProblemDetails>>;
+using EndpointResult=Results<Ok<LorescopeResponse>, BadRequest<ProblemDetails>>;
 
-public class CreateLorescopeEndpoint(IMediator mediator) : Endpoint<LoreScopeForm, EndpointResult, LoreScopeResponseMapper> {
+public class CreateLorescopeEndpoint(IMediator mediator) : Endpoint<LorescopeForm, EndpointResult, LorescopeResponseMapper> {
     public override void Configure() {
         Post("/data-user/{UserId:guid}/lore-scopes/");
         // Permissions("data-user.lore-scopes.create");
     }
 
-    public async override Task<EndpointResult> ExecuteAsync(LoreScopeForm req, CancellationToken ct) {
-        SuccessOrFailure<LoreScopeModel, string> result = await mediator.Send(
+    public async override Task<EndpointResult> ExecuteAsync(LorescopeForm req, CancellationToken ct) {
+        SuccessOrFailure<LorescopeModel> result = await mediator.Send(
             new CreateLorescopeCommand(
-                HttpContext,
                 await Map.ToEntityAsync(req, ct)),
             ct
         );

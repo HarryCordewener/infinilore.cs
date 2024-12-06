@@ -33,7 +33,7 @@
         <Folder Include="Controllers\Admin\"/>
         <Folder Include="Controllers\Data\Discovery\"/>
         <Folder Include="Controllers\Data\System\"/>
-        <Folder Include="Controllers\Data\User\LoreScopes\GetLoreScopesUser\"/>
+        <Folder Include="Controllers\Data\User\Lorescopes\GetLorescopesUser\"/>
     </ItemGroup>
 
 </Project>
