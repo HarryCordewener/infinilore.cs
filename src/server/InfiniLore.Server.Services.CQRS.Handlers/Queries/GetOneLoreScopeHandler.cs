@@ -15,14 +15,19 @@ namespace InfiniLore.Server.Services.CQRS.Handlers.Queries;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetOneLoreScopeHandler(ILoreScopeRepository loreScopeRepository, ILogger logger, IUserContentAuthorizationService authService) : IRequestHandler<GetOneLorescopeQuery, SuccessOrFailure<LoreScopeModel, string>> {
+public class GetOneLoreScopeHandler(
+    ILoreScopeRepository loreScopeRepository, 
+    ILogger logger, 
+    IUserContentAuthorizationService authService
+) : IRequestHandler<GetOneLorescopeQuery, SuccessOrFailure<LoreScopeModel>> {
 
-    public async Task<SuccessOrFailure<LoreScopeModel, string>> Handle(GetOneLorescopeQuery request, CancellationToken ct) {
+    public async Task<SuccessOrFailure<LoreScopeModel>> Handle(GetOneLorescopeQuery request, CancellationToken ct) {
         try {
             if (!await authService.ValidateAsync(request.LorescopeId, AccessKind.Read, ct)) return "Access Denied";
+            
 
             // After everything is validated, we can finally store to the db
-            RepoResult<LoreScopeModel[]> result = await loreScopeRepository.TryGetByUserIdAndLorescopeId(request.UserIdUnion, request.LorescopeId, ct);
+            RepoResult<LoreScopeModel[]> result = await loreScopeRepository.TryGetByUserIdAndLorescopeIdAsync(request.UserIdUnion, request.LorescopeId, ct);
 
             return result.Value switch {
                 Success<LoreScopeModel> success => success,

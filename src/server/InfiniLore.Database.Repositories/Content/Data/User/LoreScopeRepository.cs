@@ -2,6 +2,7 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.DependencyInjection;
+using AterraEngine.Unions;
 using InfiniLore.Database.Models.Content.UserData;
 using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Server.Contracts.Database;
@@ -17,7 +18,7 @@ namespace InfiniLore.Database.Repositories.Content.Data.User;
 // ---------------------------------------------------------------------------------------------------------------------
 [InjectableService<ILoreScopeRepository>(ServiceLifetime.Scoped)]
 public class LoreScopeRepository(IDbUnitOfWork<MsSqlDbContext> unitOfWork) : UserContentRepository<LoreScopeModel>(unitOfWork), ILoreScopeRepository {
-    public async ValueTask<RepoResult<LoreScopeModel[]>> TryGetByUserIdAndLorescopeId(UserIdUnion userId, Guid lorescopeId, CancellationToken ct = default) {
+    public async ValueTask<RepoResult<LoreScopeModel[]>> TryGetByUserIdAndLorescopeIdAsync(UserIdUnion userId, Guid lorescopeId, CancellationToken ct = default) {
         DbSet<LoreScopeModel> dbSet = await GetDbSetAsync(ct);
 
         LoreScopeModel[] result = await dbSet
@@ -26,5 +27,14 @@ public class LoreScopeRepository(IDbUnitOfWork<MsSqlDbContext> unitOfWork) : Use
             .ToArrayAsync(cancellationToken: ct);
 
         return result;
+    }
+    public async ValueTask<RepoResult> CanUseAsNewLorescopeNameAsync(UserIdUnion userId, string name, CancellationToken ct = default) {
+        DbSet<LoreScopeModel> dbSet = await GetDbSetAsync(ct);
+        
+        LoreScopeModel? existing = await dbSet
+            .FirstOrDefaultAsync(predicate: model => model.OwnerId == userId.ToGuid() && model.Name == name, ct);
+        
+        if (existing != null) return "A lore scope with that name already exists";
+        return new Success();
     }
 }

@@ -16,17 +16,20 @@ namespace InfiniLore.Server.Services.CQRS.Handlers.Commands;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class CreateLorescopeHandler(ILoreScopeRepository loreScopeRepository, ILogger logger, IDbUnitOfWork<MsSqlDbContext> unitOfWork, IUserContentAuthorizationService authService) : IRequestHandler<CreateLorescopeCommand, SuccessOrFailure<LoreScopeModel, string>> {
-    public async Task<SuccessOrFailure<LoreScopeModel, string>> Handle(CreateLorescopeCommand request, CancellationToken ct) {
+public class CreateLorescopeHandler(ILoreScopeRepository loreScopeRepository, ILogger logger, IDbUnitOfWork<MsSqlDbContext> unitOfWork, IUserContentAuthorizationService authService) : IRequestHandler<CreateLorescopeCommand, SuccessOrFailure<LoreScopeModel>> {
+    public async Task<SuccessOrFailure<LoreScopeModel>> Handle(CreateLorescopeCommand request, CancellationToken ct) {
         try {
             if (!await authService.ValidateIsOwnerAsync(request.Lorescope.OwnerId, ct)) return "Access Denied";
+            
+            RepoResult resultCanUseName = await loreScopeRepository.CanUseAsNewLorescopeNameAsync(request.Lorescope.OwnerId, request.Lorescope.Name, ct);
+            if (resultCanUseName.IsFailure) return resultCanUseName.AsFailure;
 
             RepoResult<LoreScopeModel> result = await loreScopeRepository.TryAddWithResultAsync(request.Lorescope, ct);
             await unitOfWork.CommitAsync(ct);
 
             return result.Value switch {
                 Success<LoreScopeModel> success => success,
-                Failure<string> failure => failure,// Pass failure directly
+                Failure<string> failure => failure, // Pass failure directly
                 _ => throw new ArgumentException("Result union did not have a valid success or failure value")
             };
         }
