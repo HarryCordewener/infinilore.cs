@@ -11,7 +11,6 @@ using InfiniLore.Server.Contracts.Services.Auth.Authorization;
 using InfiniLore.Server.Services.CQRS.Requests.Commands;
 using MediatR;
 using Serilog;
-using RepoResult=InfiniLore.Server.Contracts.Database.Repositories.RepoResult;
 
 namespace InfiniLore.Server.Services.CQRS.Handlers.Commands.Data.User.Lorescopes;
 // ---------------------------------------------------------------------------------------------------------------------
