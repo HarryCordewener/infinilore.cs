@@ -10,7 +10,6 @@ using InfiniLore.Server.Contracts.Database.Repositories.Content.Data.User;
 using InfiniLore.Server.Contracts.Services.Auth.Authorization;
 using InfiniLore.Server.Services.CQRS.Requests.Commands;
 using MediatR;
-using Serilog;
 
 namespace InfiniLore.Server.Services.CQRS.Handlers.Commands.Data.User.Lorescopes;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -18,7 +17,6 @@ namespace InfiniLore.Server.Services.CQRS.Handlers.Commands.Data.User.Lorescopes
 // ---------------------------------------------------------------------------------------------------------------------
 public class CreateLorescopeHandler(
     ILorescopeRepository lorescopeRepository,
-    ILogger logger,
     IDbUnitOfWork<MsSqlDbContext> unitOfWork,
     IUserContentAuthorizationService authService
 ) : IRequestHandler<CreateLorescopeCommand, SuccessOrFailure<LorescopeModel>> {
@@ -32,19 +30,18 @@ public class CreateLorescopeHandler(
             // Pre-check if we can use the name
             // Done to get more human-readable error strings back
             RepoResult resultCanUseName = await lorescopeRepository.IsValidNewNameAsync(request.Lorescope.OwnerId, request.Lorescope.Name, ct);
-            if (resultCanUseName.IsFailure) return resultCanUseName.AsFailure;
+            if (!resultCanUseName) return resultCanUseName.AsFailure;
 
             // Actually add the lore scope to the db
             RepoResult<LorescopeModel> resultAddition = await lorescopeRepository.TryAddWithResultAsync(request.Lorescope, ct);
-            if (resultAddition.IsFailure) return resultAddition.AsFailure;
+            if (!resultAddition) return resultAddition.AsFailure;
 
             await unitOfWork.CommitAsync(ct);
 
             // Because we already checked for IsFailure above, we know that the result is a Success
             return resultAddition.AsSuccess;
         }
-        catch (Exception e) {
-            logger.Error(e, "An error occurred while trying to create a lore scope");
+        catch (Exception ex) {
             return "An unknown error occurred";
         }
     }
