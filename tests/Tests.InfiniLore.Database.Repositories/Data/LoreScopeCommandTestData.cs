@@ -1,107 +1,106 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+
 using InfiniLore.Database.Models.Content.Account;
 using InfiniLore.Database.Models.Content.UserData;
 
 namespace Tests.InfiniLore.Database.Repositories.Data;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public static class LoreScopeCommandTestData {
-    public static TheoryData<LoreScopeModel> GetSingleModels() {
-        var data = new TheoryData<LoreScopeModel>();
-
+public static class LoreScopeCommandTestData
+{
+    public static IEnumerable<Func<LoreScopeModel>> GetSingleModels()
+    {
         // Ensure GetUser1 method exists in InfiniLoreUserTestData
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 
-        data.Add(new LoreScopeModel {
+        yield return () => new LoreScopeModel
+        {
             Id = Guid.NewGuid(),
             Name = "Test Scope 1",
             Description = "Test Scope Description 1",
             Owner = user1
-        });
+        };
 
-        data.Add(new LoreScopeModel {
+        yield return () => new LoreScopeModel
+        {
             Id = Guid.NewGuid(),
             Name = "Test Scope 2",
             Description = "Test Scope Description 2",
             Owner = user1
-        });
-
-        return data;
+        };
     }
 
-    public static TheoryData<IEnumerable<LoreScopeModel>> GetMultipleModels() {
-        var data = new TheoryData<IEnumerable<LoreScopeModel>>();
-
+    public static IEnumerable<Func<IEnumerable<LoreScopeModel>>> GetMultipleModels()
+    {
         InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
 
-        data.Add(new List<LoreScopeModel> {
-            new() {
+        yield return () => new List<LoreScopeModel>
+        {
+            new()
+            {
                 Id = Guid.NewGuid(),
                 Name = "Test Scope 3",
                 Description = "Test Scope Description 3",
                 Owner = user1
             },
-            new() {
+            new()
+            {
                 Id = Guid.NewGuid(),
                 Name = "Test Scope 4",
                 Description = "Test Scope Description 4",
                 Owner = user1
             }
-        });
+        };
 
-        data.Add(new List<LoreScopeModel> {
-            new() {
+        yield return () =>
+        [
+            new()
+            {
                 Name = "Test Scope Without Server Side Id",
                 Description = "Test Scope Description 3",
                 Owner = user1
             },
-            new() {
+            new()
+            {
                 Name = "Test Scope Without Server Side Id 2",
                 Description = "Test Scope Description 4",
                 Owner = user1
             }
-        });
-
-        return data;
+        ];
     }
 
-    public static TheoryData<LoreScopeModel, Func<LoreScopeModel, ValueTask<LoreScopeModel>>, Func<LoreScopeModel, bool>> GetUpdate() {
-        var data = new TheoryData<LoreScopeModel, Func<LoreScopeModel, ValueTask<LoreScopeModel>>, Func<LoreScopeModel, bool>>();
-
-        InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
-
-        data.Add(
-            new LoreScopeModel {
+    public static IEnumerable<(LoreScopeModel model, Func<LoreScopeModel, ValueTask<LoreScopeModel>> function,
+        Func<LoreScopeModel, bool> predicate)> GetUpdate()
+    {
+        yield return new(
+            new LoreScopeModel
+            {
                 Id = Guid.NewGuid(),
                 Name = "Test Scope 5",
                 Description = "Test Scope Description 5",
-                Owner = user1
+                Owner = InfiniLoreUserCommandTestData.GetUser1()
             },
-            p2: async model => {
+            async model =>
+            {
                 model.Description = "Updated Scope Description 5";
                 return await Task.FromResult(model);
             },
-            p3: model => model.Description == "Updated Scope Description 5"
+            model => model.Description == "Updated Scope Description 5"
         );
-
-        return data;
     }
 
-    public static TheoryData<LoreScopeModel> GetDeletes() {
-        var data = new TheoryData<LoreScopeModel>();
-
-        InfiniLoreUser user1 = InfiniLoreUserCommandTestData.GetUser1();
-
-        data.Add(new LoreScopeModel {
+    public static IEnumerable<Func<LoreScopeModel>> GetDeletes()
+    {
+        yield return () => new LoreScopeModel
+        {
             Id = Guid.NewGuid(),
             Name = "Test Scope 6",
             Description = "Will be deleted",
-            Owner = user1
-        });
-
-        return data;
+            Owner = InfiniLoreUserCommandTestData.GetUser1()
+        };
     }
 }

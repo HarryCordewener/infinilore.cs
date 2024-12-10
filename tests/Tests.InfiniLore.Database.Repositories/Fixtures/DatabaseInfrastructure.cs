@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
+
 using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Database.Repositories;
 using InfiniLore.Server.Contracts.Database;
@@ -9,29 +10,30 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Core;
 using Testcontainers.MsSql;
+using TUnit.Core.Interfaces;
 
 namespace Tests.InfiniLore.Database.Repositories.Fixtures;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[UsedImplicitly]
-public class DatabaseFixture : IAsyncLifetime {
-    private MsSqlContainer MsSqlContainer { get; set; } = null!;
-    public MsSqlDbContext DbContext { get; set; } = null!;
-    public IServiceProvider ServiceProvider { get; set; } = null!;
+public class DatabaseInfrastructure : IAsyncInitializer, IAsyncDisposable
+{
+    private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder()
+        .WithImage("mcr.microsoft.com/mssql/server:2022-CU10-ubuntu-22.04")
+        .Build();
+    public MsSqlDbContext DbContext { get; private set; } = null!;
+    public IServiceProvider ServiceProvider { get; private set; } = null!;
 
-    public async Task InitializeAsync() {
+    public DatabaseInfrastructure()
+    {
         var services = new ServiceCollection();
 
-        MsSqlContainer = new MsSqlBuilder()
-            .WithImage("mcr.microsoft.com/mssql/server:2022-CU10-ubuntu-22.04")
-            .Build();
-
-        await MsSqlContainer.StartAsync();
+        _msSqlContainer.StartAsync().Wait();
 
         services.AddSingleton(Logger.None);
         services.AddDbContextFactory<MsSqlDbContext>(
-            options => options.UseSqlServer(MsSqlContainer.GetConnectionString())
+            options => options.UseSqlServer(_msSqlContainer.GetConnectionString())
         );
 
         services.RegisterServicesFromInfiniLoreDatabaseMsSqlServer();
@@ -39,14 +41,21 @@ public class DatabaseFixture : IAsyncLifetime {
 
         ServiceProvider = services.BuildServiceProvider().CreateScope().ServiceProvider;
 
-        MsSqlDbContext db = await ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>().GetDbContextAsync();
-        await db.Database.EnsureCreatedAsync();
-        await db.SaveChangesAsync();
+        MsSqlDbContext db = ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>()
+            .GetDbContextAsync().GetAwaiter().GetResult();
+        db.Database.EnsureCreatedAsync().Wait();
+        db.SaveChangesAsync().Wait();
         DbContext = db;
     }
+    
+    public async Task InitializeAsync()
+    {
+        await Task.CompletedTask;
+    }
 
-    public async Task DisposeAsync() {
-        await MsSqlContainer.DisposeAsync();
+    public async ValueTask DisposeAsync()
+    {
+        await _msSqlContainer.DisposeAsync();
         await DbContext.DisposeAsync();
     }
 }
