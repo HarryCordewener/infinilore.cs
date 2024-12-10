@@ -6,7 +6,6 @@ using InfiniLore.Database.Models.Content.Account;
 using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Database.Repositories;
 using InfiniLore.Server.Contracts.Database;
-using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,14 +52,13 @@ public class DatabaseInfrastructure : IAsyncInitializer, IAsyncDisposable
 
         MsSqlDbContext db = ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>()
             .GetDbContextAsync().GetAwaiter().GetResult();
-        db.Database.EnsureCreatedAsync().Wait();
-        db.SaveChangesAsync().Wait();
         DbContext = db;
     }
     
     public async Task InitializeAsync()
     {
-        await Task.CompletedTask;
+        await DbContext.Database.EnsureCreatedAsync();
+        await DbContext.SaveChangesAsync();
     }
 
     public async ValueTask DisposeAsync()
