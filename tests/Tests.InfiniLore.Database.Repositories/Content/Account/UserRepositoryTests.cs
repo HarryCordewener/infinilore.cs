@@ -10,18 +10,18 @@ using Microsoft.AspNetCore.Identity;
 using Tests.InfiniLore.Database.Repositories.Fixtures;
 
 namespace Tests.InfiniLore.Database.Repositories.Content.Account;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [TestSubject(typeof(UserRepository))]
-public class UserRepositoryTests(DatabaseFixture fixture) : RepositoryTestFramework<UserRepository>(fixture) {
+[ClassDataSource<DatabaseInfrastructure>]
+public class UserRepositoryTests(DatabaseInfrastructure infrastructure) : RepositoryTestFramework<UserRepository>(infrastructure) {
     // -----------------------------------------------------------------------------------------------------------------
     // Seeding
     // -----------------------------------------------------------------------------------------------------------------
     public async override Task InitializeAsync() {
         await base.InitializeAsync();
-        
+
         // Arrange seed data
         var originalUser = new InfiniLoreUser { Id = Guid.Parse("bc8caeb2-346e-4754-b05d-8a747a95dc0f"), UserName = "seedTestUser" };
         var roleAdminId = Guid.CreateVersion7();
@@ -50,51 +50,51 @@ public class UserRepositoryTests(DatabaseFixture fixture) : RepositoryTestFramew
     // -----------------------------------------------------------------------------------------------------------------
     // Test Methods
     // -----------------------------------------------------------------------------------------------------------------
-    [Theory]
-    [InlineData("bc8caeb2-346e-4754-b05d-8a747a95dc0f",new[] { "Admin", "User" })]
-    [InlineData("bc8caeb2-346e-4754-b05d-8a747a95dc0f",new[] { "User" })]
-    [InlineData("bc8caeb2-346e-4754-b05d-8a747a95dc0f",new[] { "Admin" })]
+    [Test]
+    [Arguments("bc8caeb2-346e-4754-b05d-8a747a95dc0f", new[] { "Admin", "User" })]
+    [Arguments("bc8caeb2-346e-4754-b05d-8a747a95dc0f", new[] { "User" })]
+    [Arguments("bc8caeb2-346e-4754-b05d-8a747a95dc0f", new[] { "Admin" })]
     public async Task UserHasAllRoles_ShouldReturnValidUser(string userIdValue, string[] roles) {
         // Arrange
-        Guid userId = Guid.Parse(userIdValue);     
-        
+        Guid userId = Guid.Parse(userIdValue);
+
         // Act
         RepoResult<InfiniLoreUser> result = await Repository.UserHasAllRolesAsync(userId, roles);
 
         // Assert
-        Assert.True(result.IsSuccess);
-        Assert.False(result.IsFailure);
-        Assert.Equal(userId, result.AsSuccess.Value.Id);
+        await Assert.That(result.IsSuccess).IsTrue();
+        await Assert.That(result.IsFailure).IsFalse();
+        await Assert.That(result.AsSuccess.Value.Id).IsEqualTo(userId);
     }
-    
-    [Theory]
-    [InlineData("bc8caeb2-346e-4754-b05d-8a747a95dc0f",new[] { "Admin", "Editor" })]
-    [InlineData("bc8caeb2-346e-4754-b05d-8a747a95dc0f",new[] { "Editor" })]
+
+    [Test]
+    [Arguments("bc8caeb2-346e-4754-b05d-8a747a95dc0f", new[] { "Admin", "Editor" })]
+    [Arguments("bc8caeb2-346e-4754-b05d-8a747a95dc0f", new[] { "Editor" })]
     public async Task UserHasAllRoles_ShouldReturnFailure(string userIdValue, string[] roles) {
         // Arrange
-        Guid userId = Guid.Parse(userIdValue);   
-        
+        Guid userId = Guid.Parse(userIdValue);
+
         // Act
         RepoResult<InfiniLoreUser> result = await Repository.UserHasAllRolesAsync(userId, roles);
 
         // Assert
-        Assert.True(result.IsFailure);
-        Assert.False(result.IsSuccess);
-        Assert.Equal("User does not have all roles.", result.AsFailure.Value);
+        await Assert.That(result.IsFailure).IsTrue();
+        await Assert.That(result.IsSuccess).IsFalse();
+        await Assert.That(result.AsFailure.Value).IsEqualTo("User does not have all roles.");
     }
-    
-    [Theory]
-    [InlineData("d9494938-0bef-47b5-9a92-6f10d26779a6",new[] { "Admin", "User" })]
+
+    [Test]
+    [Arguments("d9494938-0bef-47b5-9a92-6f10d26779a6", new[] { "Admin", "User" })]
     public async Task UserHasAllRoles_ShouldReturnFailureUserDoesntExist(string userIdValue, string[] roles) {
         // Arrange
-        Guid userId = Guid.Parse(userIdValue);   
-        
+        Guid userId = Guid.Parse(userIdValue);
+
         // Act
         RepoResult<InfiniLoreUser> result = await Repository.UserHasAllRolesAsync(userId, roles);
 
         // Assert
-        Assert.True(result.IsFailure);
-        Assert.False(result.IsSuccess);
-        Assert.Equal("User not found.", result.AsFailure.Value);
+        await Assert.That(result.IsFailure).IsTrue();
+        await Assert.That(result.IsSuccess).IsFalse();
+        await Assert.That(result.AsFailure.Value).IsEqualTo("User not found.");
     }
 }

@@ -10,63 +10,59 @@ using Tests.InfiniLore.Database.Repositories.Fixtures;
 using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
 namespace Tests.InfiniLore.Database.Repositories;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [ClassDataSource<DatabaseInfrastructure>(Shared = SharedType.PerAssembly)]
 [NotInParallel]
 public class LoreScopeQueryRepositoryTest(DatabaseInfrastructure infrastructure)
-    : UserContentRepositoryTestBase<ILoreScopeRepository, LoreScopeModel>(infrastructure)
-{
+    : UserContentRepositoryTestBase<ILorescopeRepository, LorescopeModel>(infrastructure) {
     #region Commands
-
     [Test]
     [MethodDataSource(typeof(LoreScopeCommandTestData), nameof(LoreScopeCommandTestData.GetSingleModels))]
-    public override Task TestCanCreateSingleModel(LoreScopeModel model)
+    public override Task TestCanCreateSingleModel(LorescopeModel model)
         => CanCreateSingleModel(model);
 
     [Test]
     [MethodDataSource(typeof(LoreScopeCommandTestData), nameof(LoreScopeCommandTestData.GetMultipleModels))]
-    public override Task TestCanCreateMultipleModels(IEnumerable<LoreScopeModel> models)
+    public override Task TestCanCreateMultipleModels(IEnumerable<LorescopeModel> models)
         => CanCreateMultipleModels(models);
 
     [Test]
     [MethodDataSource(typeof(LoreScopeCommandTestData), nameof(LoreScopeCommandTestData.GetUpdate))]
     public override Task TestCanUpdateModel(
-        (LoreScopeModel model, Func<LoreScopeModel, ValueTask<LoreScopeModel>> updateFunc, Func<LoreScopeModel, bool>
-            validateFunc) tuple)
+        (LorescopeModel model, Func<LorescopeModel, ValueTask<LorescopeModel>> updateFunc, Func<LorescopeModel, bool>
+            validateFunc) tuple
+    )
         => CanUpdateModel(tuple);
 
     [Test]
     [MethodDataSource(typeof(LoreScopeCommandTestData), nameof(LoreScopeCommandTestData.GetDeletes))]
-    public override Task TestCanDeleteModel(LoreScopeModel model)
+    public override Task TestCanDeleteModel(LorescopeModel model)
         => CanDeleteModel(model);
-
     #endregion
 
     #region Queries
-
     [Test]
     [MethodDataSource(typeof(LoreScopeCommandTestData), nameof(LoreScopeQueryTestData.GetSingleModels))]
-    public override Task TestCanGetByIdAsync(LoreScopeModel model)
+    public override Task TestCanGetByIdAsync(LorescopeModel model)
         => CanGetByIdAsync(model);
 
     [Test]
     [MethodDataSource(typeof(LoreScopeQueryTestData), nameof(LoreScopeQueryTestData.GetUserModels))]
-    public override Task TestCanGetByUserAsync((UserIdUnion userUnion, LoreScopeModel model) tuple)
+    public override Task TestCanGetByUserAsync((UserIdUnion userUnion, LorescopeModel model) tuple)
         => CanGetByUserAsync(tuple);
 
     [Test]
     [MethodDataSource(typeof(LoreScopeCommandTestData), nameof(LoreScopeQueryTestData.GetMultipleModels))]
-    public override Task TestCanGetAllAsync(IEnumerable<LoreScopeModel> models)
+    public override Task TestCanGetAllAsync(IEnumerable<LorescopeModel> models)
         => CanGetAllAsync(models);
 
     [Test]
     [MethodDataSource(typeof(LoreScopeQueryTestData), nameof(LoreScopeQueryTestData.GetCriteriaModels))]
     public override Task TestCanGetByCriteriaAsync(
-        (Expression<Func<LoreScopeModel, bool>> predicate, LoreScopeModel model) tuple)
+        (Expression<Func<LorescopeModel, bool>> predicate, LorescopeModel model) tuple
+    )
         => CanGetByCriteriaAsync(tuple);
-
     #endregion
 }

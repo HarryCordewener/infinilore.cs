@@ -5,9 +5,9 @@ using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Server.Contracts.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.InfiniLore.Database.Repositories.Fixtures;
+using TUnit.Core.Interfaces;
 
 namespace Tests.InfiniLore.Database.Repositories.Content;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
@@ -19,9 +19,8 @@ namespace Tests.InfiniLore.Database.Repositories.Content;
 /// <typeparam name="TRepository">
 /// The type of the repository being tested, which must implement the <see cref="IRepository"/> interface.
 /// </typeparam>
-public abstract class RepositoryTestFramework<TRepository>(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>, IAsyncLifetime 
-    where TRepository : class, IRepository 
-{
+public abstract class RepositoryTestFramework<TRepository>(DatabaseInfrastructure infrastructure) : IAsyncInitializer, IAsyncDisposable
+    where TRepository : class, IRepository {
 
     /// <summary>
     /// Represents the generic repository instance used for performing database operations in test cases.
@@ -44,18 +43,18 @@ public abstract class RepositoryTestFramework<TRepository>(DatabaseFixture fixtu
     // -----------------------------------------------------------------------------------------------------------------
     /// <inheritdoc/>
     public async virtual Task InitializeAsync() {
-        _scope = fixture.Provider.CreateScope();
+        _scope = infrastructure.ServiceProvider.CreateScope();
         UnitOfWork = _scope.ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
-        
+
         await UnitOfWork.BeginTransactionAsync();
         await UnitOfWork.CreateSavepointAsync(nameof(RepositoryTestFramework<TRepository>));
     }
 
     /// <inheritdoc/>
-    public async virtual Task DisposeAsync() {
+    public async virtual ValueTask DisposeAsync() {
         await UnitOfWork.TryRollbackToSavepointAsync(nameof(RepositoryTestFramework<TRepository>));
         await UnitOfWork.DisposeAsync();
-        
+
         _scope.Dispose();
     }
 }

@@ -13,13 +13,11 @@ namespace Tests.InfiniLore.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 
 [ClassDataSource<DatabaseInfrastructure>(Shared = SharedType.PerAssembly)]
-public class LoreScopeCommandRepositoryTest(DatabaseInfrastructure infrastructure)
-{
+public class LoreScopeCommandRepositoryTest(DatabaseInfrastructure infrastructure) {
     private readonly IDbUnitOfWork<MsSqlDbContext> _unitOfWork = infrastructure.ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
 
     [Test]
-    public async Task TestCanConnect()
-    {
+    public async Task TestCanConnect() {
         // Arrange: get dbContext
         var dbContext = await _unitOfWork.GetDbContextAsync();
 
