@@ -14,7 +14,7 @@ namespace Tests.InfiniLore.Database.Repositories.Scopes;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[ClassDataSource<DatabaseInfrastructure>(Shared = SharedType.PerAssembly)]
+[ClassDataSource<DatabaseInfrastructure>(Shared = SharedType.PerTestSession)]
 [NotInParallel]
 public class LoreScopeQueryRepositoryTest(DatabaseInfrastructure infrastructure)
     : UserContentRepositoryTestBase<ILorescopeRepository, LorescopeModel>(infrastructure) {

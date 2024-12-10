@@ -9,12 +9,13 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 using Tests.InfiniLore.Database.Repositories.TestInfrastructure;
 
-namespace Tests.InfiniLore.Database.Repositories.Content.Account;
+namespace Tests.InfiniLore.Database.Repositories.Users;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [TestSubject(typeof(UserRepository))]
-[ClassDataSource<DatabaseInfrastructure>]
+[NotInParallel]
+[ClassDataSource<DatabaseInfrastructure>(Shared = SharedType.PerTestSession)]
 public class UserRepositoryTests(DatabaseInfrastructure infrastructure) : RepositoryTestFramework<UserRepository>(infrastructure) {
     // -----------------------------------------------------------------------------------------------------------------
     // Seeding
