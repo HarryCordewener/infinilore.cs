@@ -4,10 +4,10 @@
 
 using InfiniLore.Database.Models.Content.UserData;
 using InfiniLore.Server.Contracts.Database.Repositories.Content.Data.User;
-using InfiniLore.Server.Contracts.Types.Unions;
 using System.Linq.Expressions;
 using Tests.InfiniLore.Database.Repositories.Data;
 using Tests.InfiniLore.Database.Repositories.Fixtures;
+using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
 namespace Tests.InfiniLore.Database.Repositories;
 

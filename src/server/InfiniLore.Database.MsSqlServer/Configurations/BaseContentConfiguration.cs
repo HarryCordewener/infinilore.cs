@@ -14,11 +14,11 @@ public abstract class BaseContentConfiguration<T> : IEntityTypeConfiguration<T> 
         HasUniqueIdAsKey(builder);
     }
 
-    protected static void HasSoftDeleteAsQueryFilter(EntityTypeBuilder<T> builder) {
+    private static void HasSoftDeleteAsQueryFilter(EntityTypeBuilder<T> builder) {
         builder.HasQueryFilter(model => model.SoftDeleteDate == null);
     }
 
-    protected static void HasUniqueIdAsKey(EntityTypeBuilder<T> builder) {
+    private static void HasUniqueIdAsKey(EntityTypeBuilder<T> builder) {
         builder.HasKey(x => x.Id);
         builder.HasIndex(x => x.Id).IsUnique();
     }

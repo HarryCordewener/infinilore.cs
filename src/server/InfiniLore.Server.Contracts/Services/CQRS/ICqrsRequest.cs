@@ -8,4 +8,6 @@ namespace InfiniLore.Server.Contracts.Services.CQRS;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface ICqrsRequest<T> : IRequest<SuccessOrFailure<T, string>>;
+public interface ICqrsRequest<T> : IRequest<SuccessOrFailure<T>>;
+
+public interface ICqrsRequest : IRequest<SuccessOrFailure>;

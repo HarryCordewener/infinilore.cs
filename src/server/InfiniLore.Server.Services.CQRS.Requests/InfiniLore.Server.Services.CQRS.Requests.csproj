@@ -9,7 +9,7 @@
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
 
-        <PackageReference Include="AterraEngine.Unions" Version="2.1.0"/>
+        <PackageReference Include="AterraEngine.Unions" Version="2.5.0" />
         <PackageReference Include="MediatR.Contracts" Version="2.0.1"/>
     </ItemGroup>
 
@@ -21,6 +21,7 @@
     <ItemGroup>
         <Folder Include="Commands\Data\Discovery\"/>
         <Folder Include="Commands\Data\System\"/>
+        <Folder Include="Queries\Account\"/>
         <Folder Include="Queries\Data\Discovery\"/>
         <Folder Include="Queries\Data\System\"/>
     </ItemGroup>

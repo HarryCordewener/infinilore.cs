@@ -1,13 +1,17 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-namespace InfiniLore.Server.API.Controllers.Data.User.LoreScopes;
+using InfiniLore.Database.Models.Content.Account;
+using InfiniLore.Server.Contracts.Services.CQRS;
+using InfiniLore.Server.Contracts.Types;
+
+namespace InfiniLore.Server.Services.CQRS.Requests.Commands.Account.Jwt;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public record LoreScopeForm(
-    Guid UserId,
-    Guid? Id,
-    string Name,
-    string Description
-);
+public record CreateJwtTokenCommand(
+    InfiniLoreUser User,
+    string[] Roles,
+    string[] Permissions,
+    int? RefreshExpiresInDays = null
+) : ICqrsRequest<JwtTokenData>;

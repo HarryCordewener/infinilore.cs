@@ -13,4 +13,4 @@ namespace InfiniLore.Server.Services.CQRS.Requests.Commands;
 public record DeleteLorescopeCommand(
     HttpContext HttpContext,
     Guid LorescopeId
-) : ICqrsRequest<LoreScopeModel>;
+) : ICqrsRequest<LorescopeModel>;

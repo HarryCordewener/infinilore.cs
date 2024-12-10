@@ -4,8 +4,8 @@
 
 using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Database.Repositories;
-using InfiniLore.Server.Contracts.Database;
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Core;
@@ -36,6 +36,14 @@ public class DatabaseInfrastructure : IAsyncInitializer, IAsyncDisposable
             options => options.UseSqlServer(_msSqlContainer.GetConnectionString())
         );
 
+        services.AddIdentityCore<InfiniLoreUser>(options => {
+                options.SignIn.RequireConfirmedAccount = false;
+            })
+            .AddRoles<IdentityRole<Guid>>()
+            .AddEntityFrameworkStores<MsSqlDbContext>()
+            .AddSignInManager();
+
+        // Register the services which access and manipulate the database.
         services.RegisterServicesFromInfiniLoreDatabaseMsSqlServer();
         services.RegisterServicesFromInfiniLoreDatabaseRepositories();
 

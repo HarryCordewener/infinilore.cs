@@ -2,11 +2,10 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using AterraEngine.Unions;
-using InfiniLore.Database.Models;
 using InfiniLore.Database.Models.Content.UserData;
+using InfiniLore.Server.Contracts.Database.Repositories;
 using InfiniLore.Server.Contracts.Database.Repositories.Content.Data.User;
 using InfiniLore.Server.Contracts.Services.Auth.Authorization;
-using InfiniLore.Server.Contracts.Types.Results;
 using InfiniLore.Server.Services.CQRS.Requests.Queries;
 using MediatR;
 using Serilog;
@@ -15,20 +14,18 @@ namespace InfiniLore.Server.Services.CQRS.Handlers.Queries;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class GetOneLoreScopeHandler(ILoreScopeRepository loreScopeRepository, ILogger logger, IUserContentAuthorizationService authService) : IRequestHandler<GetOneLorescopeQuery, SuccessOrFailure<LoreScopeModel, string>> {
+public class GetOneLorescopeHandler(
+    ILorescopeRepository lorescopeRepository,
+    ILogger logger,
+    IUserContentAuthorizationService authService
+) : IRequestHandler<GetOneLorescopeQuery, SuccessOrFailure<LorescopeModel>> {
 
-    public async Task<SuccessOrFailure<LoreScopeModel, string>> Handle(GetOneLorescopeQuery request, CancellationToken ct) {
+    public async Task<SuccessOrFailure<LorescopeModel>> Handle(GetOneLorescopeQuery request, CancellationToken ct) {
         try {
-            if (!await authService.ValidateAsync(request.LorescopeId, AccessKind.Read, ct)) return "Access Denied";
+            if (!await authService.HasAccessRead(request.LorescopeId, ct)) return "Access Denied";
 
-            // After everything is validated, we can finally store to the db
-            RepoResult<LoreScopeModel[]> result = await loreScopeRepository.TryGetByUserIdAndLorescopeId(request.UserIdUnion, request.LorescopeId, ct);
-
-            return result.Value switch {
-                Success<LoreScopeModel> success => success,
-                Failure<string> failure => failure,// Pass failure directly
-                _ => "An unknown error occurred"
-            };
+            RepoResult<LorescopeModel> result = await lorescopeRepository.TryGetByIdAsync(request.LorescopeId, ct);
+            return result.ToSuccessOrFailure();
         }
         catch (Exception e) {
             logger.Error(e, "An error occurred while trying to get a lore scope");

@@ -8,17 +8,17 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace InfiniLore.Server.API.Controllers.Data.User.LoreScopes.GetLoreScope;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.GetLorescope;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-using EndpointResult=Results<Ok<LoreScopeResponse>, BadRequest<ProblemDetails>>;
+using EndpointResult=Results<Ok<LorescopeResponse>, BadRequest<ProblemDetails>>;
 
-public class GetLoreScopeEndpoint(IMediator mediator) : Endpoint<GetLorescopeRequest, EndpointResult, LoreScopeResponseMapper> {
+public class GetLorescopeEndpoint(IMediator mediator) : Endpoint<GetLorescopeRequest, EndpointResult, GetLorescopeMapper> {
 
     public override void Configure() {
-        Get("/data-user/{UserId:guid}/lore-scopes/{LoreScopeId:guid}");
+        Get("/data-user/{UserId:guid}/lore-scopes/{LorescopeId:guid}");
         // Permissions("data-user.lore-scopes.read");
     }
 
@@ -26,17 +26,17 @@ public class GetLoreScopeEndpoint(IMediator mediator) : Endpoint<GetLorescopeReq
     // Methods
     // -----------------------------------------------------------------------------------------------------------------
     public async override Task<EndpointResult> ExecuteAsync(GetLorescopeRequest req, CancellationToken ct) {
-        SuccessOrFailure<LoreScopeModel, string> data = await mediator.Send(
+        SuccessOrFailure<LorescopeModel> data = await mediator.Send(
             new GetOneLorescopeQuery(
                 req.UserId,
-                req.LoreScopeId
+                req.LorescopeId
             ),
             ct
         );
 
-        if (data.TryGetAsFailure(out Failure<string> failure)) {
+        if (data.TryGetAsFailureValue(out string? failureString)) {
             return TypedResults.BadRequest(new ProblemDetails {
-                Detail = failure.Value
+                Detail = failureString
             });
         }
 

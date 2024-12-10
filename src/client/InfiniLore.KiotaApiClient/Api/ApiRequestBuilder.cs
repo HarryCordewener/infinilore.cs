@@ -2,7 +2,7 @@
 #pragma warning disable CS0618
 using InfiniLore.KiotaApiClient.Api.Account;
 using InfiniLore.KiotaApiClient.Api.Item;
-using InfiniLore.KiotaApiClient.Api.LoreScopes;
+using InfiniLore.KiotaApiClient.Api.Lorescopes;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions;
 using System.Collections.Generic;
@@ -22,10 +22,10 @@ namespace InfiniLore.KiotaApiClient.Api
         {
             get => new global::InfiniLore.KiotaApiClient.Api.Account.AccountRequestBuilder(PathParameters, RequestAdapter);
         }
-        /// <summary>The loreScopes property</summary>
-        public global::InfiniLore.KiotaApiClient.Api.LoreScopes.LoreScopesRequestBuilder LoreScopes
+        /// <summary>The Lorescopes property</summary>
+        public global::InfiniLore.KiotaApiClient.Api.Lorescopes.LorescopesRequestBuilder Lorescopes
         {
-            get => new global::InfiniLore.KiotaApiClient.Api.LoreScopes.LoreScopesRequestBuilder(PathParameters, RequestAdapter);
+            get => new global::InfiniLore.KiotaApiClient.Api.Lorescopes.LorescopesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>Gets an item from the InfiniLore.KiotaApiClient.api.item collection</summary>
         /// <param name="position">Unique identifier of the item</param>
