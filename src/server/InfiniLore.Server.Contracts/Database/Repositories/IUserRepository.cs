@@ -2,8 +2,8 @@
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Database.Models.Content.Account;
+using InfiniLore.Server.Contracts.Types;
 using System.Security.Claims;
-using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
 namespace InfiniLore.Server.Contracts.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -40,4 +40,6 @@ public interface IUserRepository {
     ///     the repository operation. The result may indicate success or failure, and contain the user instance if successful.
     /// </returns>
     ValueTask<RepoResult<InfiniLoreUser>> TryGetByIdAsync(UserIdUnion userId, CancellationToken ct = default);
+
+    ValueTask<RepoResult<InfiniLoreUser>> UserHasAllRolesAsync(UserIdUnion userId, IEnumerable<string> roles, CancellationToken ct = default);
 }

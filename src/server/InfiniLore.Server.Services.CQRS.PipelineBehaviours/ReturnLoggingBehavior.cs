@@ -1,10 +1,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using AterraEngine.DependencyInjection;
 using AterraEngine.Unions;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace InfiniLore.Server.Services.CQRS.PipelineBehaviours;
@@ -12,7 +10,6 @@ namespace InfiniLore.Server.Services.CQRS.PipelineBehaviours;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[InjectableService<IPipelineBehavior<TRequest,TResponse>>(ServiceLifetime.Transient)]
 public class ReturnLoggingBehavior<TRequest, TResponse>(ILogger logger) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
     where TResponse : ITryGetAsFailureValue<string>

@@ -19,8 +19,8 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
     where TRepository : IUserContentRepository<TModel>
     where TModel : UserContent {
 
-    private readonly TRepository _repository = fixture.ServiceProvider.GetRequiredService<TRepository>();
-    private readonly IDbUnitOfWork<MsSqlDbContext> _unitOfWork = fixture.ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
+    private readonly TRepository _repository = fixture.Provider.GetRequiredService<TRepository>();
+    private readonly IDbUnitOfWork<MsSqlDbContext> _unitOfWork = fixture.Provider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
@@ -174,7 +174,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
     }
 
     private async Task AddModelToDatabaseAsync(TModel model) {
-        var repository = fixture.ServiceProvider.GetRequiredService<TRepository>();
+        var repository = fixture.Provider.GetRequiredService<TRepository>();
         await repository.TryAddAsync(model);
         await _unitOfWork.TryCommitAsync();
     }
