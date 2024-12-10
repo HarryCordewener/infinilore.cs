@@ -11,7 +11,7 @@ namespace InfiniLore.Server.Services.CQRS.Handlers.Commands.Account.Jwt;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class CreatJwtTokenHandler(IJwtTokenService jwtTokenService) : IRequestHandler<CreateJwtTokenCommand, SuccessOrFailure<JwtTokenData>> {
+public class CreatJwtTokenHandler(IJwtTokenGenerationService jwtTokenService) : IRequestHandler<CreateJwtTokenCommand, SuccessOrFailure<JwtTokenData>> {
 
     public async Task<SuccessOrFailure<JwtTokenData>> Handle(CreateJwtTokenCommand request, CancellationToken ct) =>
         // Todo check if user has roles

@@ -27,8 +27,7 @@ public class CreateLorescopeEndpoint(IMediator mediator, IMediatorOutputService 
 
     public async override Task<Results<Ok<LorescopeResponse>, BadRequest<ProblemDetails>>> ExecuteAsync(CreateLorescopeRequest req, CancellationToken ct) {
         SuccessOrFailure<LorescopeModel> result = await mediator.Send(
-            new CreateLorescopeCommand(
-                await Map.ToEntityAsync(req, ct)),
+            new CreateLorescopeCommand(Map.ToEntity(req)),
             ct
         );
 

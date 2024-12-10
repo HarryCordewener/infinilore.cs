@@ -1,9 +1,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using InfiniLore.Database.Models.Content.Account;
 using InfiniLore.Database.Models.Content.UserData;
-using InfiniLore.Server.Contracts.Database.Repositories;
 
 namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -19,19 +17,10 @@ public class CreateLorescopeMapper : Mapper<CreateLorescopeRequest, LorescopeRes
         ls.Multiverses.Select(selector: m => m.Id).ToArray()
     );
 
-    public async override Task<LorescopeModel> ToEntityAsync(CreateLorescopeRequest request, CancellationToken ct = new()) {
-        // TODO Find a way to fit this into CQRS pattern
-        var userRepository = Resolve<IUserRepository>();
-        RepoResult<InfiniLoreUser> result = await userRepository.TryGetByIdAsync(request.UserId, ct);
-
-        if (!result.TryGetSuccessValue(out InfiniLoreUser? user)) {
-            throw new ArgumentException($"User not found with id {request.UserId}");
-        }
-
-        return new LorescopeModel {
-            Owner = user,
+    public override LorescopeModel ToEntity(CreateLorescopeRequest request) 
+        => new() {
+            OwnerId = request.UserId,
             Name = request.Name,
             Description = request.Description
         };
-    }
 }

@@ -21,13 +21,13 @@ namespace InfiniLore.Server.Services.Authentication;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[InjectableService<IJwtTokenService>(ServiceLifetime.Scoped)]
-public class JwtTokenService(
+[InjectableService<IJwtTokenGenerationService>(ServiceLifetime.Scoped)]
+public class JwtTokenGenerationService(
     IConfiguration configuration,
     IJwtRefreshTokenRepository repository,
     ILogger logger,
     UserManager<InfiniLoreUser> userManager
-) : IJwtTokenService {
+) : IJwtTokenGenerationService {
     private readonly string _jwtKey = configuration["Jwt:Key"]!;
     private readonly int _jwtAccessExpiresInMinutes = int.Parse(configuration["Jwt:AccessExpiresInMinutes"]!);
     private readonly int _jwtRefreshExpiresInDays = int.Parse(configuration["Jwt:RefreshExpiresInDays"]!);

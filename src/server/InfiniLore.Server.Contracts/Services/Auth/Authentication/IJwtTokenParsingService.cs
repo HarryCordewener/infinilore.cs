@@ -8,7 +8,7 @@ namespace InfiniLore.Server.Contracts.Services.Auth.Authentication;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public interface IJwtParsingService {
+public interface IJwtTokenParsingService {
     JwtSecurityToken? Jwt { get; }
     bool TryParseJwt([NotNullWhen(true)] out JwtSecurityToken? jwt);
     bool TryGetPermissions([NotNullWhen(true)] out string[]? roles);

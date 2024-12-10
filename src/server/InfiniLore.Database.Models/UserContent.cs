@@ -42,6 +42,6 @@ public abstract class UserContent : BaseContent, IHasOwner {
     /// <summary>
     ///     Gets or sets the owner of the user content.
     /// </summary>
-    public required virtual InfiniLoreUser Owner { get; set; } = null!;
+    public virtual InfiniLoreUser Owner { get; set; } = default!;
     public Guid OwnerId { get; set; }
 }

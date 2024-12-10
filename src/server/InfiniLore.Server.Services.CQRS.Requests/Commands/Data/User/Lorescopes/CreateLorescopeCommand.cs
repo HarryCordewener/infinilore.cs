@@ -8,7 +8,7 @@ using InfiniLore.Server.Contracts.Services.CQRS;
 namespace InfiniLore.Server.Services.CQRS.Requests.Commands;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
-// -------------------------------------------------------------------------/--------------------------------------------
-public record CreateLorescopeCommand(
+// ---------------------------------------------------------------------------------------------------------------------
+public record struct CreateLorescopeCommand(
     LorescopeModel Lorescope
 ) : ICqrsRequest<LorescopeModel>;
