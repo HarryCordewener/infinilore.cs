@@ -5,7 +5,7 @@
 using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Server.Contracts.Database;
 using Microsoft.Extensions.DependencyInjection;
-using Tests.InfiniLore.Database.Repositories.Fixtures;
+using Tests.InfiniLore.Database.Repositories.TestInfrastructure;
 
 namespace Tests.InfiniLore.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------

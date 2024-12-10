@@ -8,11 +8,11 @@ using InfiniLore.Server.Contracts.Database;
 using InfiniLore.Server.Contracts.Database.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
-using Tests.InfiniLore.Database.Repositories.Fixtures;
+using Tests.InfiniLore.Database.Repositories.TestInfrastructure;
 using RepoResult=InfiniLore.Server.Contracts.Database.Repositories.RepoResult;
 using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
-namespace Tests.InfiniLore.Database.Repositories;
+namespace Tests.InfiniLore.Database.Repositories.Content;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------

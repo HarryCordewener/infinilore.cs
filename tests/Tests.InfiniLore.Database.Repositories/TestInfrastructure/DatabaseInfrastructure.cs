@@ -13,7 +13,7 @@ using Serilog.Core;
 using Testcontainers.MsSql;
 using TUnit.Core.Interfaces;
 
-namespace Tests.InfiniLore.Database.Repositories.Fixtures;
+namespace Tests.InfiniLore.Database.Repositories.TestInfrastructure;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
@@ -23,8 +23,8 @@ public class DatabaseInfrastructure : IAsyncInitializer, IAsyncDisposable
     private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder()
         .WithImage("mcr.microsoft.com/mssql/server:2022-CU10-ubuntu-22.04")
         .Build();
-    public MsSqlDbContext DbContext { get; private set; } = null!;
-    public IServiceProvider ServiceProvider { get; private set; } = null!;
+    public MsSqlDbContext DbContext { get; private set; }
+    public IServiceProvider ServiceProvider { get; private set; }
 
     public DatabaseInfrastructure()
     {
