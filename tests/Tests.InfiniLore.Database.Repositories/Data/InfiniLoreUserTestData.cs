@@ -27,14 +27,14 @@ public static class InfiniLoreUserCommandTestData {
             Email = "user2@example.com"
         };
 
-        user2.LoreScopes.Add(new LoreScopeModel {
+        user2.Lorescopes.Add(new LorescopeModel {
             Id = Guid.NewGuid(),
             Name = "Scope1",
             Description = "Description1",
             Owner = user2
         });
 
-        user2.LoreScopes.Add(new LoreScopeModel {
+        user2.Lorescopes.Add(new LorescopeModel {
             Id = Guid.NewGuid(),
             Name = "Scope2",
             Description = "Description2",
@@ -49,7 +49,7 @@ public static class InfiniLoreUserCommandTestData {
             Email = "user3@example.com"
         };
 
-        var user3LoreScope = new LoreScopeModel {
+        var user3Lorescope = new LorescopeModel {
             Id = Guid.NewGuid(),
             Name = "Scope1",
             Description = "Description1",
@@ -60,7 +60,7 @@ public static class InfiniLoreUserCommandTestData {
             Id = Guid.NewGuid(),
             Name = "Multiverse1",
             Description = "Description1",
-            LoreScope = user3LoreScope,
+            Lorescope = user3Lorescope,
             Owner = user3
         };
 
@@ -72,7 +72,7 @@ public static class InfiniLoreUserCommandTestData {
             Owner = user3
         };
 
-        user3.LoreScopes.Add(user3LoreScope);
+        user3.Lorescopes.Add(user3Lorescope);
         user3.Multiverses.Add(user3Multiverse);
         user3.Universes.Add(user3Universe);
         data.Add(user3);

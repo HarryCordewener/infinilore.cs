@@ -5,7 +5,7 @@ namespace InfiniLore.Server.Contracts.Types;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public record struct JwtTokenData(
+public readonly record struct JwtTokenData(
     string AccessToken,
     DateTime AccessTokenExpiryUtc,
     Guid RefreshToken,

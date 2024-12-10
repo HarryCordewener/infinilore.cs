@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Database.Models.Content.UserData;
 using InfiniLore.Server.Contracts.Services.CQRS;
-using InfiniLore.Server.Contracts.Types.Unions;
+using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
 // ReSharper disable once CheckNamespace
 namespace InfiniLore.Server.Services.CQRS.Requests.Queries;
@@ -12,4 +12,4 @@ namespace InfiniLore.Server.Services.CQRS.Requests.Queries;
 // ---------------------------------------------------------------------------------------------------------------------
 public record GetOneLorescopeQuery(
     UserIdUnion UserIdUnion,
-    Guid LorescopeId) : ICqrsRequest<LoreScopeModel>;
+    Guid LorescopeId) : ICqrsRequest<LorescopeModel>;

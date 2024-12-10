@@ -1,13 +1,19 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
-using AterraEngine.Unions;
+using InfiniLore.Database.Models.Content.UserData;
 
-namespace InfiniLore.Server.Contracts.Types.Results;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.GetLorescope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[UnionAliases(aliasT1: "Error")]
-public readonly partial struct JwtResult() : IUnion<JwtTokenData, Error<string>> {
-    public static implicit operator JwtResult(string input) => new Error<string>(input);
+[UsedImplicitly]
+public class GetLorescopeMapper : ResponseMapper<LorescopeResponse, LorescopeModel> {
+    public override LorescopeResponse FromEntity(LorescopeModel ls) => new(
+        ls.Id,
+        ls.OwnerId,
+        ls.Name,
+        ls.Description,
+        ls.Multiverses.Select(selector: m => m.Id).ToArray()
+    );
 }

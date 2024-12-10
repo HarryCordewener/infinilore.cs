@@ -1,13 +1,14 @@
-// ---------------------------------------------------------------------------------------------------------------------
+﻿// ---------------------------------------------------------------------------------------------------------------------
 // Imports
 // ---------------------------------------------------------------------------------------------------------------------
 using Microsoft.AspNetCore.Mvc;
 
-namespace InfiniLore.Server.API.Controllers.Data.User.LoreScopes.GetLoreScope;
+namespace InfiniLore.Server.API.Controllers.Data.User.Lorescopes.CreateLorescope;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public record GetLorescopeRequest(
+public record CreateLorescopeRequest(
     [FromRoute] Guid UserId,
-    [FromRoute] Guid LoreScopeId
+    string Name,
+    string Description
 );

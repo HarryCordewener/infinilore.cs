@@ -11,7 +11,7 @@ namespace InfiniLore.Database.MsSqlServer.Configurations.Content.Account;
 public class InfiniLoreUserConfiguration : IEntityTypeConfiguration<InfiniLoreUser> {
 
     public void Configure(EntityTypeBuilder<InfiniLoreUser> builder) {
-        builder.HasMany(user => user.LoreScopes)
+        builder.HasMany(user => user.Lorescopes)
             .WithOne(scope => scope.Owner)
             .HasForeignKey(x => x.OwnerId);
 

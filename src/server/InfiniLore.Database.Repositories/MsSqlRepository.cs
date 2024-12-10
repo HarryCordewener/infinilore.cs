@@ -14,7 +14,7 @@ namespace InfiniLore.Database.Repositories;
 ///     Represents an abstract base class for repositories that handle entities within an MSSQL database context.
 /// </summary>
 /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
-public abstract class MsSqlRepository<T>(IDbUnitOfWork<MsSqlDbContext> unitOfWork) : IRepository<MsSqlDbContext> where T : class {
+public abstract class MsSqlRepository<T>(IDbUnitOfWork<MsSqlDbContext> unitOfWork) : IRepository where T : class {
     #region Queryables
     /// <summary>
     ///     Asynchronously retrieves the current instance of the MsSqlDbContext.

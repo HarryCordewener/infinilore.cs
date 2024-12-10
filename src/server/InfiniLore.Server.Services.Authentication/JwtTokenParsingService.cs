@@ -15,9 +15,8 @@ namespace InfiniLore.Server.Services.Authentication;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[InjectableService<IJwtParsingService>(ServiceLifetime.Scoped)]
-public class JwtParsingService(IHttpContextAccessor contextAccessor, ILogger logger) : IJwtParsingService {
-
+[InjectableService<IJwtTokenParsingService>(ServiceLifetime.Scoped)]
+public class JwtTokenParsingService(IHttpContextAccessor contextAccessor, ILogger logger) : IJwtTokenParsingService {
     private readonly JwtSecurityTokenHandler _handler = new();
     private bool _gotValidToken;
     private JwtSecurityToken? _jwt;

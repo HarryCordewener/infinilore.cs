@@ -12,7 +12,7 @@ namespace InfiniLore.Database.MsSqlServer;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 
-/// <inheritdoc cref="InfiniLore.Server.Contracts.Data.IDbUnitOfWork{T}" />
+/// <inheritdoc cref="IDbUnitOfWork{T}" />
 [InjectableService<IDbUnitOfWork<MsSqlDbContext>>(ServiceLifetime.Scoped)]
 public class MsSqlDbUnitOfWork(IDbContextFactory<MsSqlDbContext> dbContextFactory, ILogger logger) : IDbUnitOfWork<MsSqlDbContext> {
     private MsSqlDbContext? _msSqlDb;

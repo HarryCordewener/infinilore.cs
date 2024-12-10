@@ -9,7 +9,7 @@ namespace InfiniLore.Database.Models.Content.Account;
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 public class InfiniLoreUser : IdentityUser<Guid> {
-    public ICollection<LoreScopeModel> LoreScopes { get; init; } = [];
+    public ICollection<LorescopeModel> Lorescopes { get; init; } = [];
     public ICollection<MultiverseModel> Multiverses { get; init; } = [];
     public ICollection<UniverseModel> Universes { get; init; } = [];
     public ICollection<JwtRefreshTokenModel> JwtRefreshTokens { get; init; } = [];

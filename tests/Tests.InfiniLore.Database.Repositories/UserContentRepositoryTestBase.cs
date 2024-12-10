@@ -5,11 +5,11 @@ using InfiniLore.Database.Models;
 using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Server.Contracts.Database;
 using InfiniLore.Server.Contracts.Database.Repositories;
-using InfiniLore.Server.Contracts.Types.Results;
-using InfiniLore.Server.Contracts.Types.Unions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using Tests.InfiniLore.Database.Repositories.Fixtures;
+using RepoResult=InfiniLore.Server.Contracts.Database.Repositories.RepoResult;
+using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
 namespace Tests.InfiniLore.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
@@ -19,8 +19,8 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
     where TRepository : IUserContentRepository<TModel>
     where TModel : UserContent {
 
-    private readonly TRepository _repository = fixture.ServiceProvider.GetRequiredService<TRepository>();
-    private readonly IDbUnitOfWork<MsSqlDbContext> _unitOfWork = fixture.ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
+    private readonly TRepository _repository = fixture.Provider.GetRequiredService<TRepository>();
+    private readonly IDbUnitOfWork<MsSqlDbContext> _unitOfWork = fixture.Provider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
 
     // -----------------------------------------------------------------------------------------------------------------
     // Methods
@@ -109,7 +109,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
         // Verify
         RepoResult<TModel> deletedModel = await _repository.TryGetByIdAsync(model.Id);
         Assert.True(deletedModel.IsFailure);// should be deleted
-        Assert.Equal("Content not found.", deletedModel.FailureString);
+        Assert.Equal("Content not found.", deletedModel.AsFailure.Value);
     }
     #endregion
 
@@ -174,7 +174,7 @@ public abstract class UserContentRepositoryTestBase<TRepository, TModel>(Databas
     }
 
     private async Task AddModelToDatabaseAsync(TModel model) {
-        var repository = fixture.ServiceProvider.GetRequiredService<TRepository>();
+        var repository = fixture.Provider.GetRequiredService<TRepository>();
         await repository.TryAddAsync(model);
         await _unitOfWork.TryCommitAsync();
     }

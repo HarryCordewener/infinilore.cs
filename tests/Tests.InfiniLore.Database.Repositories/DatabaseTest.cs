@@ -10,8 +10,8 @@ namespace Tests.InfiniLore.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class LoreScopeCommandRepositoryTest(DatabaseFixture fixture) : IClassFixture<DatabaseFixture> {
-    private readonly IDbUnitOfWork<MsSqlDbContext> _unitOfWork = fixture.ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
+public class LorescopeCommandRepositoryTest(DatabaseFixture fixture) : IClassFixture<DatabaseFixture> {
+    private readonly IDbUnitOfWork<MsSqlDbContext> _unitOfWork = fixture.Provider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
 
     [Fact]
     public async Task TestCanConnect() {
