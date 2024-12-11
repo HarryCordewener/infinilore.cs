@@ -14,20 +14,21 @@ using Testcontainers.MsSql;
 using TUnit.Core.Interfaces;
 
 namespace Tests.InfiniLore.Database.Repositories.TestInfrastructure;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public class DatabaseInfrastructure : IAsyncInitializer, IAsyncDisposable
-{
+public class DatabaseInfrastructure : IAsyncInitializer, IAsyncDisposable {
     private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder()
         .WithImage("mcr.microsoft.com/mssql/server:2022-CU10-ubuntu-22.04")
         .Build();
-    public MsSqlDbContext DbContext { get; private set; }
-    public IServiceProvider ServiceProvider { get; private set; }
 
-    public DatabaseInfrastructure()
-    {
+    public MsSqlDbContext DbContext { get; }
+    public IServiceProvider ServiceProvider { get; }
+    
+    // -----------------------------------------------------------------------------------------------------------------
+    // Constructors
+    // -----------------------------------------------------------------------------------------------------------------
+    public DatabaseInfrastructure() {
         var services = new ServiceCollection();
 
         _msSqlContainer.StartAsync().Wait();
@@ -52,17 +53,19 @@ public class DatabaseInfrastructure : IAsyncInitializer, IAsyncDisposable
 
         MsSqlDbContext db = ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>()
             .GetDbContextAsync().GetAwaiter().GetResult();
+
         DbContext = db;
     }
-    
-    public async Task InitializeAsync()
-    {
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Methods
+    // -----------------------------------------------------------------------------------------------------------------
+    public async Task InitializeAsync() {
         await DbContext.Database.EnsureCreatedAsync();
         await DbContext.SaveChangesAsync();
     }
 
-    public async ValueTask DisposeAsync()
-    {
+    public async ValueTask DisposeAsync() {
         await _msSqlContainer.DisposeAsync();
         await DbContext.DisposeAsync();
     }

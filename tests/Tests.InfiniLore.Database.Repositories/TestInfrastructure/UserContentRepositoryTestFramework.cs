@@ -6,17 +6,16 @@ using InfiniLore.Database.Models;
 using InfiniLore.Database.MsSqlServer;
 using InfiniLore.Server.Contracts.Database;
 using InfiniLore.Server.Contracts.Database.Repositories;
+using InfiniLore.Server.Contracts.Types;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 using Tests.InfiniLore.Database.Repositories.TestInfrastructure;
-using RepoResult=InfiniLore.Server.Contracts.Database.Repositories.RepoResult;
-using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
-namespace Tests.InfiniLore.Database.Repositories.Content;
+namespace Tests.InfiniLore.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-public abstract class UserContentRepositoryTestBase<TRepository, TModel>(DatabaseInfrastructure infrastructure)
+public abstract class UserContentRepositoryTestFramework<TRepository, TModel>(DatabaseInfrastructure infrastructure)
     where TRepository : IUserContentRepository<TModel>
     where TModel : UserContent {
     private readonly TRepository _repository = infrastructure.ServiceProvider.GetRequiredService<TRepository>();

@@ -4,21 +4,20 @@
 
 using InfiniLore.Database.Models.Content.UserData;
 using InfiniLore.Server.Contracts.Database.Repositories.Content.Data.User;
+using InfiniLore.Server.Contracts.Types;
 using System.Linq.Expressions;
-using Tests.InfiniLore.Database.Repositories.Content;
 using Tests.InfiniLore.Database.Repositories.Data;
 using Tests.InfiniLore.Database.Repositories.TestInfrastructure;
-using UserIdUnion=InfiniLore.Server.Contracts.Types.UserIdUnion;
 
-namespace Tests.InfiniLore.Database.Repositories.Scopes;
+namespace Tests.InfiniLore.Database.Repositories.Content.Data.User.LorescopeRepository;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
 [ClassDataSource<DatabaseInfrastructure>(Shared = SharedType.PerTestSession)]
 [NotInParallel]
-public class LoreScopeQueryRepositoryTest(DatabaseInfrastructure infrastructure)
-    : UserContentRepositoryTestBase<ILorescopeRepository, LorescopeModel>(infrastructure) {
-    #region Commands
+public class LoreScopeRepositoryTest(DatabaseInfrastructure infrastructure)
+    : UserContentRepositoryTestFramework<ILorescopeRepository, LorescopeModel>(infrastructure) {
+
     [Test]
     [MethodDataSource(typeof(LoreScopeCommandTestData), nameof(LoreScopeCommandTestData.GetSingleModels))]
     public override Task TestCanCreateSingleModel(LorescopeModel model)
@@ -41,9 +40,7 @@ public class LoreScopeQueryRepositoryTest(DatabaseInfrastructure infrastructure)
     [MethodDataSource(typeof(LoreScopeCommandTestData), nameof(LoreScopeCommandTestData.GetDeletes))]
     public override Task TestCanDeleteModel(LorescopeModel model)
         => CanDeleteModel(model);
-    #endregion
 
-    #region Queries
     [Test]
     [MethodDataSource(typeof(LoreScopeCommandTestData), nameof(LoreScopeQueryTestData.GetSingleModels))]
     public override Task TestCanGetByIdAsync(LorescopeModel model)
@@ -65,5 +62,4 @@ public class LoreScopeQueryRepositoryTest(DatabaseInfrastructure infrastructure)
         (Expression<Func<LorescopeModel, bool>> predicate, LorescopeModel model) tuple
     )
         => CanGetByCriteriaAsync(tuple);
-    #endregion
 }

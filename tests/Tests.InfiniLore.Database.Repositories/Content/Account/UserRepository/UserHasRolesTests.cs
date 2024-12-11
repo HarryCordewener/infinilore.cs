@@ -3,20 +3,19 @@
 // ---------------------------------------------------------------------------------------------------------------------
 using InfiniLore.Database.Models.Content.Account;
 using InfiniLore.Database.MsSqlServer;
-using InfiniLore.Database.Repositories.Content.Account;
 using InfiniLore.Server.Contracts.Database.Repositories;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Identity;
 using Tests.InfiniLore.Database.Repositories.TestInfrastructure;
 
-namespace Tests.InfiniLore.Database.Repositories.Users;
+namespace Tests.InfiniLore.Database.Repositories.Content.Account.UserRepository;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-[TestSubject(typeof(UserRepository))]
+[TestSubject(typeof(global::InfiniLore.Database.Repositories.Content.Account.UserRepository))]
 [NotInParallel]
 [ClassDataSource<DatabaseInfrastructure>(Shared = SharedType.PerTestSession)]
-public class UserRepositoryTests(DatabaseInfrastructure infrastructure) : RepositoryTestFramework<UserRepository>(infrastructure) {
+public class UserHasRolesTests(DatabaseInfrastructure infrastructure) : RepositoryTestFramework<global::InfiniLore.Database.Repositories.Content.Account.UserRepository>(infrastructure) {
     // -----------------------------------------------------------------------------------------------------------------
     // Seeding
     // -----------------------------------------------------------------------------------------------------------------

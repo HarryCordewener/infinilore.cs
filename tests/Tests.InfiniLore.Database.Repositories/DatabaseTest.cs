@@ -11,7 +11,6 @@ namespace Tests.InfiniLore.Database.Repositories;
 // ---------------------------------------------------------------------------------------------------------------------
 // Code
 // ---------------------------------------------------------------------------------------------------------------------
-
 [ClassDataSource<DatabaseInfrastructure>(Shared = SharedType.PerTestSession)]
 public class LoreScopeCommandRepositoryTest(DatabaseInfrastructure infrastructure) {
     private readonly IDbUnitOfWork<MsSqlDbContext> _unitOfWork = infrastructure.ServiceProvider.GetRequiredService<IDbUnitOfWork<MsSqlDbContext>>();
